@@ -1,11 +1,17 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import {
+  InsertUser, users,
+  userProfiles, InsertUserProfile,
+  bodyMetrics, InsertBodyMetric,
+  foodLogs, InsertFoodLog,
+  foodLogItems, InsertFoodLogItem,
+  exercises, InsertExercise,
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -17,6 +23,10 @@ export async function getDb() {
   }
   return _db;
 }
+
+// ============================================================================
+// User Operations (keep existing)
+// ============================================================================
 
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
@@ -85,8 +95,202 @@ export async function getUserByOpenId(openId: string) {
   }
 
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ============================================================================
+// User Profile Operations
+// ============================================================================
+
+export async function getUserProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function createUserProfile(data: InsertUserProfile) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(userProfiles).values(data);
+  return getUserProfile(data.userId);
+}
+
+export async function updateUserProfile(userId: number, data: Partial<InsertUserProfile>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+  return getUserProfile(userId);
+}
+
+// ============================================================================
+// Body Metrics Operations
+// ============================================================================
+
+export async function getBodyMetrics(userId: number, days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  const startDateStr = startDate.toISOString().split('T')[0];
+
+  const result = await db.select().from(bodyMetrics)
+    .where(and(eq(bodyMetrics.userId, userId), gte(bodyMetrics.date, startDateStr)))
+    .orderBy(desc(bodyMetrics.date));
+  return result;
+}
+
+export async function getLatestBodyMetric(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(bodyMetrics)
+    .where(eq(bodyMetrics.userId, userId))
+    .orderBy(desc(bodyMetrics.date))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function createBodyMetric(data: InsertBodyMetric) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(bodyMetrics).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function updateBodyMetric(id: number, userId: number, data: Partial<InsertBodyMetric>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(bodyMetrics).set(data).where(and(eq(bodyMetrics.id, id), eq(bodyMetrics.userId, userId)));
+  const result = await db.select().from(bodyMetrics).where(eq(bodyMetrics.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function deleteBodyMetric(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(bodyMetrics).where(and(eq(bodyMetrics.id, id), eq(bodyMetrics.userId, userId)));
+  return true;
+}
+
+// ============================================================================
+// Food Log Operations
+// ============================================================================
+
+export async function getOrCreateFoodLog(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const existing = await db.select().from(foodLogs)
+    .where(and(eq(foodLogs.userId, userId), eq(foodLogs.date, date)))
+    .limit(1);
+
+  if (existing.length > 0) return existing[0];
+
+  const result = await db.insert(foodLogs).values({ userId, date });
+  const created = await db.select().from(foodLogs)
+    .where(and(eq(foodLogs.userId, userId), eq(foodLogs.date, date)))
+    .limit(1);
+  return created[0];
+}
+
+export async function getFoodLogItems(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const log = await db.select().from(foodLogs)
+    .where(and(eq(foodLogs.userId, userId), eq(foodLogs.date, date)))
+    .limit(1);
+
+  if (log.length === 0) return [];
+
+  const items = await db.select().from(foodLogItems)
+    .where(and(eq(foodLogItems.foodLogId, log[0].id), eq(foodLogItems.userId, userId)))
+    .orderBy(foodLogItems.createdAt);
+  return items;
+}
+
+export async function getFoodLogItemsForDateRange(userId: number, startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const logs = await db.select().from(foodLogs)
+    .where(and(eq(foodLogs.userId, userId), gte(foodLogs.date, startDate), lte(foodLogs.date, endDate)));
+
+  if (logs.length === 0) return [];
+
+  const logIds = logs.map(l => l.id);
+  const allItems: any[] = [];
+  for (const logId of logIds) {
+    const items = await db.select().from(foodLogItems)
+      .where(and(eq(foodLogItems.foodLogId, logId), eq(foodLogItems.userId, userId)));
+    const log = logs.find(l => l.id === logId);
+    items.forEach(item => allItems.push({ ...item, date: log?.date }));
+  }
+  return allItems;
+}
+
+export async function createFoodLogItem(data: InsertFoodLogItem) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(foodLogItems).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function updateFoodLogItem(id: number, userId: number, data: Partial<InsertFoodLogItem>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(foodLogItems).set(data).where(and(eq(foodLogItems.id, id), eq(foodLogItems.userId, userId)));
+  const result = await db.select().from(foodLogItems).where(eq(foodLogItems.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function deleteFoodLogItem(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(foodLogItems).where(and(eq(foodLogItems.id, id), eq(foodLogItems.userId, userId)));
+  return true;
+}
+
+// ============================================================================
+// Exercise Operations
+// ============================================================================
+
+export async function getExercises(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(exercises)
+    .where(and(eq(exercises.userId, userId), eq(exercises.date, date)))
+    .orderBy(exercises.createdAt);
+  return result;
+}
+
+export async function getExercisesForDateRange(userId: number, startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(exercises)
+    .where(and(eq(exercises.userId, userId), gte(exercises.date, startDate), lte(exercises.date, endDate)))
+    .orderBy(desc(exercises.date));
+  return result;
+}
+
+export async function createExercise(data: InsertExercise) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(exercises).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function updateExercise(id: number, userId: number, data: Partial<InsertExercise>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(exercises).set(data).where(and(eq(exercises.id, id), eq(exercises.userId, userId)));
+  const result = await db.select().from(exercises).where(eq(exercises.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function deleteExercise(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(exercises).where(and(eq(exercises.id, id), eq(exercises.userId, userId)));
+  return true;
+}
