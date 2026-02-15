@@ -11,6 +11,8 @@ import {
   getFitnessGoalText,
   getActivityLevelText,
   getBMIStatusText,
+  getBMIStatusColor,
+  getBMIStatusBgColor,
 } from "../shared/calculations";
 
 describe("BMI Calculations", () => {
@@ -28,16 +30,33 @@ describe("BMI Calculations", () => {
     expect(getBMIStatus(17)).toBe("underweight");
   });
 
-  it("returns correct BMI status for normal", () => {
+  it("returns correct BMI status for normal (Asian standard < 23)", () => {
     expect(getBMIStatus(22)).toBe("normal");
+    expect(getBMIStatus(22.9)).toBe("normal");
   });
 
-  it("returns correct BMI status for overweight", () => {
-    expect(getBMIStatus(27)).toBe("overweight");
+  it("returns correct BMI status for overweight (Asian standard 23-24.9)", () => {
+    expect(getBMIStatus(23)).toBe("overweight");
+    expect(getBMIStatus(24.5)).toBe("overweight");
   });
 
-  it("returns correct BMI status for obese", () => {
+  it("returns correct BMI status for obese (Asian standard >= 25)", () => {
+    expect(getBMIStatus(25)).toBe("obese");
     expect(getBMIStatus(32)).toBe("obese");
+  });
+
+  it("returns correct BMI color classes", () => {
+    expect(getBMIStatusColor("normal")).toBe("text-emerald-600");
+    expect(getBMIStatusColor("underweight")).toBe("text-orange-500");
+    expect(getBMIStatusColor("overweight")).toBe("text-red-500");
+    expect(getBMIStatusColor("obese")).toBe("text-red-600");
+  });
+
+  it("returns correct BMI background color classes", () => {
+    expect(getBMIStatusBgColor("normal")).toContain("bg-emerald");
+    expect(getBMIStatusBgColor("underweight")).toContain("bg-orange");
+    expect(getBMIStatusBgColor("overweight")).toContain("bg-red");
+    expect(getBMIStatusBgColor("obese")).toContain("bg-red");
   });
 
   it("returns correct BMI status text in Chinese", () => {

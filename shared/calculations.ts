@@ -16,15 +16,50 @@ export function calculateBMI(weight_kg: number, height_cm: number): number {
 }
 
 /**
- * Get BMI status category
+ * Get BMI status category using Asian standard
+ * Asian BMI thresholds (WHO Western Pacific Region):
+ * <18.5 → underweight
+ * 18.5–22.9 → normal
+ * 23–24.9 → overweight
+ * ≥25 → obese
  * @param bmi BMI value
  * @returns Status: 'underweight' | 'normal' | 'overweight' | 'obese'
  */
 export function getBMIStatus(bmi: number): 'underweight' | 'normal' | 'overweight' | 'obese' {
   if (bmi < 18.5) return 'underweight';
-  if (bmi < 25) return 'normal';
-  if (bmi < 30) return 'overweight';
+  if (bmi < 23) return 'normal';
+  if (bmi < 25) return 'overweight';
   return 'obese';
+}
+
+/**
+ * Get color class for BMI status display
+ * @param status BMI status
+ * @returns Tailwind color class
+ */
+export function getBMIStatusColor(status: 'underweight' | 'normal' | 'overweight' | 'obese'): string {
+  const colorMap = {
+    underweight: 'text-orange-500',
+    normal: 'text-emerald-600',
+    overweight: 'text-red-500',
+    obese: 'text-red-600',
+  };
+  return colorMap[status];
+}
+
+/**
+ * Get background color class for BMI status display
+ * @param status BMI status
+ * @returns Tailwind bg color class
+ */
+export function getBMIStatusBgColor(status: 'underweight' | 'normal' | 'overweight' | 'obese'): string {
+  const colorMap = {
+    underweight: 'bg-orange-50 border-orange-200',
+    normal: 'bg-emerald-50 border-emerald-200',
+    overweight: 'bg-red-50 border-red-200',
+    obese: 'bg-red-100 border-red-300',
+  };
+  return colorMap[status];
 }
 
 /**

@@ -65,4 +65,13 @@
 - [x] Write unit tests for TDEE calculations
 - [x] Write unit tests for calorie target calculations
 - [x] Write unit tests for Chinese text helpers
-- [x] All 21 tests passing
+- [x] All 23 tests passing (updated with Asian BMI standard tests)
+
+## Upgrade: Data Isolation & BMI Enhancement
+- [x] Verify all CRUD operations enforce userId filtering (server-side)
+- [x] Add Asian BMI standard to body metrics page (BMI card with color-coded status)
+- [x] Ensure BMI uses profile.heightCm + latest body_metrics.weightKg
+- [x] Handle edge cases: no height data, no weight records
+- [x] Strengthen input validation on all tRPC procedures
+- [x] Verify session stability and auth protection on all routes
+- [x] Polish UI for body metrics BMI display
