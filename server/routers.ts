@@ -4,6 +4,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { bodyMetricsImportRouter } from "./routers/bodyMetricsImport";
+import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
+import { generateAllRecommendations, type AnalysisData } from "./utils/recommendationEngine";
 
 export const appRouter = router({
   system: systemRouter,
@@ -103,6 +106,16 @@ export const appRouter = router({
         return db.deleteBodyMetric(input.id, ctx.user.id);
       }),
   }),
+
+  // ========================================================================
+  // Body Metrics Import (CSV)
+  // ========================================================================
+  bodyMetricsImport: bodyMetricsImportRouter,
+
+  // ========================================================================
+  // Body Metrics Import (Photo)
+  // ========================================================================
+  bodyMetricsPhotoImport: bodyMetricsPhotoImportRouter,
 
   // ========================================================================
   // Food Logs
@@ -307,15 +320,15 @@ export const appRouter = router({
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
       const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
 
-      const [profile, weekFood, weekExercises, recentFood] = await Promise.all([
+      const [profile, weekFood, weekExercises, weekMetrics] = await Promise.all([
         db.getUserProfile(ctx.user.id),
         db.getFoodLogItemsForDateRange(ctx.user.id, weekAgoStr, today),
         db.getExercisesForDateRange(ctx.user.id, weekAgoStr, today),
-        db.getFoodLogItemsForDateRange(ctx.user.id, threeDaysAgoStr, today),
+        db.getBodyMetrics(ctx.user.id, 7),
       ]);
 
       if (!profile) {
-        return { diet: [], exercise: [] };
+        return { diet: [], exercise: [], encouragement: [] };
       }
 
       const { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } = await import("@shared/calculations");
@@ -324,100 +337,125 @@ export const appRouter = router({
       const tdee = calculateTDEE(bmr, profile.activityLevel);
       const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal);
 
-      // Diet recommendations
-      const dietRecs: Array<{ title: string; content: string; dataBasis: string; action: string }> = [];
+      // Use enhanced recommendation engine
+      const analysisData: AnalysisData = {
+        userGoal: profile.fitnessGoal as "lose" | "maintain" | "gain",
+        lastSevenDays: {
+          foodLogs: weekFood.map((item: any) => ({
+            date: item.date,
+            calories: Number(item.calories),
+            protein: Number(item.proteinG || 0),
+          })),
+          exercises: weekExercises.map((ex: any) => ({
+            date: ex.date,
+            duration: Number(ex.duration),
+            caloriesBurned: Number(ex.caloriesBurned || 0),
+          })),
+          bodyMetrics: weekMetrics.map((m: any) => ({
+            date: m.date,
+            weight: Number(m.weightKg),
+            bodyFat: m.bodyFatPercent ? Number(m.bodyFatPercent) : undefined,
+          })),
+        },
+        profile: {
+          heightCm: Number(profile.heightCm),
+          currentWeight: Number(profile.weightKg),
+          tdee: target,
+          bmr: bmr,
+        },
+      };
 
-      // 1. Check 3-day average calories
-      const recentCalories = recentFood.reduce((sum, item) => sum + Number(item.calories), 0);
-      const recentDays = new Set(recentFood.map((item: any) => item.date)).size || 1;
-      const avgRecentCalories = recentCalories / recentDays;
-
-      if (avgRecentCalories > target * 1.1) {
-        dietRecs.push({
-          title: "近 3 日平均熱量超標",
-          content: `您近 3 日平均攝取 ${Math.round(avgRecentCalories)} kcal，超過目標 ${Math.round(target)} kcal。建議減少高熱量食物攝取。`,
-          dataBasis: `3 日平均: ${Math.round(avgRecentCalories)} kcal / 目標: ${Math.round(target)} kcal`,
-          action: "今日嘗試減少主食份量，多吃蔬菜和蛋白質。",
-        });
-      }
-
-      // 2. Check protein intake
-      const weekProtein = weekFood.reduce((sum, item) => sum + Number(item.proteinG || 0), 0);
-      const weekFoodDays = new Set(weekFood.map((item: any) => item.date)).size || 1;
-      const avgProtein = weekProtein / weekFoodDays;
-      const targetProtein = Number(profile.weightKg) * 1.6; // 1.6g per kg
-
-      if (avgProtein < targetProtein * 0.8) {
-        dietRecs.push({
-          title: "蛋白質攝取不足",
-          content: `您每日平均蛋白質攝取 ${Math.round(avgProtein)}g，建議目標為 ${Math.round(targetProtein)}g（體重 × 1.6g）。`,
-          dataBasis: `7 日平均蛋白質: ${Math.round(avgProtein)}g / 建議: ${Math.round(targetProtein)}g`,
-          action: "增加雞胸肉、魚、蛋、豆腐等高蛋白食物。",
-        });
-      }
-
-      // 3. Check dinner calories proportion
-      const dinnerItems = weekFood.filter((item: any) => item.mealType === 'dinner');
-      const dinnerCalories = dinnerItems.reduce((sum, item) => sum + Number(item.calories), 0);
-      const totalWeekCalories = weekFood.reduce((sum, item) => sum + Number(item.calories), 0);
-
-      if (totalWeekCalories > 0 && dinnerCalories / totalWeekCalories > 0.45) {
-        dietRecs.push({
-          title: "晚餐熱量過高",
-          content: `晚餐佔總熱量 ${Math.round(dinnerCalories / totalWeekCalories * 100)}%，建議控制在 40% 以下。`,
-          dataBasis: `晚餐熱量佔比: ${Math.round(dinnerCalories / totalWeekCalories * 100)}%`,
-          action: "嘗試將部分晚餐份量移至午餐，晚餐以清淡為主。",
-        });
-      }
-
-      // If no specific issues, add general advice
-      if (dietRecs.length === 0) {
-        dietRecs.push({
-          title: "飲食狀態良好",
-          content: "您的飲食記錄顯示整體攝取均衡，繼續保持！",
-          dataBasis: "基於近 7 日飲食數據分析",
-          action: "持續記錄飲食，保持均衡攝取。",
-        });
-      }
-
-      // Exercise recommendations
-      const exerciseRecs: Array<{ title: string; content: string; dataBasis: string; action: string }> = [];
-
-      // 1. Check exercise frequency
-      const exerciseDays = new Set(weekExercises.map(ex => ex.date)).size;
-      if (exerciseDays < 3) {
-        exerciseRecs.push({
-          title: "近 7 日運動不足 3 天",
-          content: `您近 7 日只有 ${exerciseDays} 天有運動記錄，建議每週至少運動 3 天。`,
-          dataBasis: `7 日運動天數: ${exerciseDays} 天`,
-          action: "今日安排 30 分鐘中等強度運動，如快走或游泳。",
-        });
-      }
-
-      // 2. Check high calorie but low exercise
-      if (avgRecentCalories > target && exerciseDays < 3) {
-        exerciseRecs.push({
-          title: "熱量偏高但運動少",
-          content: `近期熱量攝取偏高（${Math.round(avgRecentCalories)} kcal/日），但運動頻率不足。建議增加運動量以平衡能量。`,
-          dataBasis: `平均攝取: ${Math.round(avgRecentCalories)} kcal / 運動天數: ${exerciseDays}`,
-          action: "今日增加 20-30 分鐘有氧運動，幫助消耗多餘熱量。",
-        });
-      }
-
-      if (exerciseRecs.length === 0) {
-        exerciseRecs.push({
-          title: "運動習慣良好",
-          content: "您的運動頻率和強度都不錯，繼續保持！",
-          dataBasis: "基於近 7 日運動數據分析",
-          action: "保持目前的運動頻率，可嘗試增加強度或新的運動類型。",
-        });
-      }
+      const recommendations = generateAllRecommendations(analysisData);
 
       return {
-        diet: dietRecs.slice(0, 3),
-        exercise: exerciseRecs.slice(0, 2),
+        diet: recommendations.diet.slice(0, 3).map(r => ({
+          title: r.title,
+          content: r.message,
+          dataBasis: r.dataBasis,
+          action: r.action,
+        })),
+        exercise: recommendations.exercise.slice(0, 2).map(r => ({
+          title: r.title,
+          content: r.message,
+          dataBasis: r.dataBasis,
+          action: r.action,
+        })),
+        encouragement: recommendations.encouragement.map(r => ({
+          title: r.title,
+          content: r.message,
+          dataBasis: r.dataBasis,
+          action: r.action,
+        })),
       };
     }),
+  }),
+
+  // ========================================================================
+  // Fitasty Products (Admin-only)
+  // ========================================================================
+  fitastyProducts: router({
+    list: publicProcedure.query(async () => {
+      return db.getAllFitastyProducts();
+    }),
+
+    getByCategory: publicProcedure
+      .input(z.object({ category: z.string() }))
+      .query(async ({ input }) => {
+        return db.getFitastyProductsByCategory(input.category);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        category: z.string().min(1),
+        servingSize: z.string().optional(),
+        calories: z.number().nonnegative(),
+        proteinG: z.number().nonnegative().optional(),
+        carbsG: z.number().nonnegative().optional(),
+        fatG: z.number().nonnegative().optional(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Check if user is admin
+        if (ctx.user.role !== "admin") {
+          throw new Error("Only admins can create products");
+        }
+        return db.createFitastyProduct({
+          ...input,
+          isActive: 1,
+        } as any);
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        category: z.string().optional(),
+        servingSize: z.string().optional(),
+        calories: z.number().nonnegative().optional(),
+        proteinG: z.number().nonnegative().optional(),
+        carbsG: z.number().nonnegative().optional(),
+        fatG: z.number().nonnegative().optional(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Only admins can update products");
+        }
+        const { id, ...data } = input;
+        return db.updateFitastyProduct(id, data as any);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Only admins can delete products");
+        }
+        return db.deleteFitastyProduct(input.id);
+      }),
   }),
 });
 

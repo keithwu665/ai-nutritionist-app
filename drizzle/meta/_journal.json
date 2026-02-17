@@ -15,6 +15,20 @@
       "when": 1771111983741,
       "tag": "0001_brief_gargoyle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1771274221778,
+      "tag": "0002_milky_matthew_murdock",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1771296993482,
+      "tag": "0003_mean_nick_fury",
+      "breakpoints": true
     }
   ]
 }

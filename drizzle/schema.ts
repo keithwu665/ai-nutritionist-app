@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, date } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, date, tinyint } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -107,3 +107,45 @@ export const exercises = mysqlTable("exercises", {
 
 export type Exercise = typeof exercises.$inferSelect;
 export type InsertExercise = typeof exercises.$inferInsert;
+
+
+/**
+ * Fitasty products table for nutrition product database.
+ * Public read-only table managed by admins.
+ */
+export const fitastyProducts = mysqlTable("fitasty_products", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // e.g., "蛋白粉", "能量棒", "飲品"
+  servingSize: varchar("servingSize", { length: 100 }), // e.g., "100g", "1 serving"
+  calories: decimal("calories", { precision: 8, scale: 1 }).notNull(),
+  proteinG: decimal("proteinG", { precision: 6, scale: 1 }),
+  carbsG: decimal("carbsG", { precision: 6, scale: 1 }),
+  fatG: decimal("fatG", { precision: 6, scale: 1 }),
+  description: text("description"),
+  imageUrl: varchar("imageUrl", { length: 500 }),
+  isActive: tinyint("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  deletedAt: timestamp("deletedAt"),
+});
+
+export type FitastyProduct = typeof fitastyProducts.$inferSelect;
+export type InsertFitastyProduct = typeof fitastyProducts.$inferInsert;
+
+
+/**
+ * Body report templates for photo-based imports (InBody, Boditrax, etc.)
+ */
+export const bodyReportTemplates = mysqlTable("body_report_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  provider: mysqlEnum("provider", ["inbody", "boditrax", "other"]).notNull(),
+  fieldsJson: text("fieldsJson").notNull(), // JSON string of field mappings
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BodyReportTemplate = typeof bodyReportTemplates.$inferSelect;
+export type InsertBodyReportTemplate = typeof bodyReportTemplates.$inferInsert;

@@ -7,6 +7,8 @@ import {
   foodLogs, InsertFoodLog,
   foodLogItems, InsertFoodLogItem,
   exercises, InsertExercise,
+  fitastyProducts, InsertFitastyProduct,
+  bodyReportTemplates, InsertBodyReportTemplate,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -293,4 +295,126 @@ export async function deleteExercise(id: number, userId: number) {
   if (!db) throw new Error("Database not available");
   await db.delete(exercises).where(and(eq(exercises.id, id), eq(exercises.userId, userId)));
   return true;
+}
+
+
+// ============================================================================
+// Fitasty Products (Admin-only)
+// ============================================================================
+
+export async function getAllFitastyProducts() {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(fitastyProducts)
+    .where(eq(fitastyProducts.isActive, 1))
+    .orderBy(fitastyProducts.category);
+  return result;
+}
+
+export async function getFitastyProductsByCategory(category: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(fitastyProducts)
+    .where(and(eq(fitastyProducts.category, category), eq(fitastyProducts.isActive, 1)))
+    .orderBy(fitastyProducts.name);
+  return result;
+}
+
+export async function createFitastyProduct(data: InsertFitastyProduct) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(fitastyProducts).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function updateFitastyProduct(id: number, data: Partial<InsertFitastyProduct>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(fitastyProducts).set(data).where(eq(fitastyProducts.id, id));
+  const result = await db.select().from(fitastyProducts).where(eq(fitastyProducts.id, id)).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function deleteFitastyProduct(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(fitastyProducts).set({ deletedAt: new Date() }).where(eq(fitastyProducts.id, id));
+  return true;
+}
+
+
+export async function getBodyMetricByDate(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(bodyMetrics)
+    .where(and(eq(bodyMetrics.userId, userId), eq(bodyMetrics.date, date)))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+
+// ========================================================================
+// Body Report Templates
+// ========================================================================
+
+export async function getBodyReportTemplates(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(bodyReportTemplates)
+    .where(eq(bodyReportTemplates.userId, userId));
+}
+
+export async function getBodyReportTemplate(templateId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(bodyReportTemplates)
+    .where(and(
+      eq(bodyReportTemplates.id, templateId),
+      eq(bodyReportTemplates.userId, userId)
+    ))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function createBodyReportTemplate(data: {
+  userId: number;
+  name: string;
+  provider: string;
+  fieldsJson: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(bodyReportTemplates).values({
+    userId: data.userId,
+    name: data.name,
+    provider: data.provider as any,
+    fieldsJson: data.fieldsJson,
+  });
+  
+  return result;
+}
+
+export async function updateBodyReportTemplate(
+  templateId: number,
+  data: { name?: string; fieldsJson?: string }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: any = {};
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.fieldsJson !== undefined) updateData.fieldsJson = data.fieldsJson;
+  
+  return db.update(bodyReportTemplates)
+    .set(updateData)
+    .where(eq(bodyReportTemplates.id, templateId));
+}
+
+export async function deleteBodyReportTemplate(templateId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.delete(bodyReportTemplates)
+    .where(eq(bodyReportTemplates.id, templateId));
 }

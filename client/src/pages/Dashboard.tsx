@@ -217,6 +217,18 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+
+              {/* Encouragement */}
+              {recs?.encouragement && recs.encouragement.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">🎉 加油鼓勵</h4>
+                  <div className="space-y-3">
+                    {recs.encouragement.map((rec, i) => (
+                      <RecCard key={i} rec={rec} isEncouragement />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -225,8 +237,8 @@ export default function Dashboard() {
   );
 }
 
-function RecCard({ rec }: { rec: { title: string; content: string; dataBasis: string; action: string } }) {
-  const isPositive = rec.title.includes('良好');
+function RecCard({ rec, isEncouragement }: { rec: { title: string; content: string; dataBasis: string; action: string }, isEncouragement?: boolean }) {
+  const isPositive = rec.title.includes('良好') || isEncouragement;
   return (
     <div className={`p-3 rounded-lg border ${isPositive ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
       <div className="flex items-start gap-2">
