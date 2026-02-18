@@ -15,6 +15,7 @@ import FoodLog from "./pages/FoodLog";
 import ExerciseLog from "./pages/ExerciseLog";
 import Settings from "./pages/Settings";
 import Onboarding from "./pages/Onboarding";
+import AdminProducts from "./pages/AdminProducts";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -61,6 +62,11 @@ function Router() {
       <Route path={"/settings"}>
         <AppLayout>
           <Settings />
+        </AppLayout>
+      </Route>
+      <Route path={"/admin/products"}>
+        <AppLayout>
+          <AdminProducts />
         </AppLayout>
       </Route>
       <Route path={"/404"} component={NotFound} />

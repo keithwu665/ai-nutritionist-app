@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO fitasty_products (name, category, servingSize, calories, proteinG, carbsG, fatG, description, imageUrl, isActive, createdAt, updatedAt) VALUES\n('叉燒飯', '飯類', '300g', 450, 18, 55, 15, '香港經典叉燒飯', '', 1, NOW(), NOW()),\n('雲吞麵', '麵類', '300g', 380, 14, 48, 12, '傳統雲吞麵', '', 1, NOW(), NOW()),\n('蛋白質粉', '補充品', '30g', 120, 25, 2, 1, '乳清蛋白粉', '', 1, NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute INSERT INTO fitasty_products (name, category, servingSize, calories, proteinG, carbsG, fatG, description, imageUrl, isActive, createdAt, updatedAt) VALUES\n('叉燒飯', '飯類', '300g', 450, 18, 55, 15, '香港經典叉燒飯', '', 1, NOW(), NOW()),\n('雲吞麵', '麵類', '300g', 380, 14, 48, 12, '傳統雲吞麵', '', 1, NOW(), NOW()),\n('蛋白質粉', '補充品', '30g', 120, 25, 2, 1, '乳清蛋白粉', '', 1, NOW(), NOW());",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'proteinG' in 'field list'"
+  ]
+}

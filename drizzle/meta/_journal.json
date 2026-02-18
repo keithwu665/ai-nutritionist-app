@@ -29,6 +29,13 @@
       "when": 1771296993482,
       "tag": "0003_mean_nick_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1771439149182,
+      "tag": "0004_minor_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }

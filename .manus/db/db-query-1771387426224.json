@@ -1,0 +1,9 @@
+{
+  "query": "DROP TABLE fitasty_products;\nCREATE TABLE fitasty_products (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  category VARCHAR(100) NOT NULL,\n  servingSize VARCHAR(100),\n  calories DECIMAL(8,1) NOT NULL,\n  proteinG DECIMAL(6,1),\n  carbsG DECIMAL(6,1),\n  fatG DECIMAL(6,1),\n  description TEXT,\n  imageUrl VARCHAR(500),\n  isActive TINYINT NOT NULL DEFAULT 1,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  deletedAt TIMESTAMP NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute DROP TABLE fitasty_products;\nCREATE TABLE fitasty_products (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  category VARCHAR(100) NOT NULL,\n  servingSize VARCHAR(100),\n  calories DECIMAL(8,1) NOT NULL,\n  proteinG DECIMAL(6,1),\n  carbsG DECIMAL(6,1),\n  fatG DECIMAL(6,1),\n  description TEXT,\n  imageUrl VARCHAR(500),\n  isActive TINYINT NOT NULL DEFAULT 1,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  deletedAt TIMESTAMP NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1979
+}

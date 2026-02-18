@@ -1,0 +1,66 @@
+{
+  "query": "SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'fitasty_products' ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'fitasty_products' ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "name",
+      "COLUMN_TYPE": "varchar(255)"
+    },
+    {
+      "COLUMN_NAME": "category",
+      "COLUMN_TYPE": "varchar(100)"
+    },
+    {
+      "COLUMN_NAME": "servingSize",
+      "COLUMN_TYPE": "varchar(100)"
+    },
+    {
+      "COLUMN_NAME": "calories",
+      "COLUMN_TYPE": "decimal(8,1)"
+    },
+    {
+      "COLUMN_NAME": "protein",
+      "COLUMN_TYPE": "decimal(6,1)"
+    },
+    {
+      "COLUMN_NAME": "carbs",
+      "COLUMN_TYPE": "decimal(6,1)"
+    },
+    {
+      "COLUMN_NAME": "fat",
+      "COLUMN_TYPE": "decimal(6,1)"
+    },
+    {
+      "COLUMN_NAME": "description",
+      "COLUMN_TYPE": "text"
+    },
+    {
+      "COLUMN_NAME": "imageUrl",
+      "COLUMN_TYPE": "varchar(512)"
+    },
+    {
+      "COLUMN_NAME": "isActive",
+      "COLUMN_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "COLUMN_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "deletedAt",
+      "COLUMN_TYPE": "timestamp"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tCOLUMN_TYPE\nid\tint\nname\tvarchar(255)\ncategory\tvarchar(100)\nservingSize\tvarchar(100)\ncalories\tdecimal(8,1)\nprotein\tdecimal(6,1)\ncarbs\tdecimal(6,1)\nfat\tdecimal(6,1)\ndescription\ttext\nimageUrl\tvarchar(512)\nisActive\tint\ncreatedAt\ttimestamp\nupdatedAt\ttimestamp\ndeletedAt\ttimestamp\n",
+  "stderr": "",
+  "execution_time_ms": 1563
+}

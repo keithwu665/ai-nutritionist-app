@@ -1,15 +1,25 @@
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
-  InsertUser, users,
-  userProfiles, InsertUserProfile,
-  bodyMetrics, InsertBodyMetric,
-  foodLogs, InsertFoodLog,
-  foodLogItems, InsertFoodLogItem,
-  exercises, InsertExercise,
-  fitastyProducts, InsertFitastyProduct,
-  bodyReportTemplates, InsertBodyReportTemplate,
+  users,
+  userProfiles,
+  bodyMetrics,
+  foodLogs,
+  foodLogItems,
+  exercises,
+  fitastyProducts,
+  bodyReportTemplates,
 } from "../drizzle/schema";
+
+type InsertUser = InferInsertModel<typeof users>;
+type InsertUserProfile = InferInsertModel<typeof userProfiles>;
+type InsertBodyMetric = InferInsertModel<typeof bodyMetrics>;
+type InsertFoodLog = InferInsertModel<typeof foodLogs>;
+type InsertFoodLogItem = InferInsertModel<typeof foodLogItems>;
+type InsertExercise = InferInsertModel<typeof exercises>;
+type InsertFitastyProduct = InferInsertModel<typeof fitastyProducts>;
+type InsertBodyReportTemplate = InferInsertModel<typeof bodyReportTemplates>;
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -73,11 +83,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     }
 
     if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
+      values.lastSignedIn = new Date().toISOString();
     }
 
     if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
+      updateSet.lastSignedIn = new Date().toISOString();
     }
 
     await db.insert(users).values(values).onDuplicateKeyUpdate({
@@ -305,19 +315,29 @@ export async function deleteExercise(id: number, userId: number) {
 export async function getAllFitastyProducts() {
   const db = await getDb();
   if (!db) return [];
-  const result = await db.select().from(fitastyProducts)
-    .where(eq(fitastyProducts.isActive, 1))
-    .orderBy(fitastyProducts.category);
-  return result;
+  try {
+    const result = await db.select().from(fitastyProducts)
+      .where(eq(fitastyProducts.isActive, 1))
+      .orderBy(fitastyProducts.category);
+    return result;
+  } catch (error) {
+    console.error('Error fetching Fitasty products:', error);
+    return [];
+  }
 }
 
 export async function getFitastyProductsByCategory(category: string) {
   const db = await getDb();
   if (!db) return [];
-  const result = await db.select().from(fitastyProducts)
-    .where(and(eq(fitastyProducts.category, category), eq(fitastyProducts.isActive, 1)))
-    .orderBy(fitastyProducts.name);
-  return result;
+  try {
+    const result = await db.select().from(fitastyProducts)
+      .where(and(eq(fitastyProducts.category, category), eq(fitastyProducts.isActive, 1)))
+      .orderBy(fitastyProducts.name);
+    return result;
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    return [];
+  }
 }
 
 export async function createFitastyProduct(data: InsertFitastyProduct) {
@@ -338,7 +358,7 @@ export async function updateFitastyProduct(id: number, data: Partial<InsertFitas
 export async function deleteFitastyProduct(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(fitastyProducts).set({ deletedAt: new Date() }).where(eq(fitastyProducts.id, id));
+  await db.update(fitastyProducts).set({ deletedAt: new Date().toISOString() }).where(eq(fitastyProducts.id, id));
   return true;
 }
 

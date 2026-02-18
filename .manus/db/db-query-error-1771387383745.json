@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, category, servingSize, calories, protein_g, carbs_g, fat_g, description, imageUrl, isActive FROM fitasty_products;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, name, category, servingSize, calories, protein_g, carbs_g, fat_g, description, imageUrl, isActive FROM fitasty_products;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'protein_g' in 'field list'"
+  ]
+}

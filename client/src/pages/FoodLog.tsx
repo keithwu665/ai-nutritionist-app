@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,8 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(initialDate || today);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFitastySearch, setShowFitastySearch] = useState(false);
   const [newItem, setNewItem] = useState({
     mealType: 'lunch' as typeof mealTypes[number],
     name: '',
@@ -29,7 +31,24 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
   });
 
   const { data: items, isLoading } = trpc.foodLogs.getItems.useQuery({ date });
+  const { data: fitastyProducts, isLoading: productsLoading } = trpc.fitastyProducts.list.useQuery();
   const utils = trpc.useUtils();
+
+  const filteredFitastyProducts = useMemo(() => {
+    if (!fitastyProducts || !searchQuery) return [];
+    return fitastyProducts.filter(p => 
+      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [fitastyProducts, searchQuery]);
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('fitastyProducts:', fitastyProducts);
+    console.log('productsLoading:', productsLoading);
+    console.log('searchQuery:', searchQuery);
+    console.log('filteredFitastyProducts:', filteredFitastyProducts);
+  }, [fitastyProducts, productsLoading, searchQuery, filteredFitastyProducts]);
 
   const addMutation = trpc.foodLogs.addItem.useMutation({
     onSuccess: () => {
@@ -104,6 +123,19 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
       carbsG: newItem.carbsG || null,
       fatG: newItem.fatG || null,
     });
+  };
+
+  const selectFitastyProduct = (product: any) => {
+    setNewItem({
+      ...newItem,
+      name: product.name,
+      calories: product.calories.toString(),
+      proteinG: product.proteinG ? product.proteinG.toString() : '',
+      carbsG: product.carbsG ? product.carbsG.toString() : '',
+      fatG: product.fatG ? product.fatG.toString() : '',
+    });
+    setShowFitastySearch(false);
+    setSearchQuery('');
   };
 
   return (
@@ -220,8 +252,35 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">食物名稱 *</label>
-              <Input value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} required />
+              <label className="text-sm font-medium">食物名稱 * {fitastyProducts && fitastyProducts.length > 0 ? `(${fitastyProducts.length} 產品)` : '(無產品)'}</label>
+              <div className="relative">
+                <Input 
+                  value={newItem.name} 
+                  onChange={(e) => {
+                    setNewItem({ ...newItem, name: e.target.value });
+                    setSearchQuery(e.target.value);
+                    setShowFitastySearch(true);
+                  }}
+                  onFocus={() => setShowFitastySearch(true)}
+                  placeholder="搜尋或輸入食物名稱"
+                  required 
+                />
+                {showFitastySearch && filteredFitastyProducts.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+                    {filteredFitastyProducts.map((product: any) => (
+                      <button
+                        key={product.id}
+                        type="button"
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b border-gray-100 last:border-0"
+                        onClick={() => selectFitastyProduct(product)}
+                      >
+                        <p className="text-sm font-medium">{product.name}</p>
+                        <p className="text-xs text-gray-500">{product.calories} kcal · {product.category}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">熱量 (kcal) *</label>

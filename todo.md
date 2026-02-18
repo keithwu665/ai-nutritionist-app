@@ -120,3 +120,16 @@
 - TypeScript compilation: ✅ ZERO ERRORS throughout all steps
 - Test coverage: ✅ 23 tests passing
 - Phase 1 functionality: ✅ FULLY INTACT (no regressions)
+
+
+## Module 1: Fitasty Product Integration (LIVE TESTING)
+
+- [ ] Step 0: Admin product creation UX with all fields (name, category, servingSize, calories, protein, carbs, fat)
+- [ ] Step 1: Product search in /food with autocomplete
+- [ ] Step 2: Auto-fill calories/macros on product selection
+- [ ] Step 3: Persist to DB and verify dashboard updates
+- [ ] ACCEPTANCE: Product created via /admin/products ✅
+- [ ] ACCEPTANCE: Search shows product in /food ✅
+- [ ] ACCEPTANCE: Selecting auto-fills calories/macros ✅
+- [ ] ACCEPTANCE: Submit writes food_log_items ✅
+- [ ] ACCEPTANCE: Dashboard totals update ✅

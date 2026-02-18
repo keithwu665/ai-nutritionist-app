@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM fitasty_products LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT * FROM fitasty_products LIMIT 5;",
+  "rows": [
+    {
+      "id": "-1",
+      "name": "rice",
+      "category": "meal",
+      "servingSize": "200g",
+      "calories": "345.0",
+      "protein": "23.0",
+      "carbs": "34.0",
+      "fat": "10.0",
+      "description": "testing",
+      "imageUrl": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-17 16:00:00",
+      "updatedAt": "2026-02-17 16:00:00",
+      "deletedAt": "2026-02-27 16:00:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tcategory\tservingSize\tcalories\tprotein\tcarbs\tfat\tdescription\timageUrl\tisActive\tcreatedAt\tupdatedAt\tdeletedAt\n-1\trice\tmeal\t200g\t345.0\t23.0\t34.0\t10.0\ttesting\tNULL\t1\t2026-02-17 16:00:00\t2026-02-17 16:00:00\t2026-02-27 16:00:00\n",
+  "stderr": "",
+  "execution_time_ms": 1534
+}

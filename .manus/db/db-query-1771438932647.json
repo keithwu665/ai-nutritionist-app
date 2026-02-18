@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, isActive, deletedAt FROM fitasty_products ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, name, isActive, deletedAt FROM fitasty_products ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "叉燒飯",
+      "isActive": "1",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "2",
+      "name": "雲吞麵",
+      "isActive": "1",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "3",
+      "name": "蛋白質粉",
+      "isActive": "1",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "4",
+      "name": "測試食物",
+      "isActive": "1",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "5",
+      "name": "testing",
+      "isActive": "3",
+      "deletedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\tdeletedAt\n1\t叉燒飯\t1\tNULL\n2\t雲吞麵\t1\tNULL\n3\t蛋白質粉\t1\tNULL\n4\t測試食物\t1\tNULL\n5\ttesting\t3\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1493
+}
