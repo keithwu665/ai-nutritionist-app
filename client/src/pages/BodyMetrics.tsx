@@ -55,11 +55,18 @@ export default function BodyMetrics() {
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">身體數據</h1>
-        <Link href="/body/add">
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
-            <Plus className="h-4 w-4 mr-1" /> 新增
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/body/import-csv">
+            <Button variant="outline">
+              匯入 CSV
+            </Button>
+          </Link>
+          <Link href="/body/add">
+            <Button className="bg-emerald-600 hover:bg-emerald-700">
+              <Plus className="h-4 w-4 mr-1" /> 新增
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* BMI Indicator Card */}

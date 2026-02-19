@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import BodyMetrics from "./pages/BodyMetrics";
 import BodyMetricsAdd from "./pages/BodyMetricsAdd";
+import BodyMetricsImportCSV from "./pages/BodyMetricsImportCSV";
 import FoodLog from "./pages/FoodLog";
 import ExerciseLog from "./pages/ExerciseLog";
 import Settings from "./pages/Settings";
@@ -40,6 +41,11 @@ function Router() {
       <Route path={"/body/add"}>
         <AppLayout>
           <BodyMetricsAdd />
+        </AppLayout>
+      </Route>
+      <Route path={"/body/import-csv"}>
+        <AppLayout>
+          <BodyMetricsImportCSV />
         </AppLayout>
       </Route>
       <Route path={"/food"}>

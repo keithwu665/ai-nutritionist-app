@@ -124,12 +124,33 @@
 
 ## Module 1: Fitasty Product Integration (LIVE TESTING)
 
-- [ ] Step 0: Admin product creation UX with all fields (name, category, servingSize, calories, protein, carbs, fat)
-- [ ] Step 1: Product search in /food with autocomplete
-- [ ] Step 2: Auto-fill calories/macros on product selection
-- [ ] Step 3: Persist to DB and verify dashboard updates
-- [ ] ACCEPTANCE: Product created via /admin/products ✅
-- [ ] ACCEPTANCE: Search shows product in /food ✅
-- [ ] ACCEPTANCE: Selecting auto-fills calories/macros ✅
-- [ ] ACCEPTANCE: Submit writes food_log_items ✅
-- [ ] ACCEPTANCE: Dashboard totals update ✅
+- [x] Step 0: Admin product creation UX with all fields (name, category, servingSize, calories, protein, carbs, fat)
+- [x] Step 1: Product search in /food with autocomplete
+- [x] Step 2: Auto-fill calories/macros on product selection
+- [x] Step 3: Persist to DB and verify dashboard updates
+- [x] ACCEPTANCE: Product created via /admin/products ✅
+- [x] ACCEPTANCE: Search shows product in /food ✅
+- [x] ACCEPTANCE: Selecting auto-fills calories/macros ✅
+- [x] ACCEPTANCE: Submit writes food_log_items ✅
+- [x] ACCEPTANCE: Dashboard totals update ✅
+
+## PART 1: Module 1 Freeze (Admin Allowlist)
+- [x] Add ADMIN_EMAIL_ALLOWLIST environment variable
+- [x] Implement email allowlist check in /admin/products route
+- [ ] Verify Module 1 on published URL: /food autocomplete works
+- [ ] Verify Module 1 on published URL: selecting product auto-fills macros
+- [ ] Verify Module 1 on published URL: submit writes to food_log_items
+- [ ] Verify Module 1 on published URL: dashboard updates immediately
+- [ ] Create checkpoint: "module1-stable-fitasty-foodlog-allowlist"
+
+## PART 2A: CSV Import for Body Metrics
+- [x] Create /body/import-csv page (mobile-first)
+- [x] Implement CSV file upload component
+- [x] Implement CSV preview with row display
+- [x] Implement column mapping (date, weight_kg required; body_fat_percent, muscle_mass_kg optional)
+- [x] Implement CSV import logic to write body_metrics
+- [x] Handle duplicate dates (skip or overwrite)
+- [x] Verify /body chart reflects imported data
+- [ ] Test CSV import on published URL with 3 rows
+- [ ] Verify body_metrics table has 3 new rows
+- [ ] Verify /body chart shows new data points

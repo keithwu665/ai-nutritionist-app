@@ -417,9 +417,10 @@ export const appRouter = router({
         imageUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Check if user is admin
-        if (ctx.user.role !== "admin") {
-          throw new Error("Only admins can create products");
+        // Check if user email is in allowlist
+        const { ENV } = await import("./_core/env");
+        if (!ctx.user.email || !ENV.adminEmailAllowlist.includes(ctx.user.email)) {
+          throw new Error("Access denied: email not in admin allowlist");
         }
         return db.createFitastyProduct({
           ...input,
@@ -441,8 +442,9 @@ export const appRouter = router({
         imageUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") {
-          throw new Error("Only admins can update products");
+        const { ENV } = await import("./_core/env");
+        if (!ctx.user.email || !ENV.adminEmailAllowlist.includes(ctx.user.email)) {
+          throw new Error("Access denied: email not in admin allowlist");
         }
         const { id, ...data } = input;
         return db.updateFitastyProduct(id, data as any);
@@ -451,8 +453,9 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") {
-          throw new Error("Only admins can delete products");
+        const { ENV } = await import("./_core/env");
+        if (!ctx.user.email || !ENV.adminEmailAllowlist.includes(ctx.user.email)) {
+          throw new Error("Access denied: email not in admin allowlist");
         }
         return db.deleteFitastyProduct(input.id);
       }),
