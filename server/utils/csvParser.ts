@@ -75,7 +75,7 @@ export function parseDate(dateStr: string, format?: string): string | null {
   // Try DD/MM/YYYY
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
     const [day, month, year] = trimmed.split('/');
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    return `${year}-${month}-${day}`;
   }
   
   // Try MM/DD/YYYY
@@ -104,7 +104,7 @@ export function parseDate(dateStr: string, format?: string): string | null {
  * Parse a single row using the provided mapping
  */
 export function parseRow(row: string[], mapping: CSVMapping): ParsedBodyMetric | null {
-  if (!mapping.dateColumn || mapping.weightColumn === undefined) {
+  if (mapping.dateColumn === undefined || mapping.weightColumn === undefined) {
     return null;
   }
 

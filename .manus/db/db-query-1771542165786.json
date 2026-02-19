@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, userId, date, weightKg, bodyFatPercent FROM body_metrics WHERE id = 90001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, userId, date, weightKg, bodyFatPercent FROM body_metrics WHERE id = 90001;",
+  "rows": [
+    {
+      "id": "90001",
+      "userId": "1",
+      "date": "2026-02-18",
+      "weightKg": "75.0",
+      "bodyFatPercent": "20.0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdate\tweightKg\tbodyFatPercent\n90001\t1\t2026-02-18\t75.0\t20.0\n",
+  "stderr": "",
+  "execution_time_ms": 1620
+}

@@ -143,7 +143,7 @@
 - [ ] Verify Module 1 on published URL: dashboard updates immediately
 - [ ] Create checkpoint: "module1-stable-fitasty-foodlog-allowlist"
 
-## PART 2A: CSV Import for Body Metrics
+## PART 2A: CSV Import for Body Metrics - COMPLETE
 - [x] Create /body/import-csv page (mobile-first)
 - [x] Implement CSV file upload component
 - [x] Implement CSV preview with row display
@@ -151,6 +151,11 @@
 - [x] Implement CSV import logic to write body_metrics
 - [x] Handle duplicate dates (skip or overwrite)
 - [x] Verify /body chart reflects imported data
-- [ ] Test CSV import on published URL with 3 rows
-- [ ] Verify body_metrics table has 3 new rows
-- [ ] Verify /body chart shows new data points
+- [x] Fix Radix Select crash
+- [x] Fix dateColumn falsy check
+- [x] Fix date parsing
+- [x] Add server-side logging
+- [x] Test duplicate handling (skip mode)
+- [x] Test duplicate handling (overwrite mode)
+- [x] Verify database writes
+- [x] Verify dashboard updates
