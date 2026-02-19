@@ -263,16 +263,16 @@ export default function BodyMetricsImportCSV() {
                 <div>
                   <label className="block text-sm font-medium mb-2">體脂肪率 (%) - 選填</label>
                   <Select
-                    value={columnMapping.body_fat_percent?.toString() ?? ''}
+                    value={columnMapping.body_fat_percent?.toString() ?? '__UNMAPPED__'}
                     onValueChange={(val) =>
-                      setColumnMapping({ ...columnMapping, body_fat_percent: val ? parseInt(val) : null })
+                      setColumnMapping({ ...columnMapping, body_fat_percent: val === '__UNMAPPED__' ? null : parseInt(val) })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="選擇體脂肪率欄位" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">不匯入</SelectItem>
+                      <SelectItem value="__UNMAPPED__">不匯入</SelectItem>
                       {headers.map((header, idx) => (
                         <SelectItem key={idx} value={idx.toString()}>
                           {header}
@@ -285,16 +285,16 @@ export default function BodyMetricsImportCSV() {
                 <div>
                   <label className="block text-sm font-medium mb-2">肌肉量 (kg) - 選填</label>
                   <Select
-                    value={columnMapping.muscle_mass_kg?.toString() ?? ''}
+                    value={columnMapping.muscle_mass_kg?.toString() ?? '__UNMAPPED__'}
                     onValueChange={(val) =>
-                      setColumnMapping({ ...columnMapping, muscle_mass_kg: val ? parseInt(val) : null })
+                      setColumnMapping({ ...columnMapping, muscle_mass_kg: val === '__UNMAPPED__' ? null : parseInt(val) })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="選擇肌肉量欄位" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">不匯入</SelectItem>
+                      <SelectItem value="__UNMAPPED__">不匯入</SelectItem>
                       {headers.map((header, idx) => (
                         <SelectItem key={idx} value={idx.toString()}>
                           {header}
