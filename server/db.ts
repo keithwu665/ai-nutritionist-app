@@ -473,13 +473,19 @@ export async function createBodyPhoto(data: {
 
 export async function getBodyPhotos(userId: number) {
   const db = await getDb();
-  if (!db) return [];
+  if (!db) {
+    console.log('[DB_ERROR] Database not initialized');
+    return [];
+  }
   
+  console.log('[GET_PHOTOS] Query start', { userId });
   const { decryptMetadata } = await import("./encryption");
   
   const photos = await db.select().from(bodyPhotos)
     .where(eq(bodyPhotos.userId, userId))
     .orderBy(desc(bodyPhotos.uploadedAt));
+  
+  console.log('[GET_PHOTOS] Query result', { userId, count: photos.length, firstRow: photos[0] ? { id: photos[0].id, userId: photos[0].userId, isAiGenerated: photos[0].isAiGenerated } : null });
   
   // Decrypt metadata for display
   return photos.map(photo => ({

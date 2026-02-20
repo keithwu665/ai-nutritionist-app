@@ -352,3 +352,18 @@
 - [x] All 64 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint
+
+
+## CRITICAL: Progress Photos Regression Fix - COMPLETE
+- [x] Fixed missing React imports (useState, useRef, useEffect) in BodyPhotosUpload
+- [x] Verified upload button click handler is properly bound
+- [x] Verified validation errors show inline
+- [x] Verified multipart/FormData request is sent
+- [x] Verified loading state shows during upload
+- [x] Verified error toast shows on failure
+- [x] Verified AI Goal Photo still works with isAiGenerated = true
+- [x] Verified gallery displays both real and AI photos
+- [x] Verified session-locked userId in all operations
+- [x] All 64 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint
