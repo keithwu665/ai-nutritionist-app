@@ -5,16 +5,28 @@ import { getDb } from './db';
 import { bodyPhotos } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 
-const AI_GOAL_PROMPT = `You are an image editing expert. Using the provided photo as the base, generate a realistic simulation of the person after losing 15kg through healthy diet and exercise.
+const AI_GOAL_PROMPT = `You are performing a strong visible body transformation.
 
-Instructions:
-- Keep the same person, same face, same pose, same camera angle, same background, same clothing
-- Simulate a healthy fat/weight loss of 15kg
-- Reduce belly fat, slightly slim the waistline, mild increase in muscle definition
-- Do NOT exaggerate or make it look like a different person
-- Do NOT change age, gender, facial identity, or ethnicity
-- Keep it realistic and natural
-- The result should look like a natural progression of the same person`;
+This must look clearly different from the original image.
+
+Simulate a dramatic and clearly visible 15kg fat loss.
+
+Reduce body fat significantly.
+Make the waist much slimmer.
+Create strong visible abdominal definition.
+Sharpen chest and shoulder muscles.
+Tighten the torso visibly.
+
+The transformation must be obvious at first glance.
+The result must look lean and athletic.
+
+Keep the same identity, same face, same pose and same background.
+
+Do NOT produce subtle changes.
+Make the transformation clearly noticeable.
+
+Photorealistic.
+High resolution.`;
 
 export async function generateGoalPhoto(
   userId: number,
@@ -59,79 +71,81 @@ export async function generateGoalPhoto(
         },
       ],
     });
-    console.log('[AI_GOAL] Image generation successful', { generatedImageUrl: !!generatedImageUrl });
 
-    // Upload generated image to storage
-    const fileKey = `ai-goals/${userId}/${sourcePhotoId}-goal-${Date.now()}.jpg`;
     if (!generatedImageUrl) {
-      console.error('[AI_GOAL] Generated image URL is empty');
-      throw new Error('Failed to generate image');
+      throw new Error('Image generation returned no URL');
     }
-    
+
+    console.log('[AI_GOAL] Image generation successful', { generatedImageUrl: true });
+
+    // Convert image URL to buffer for storage
     console.log('[AI_GOAL] Converting image URL to buffer for storage upload');
-    // Fetch the image from the URL and convert to buffer
-    const response = await fetch(generatedImageUrl);
-    if (!response.ok) {
-      console.error('[AI_GOAL] Failed to fetch generated image', { status: response.status });
-      throw new Error(`Failed to fetch generated image: ${response.statusText}`);
+    const imageResponse = await fetch(generatedImageUrl);
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to fetch generated image: ${imageResponse.statusText}`);
     }
-    const imageBuffer = await response.arrayBuffer();
-    console.log('[AI_GOAL] Image buffer created', { size: imageBuffer.byteLength });
-    
-    console.log('[AI_GOAL] Uploading to storage', { fileKey });
-    const { url: storedUrl } = await storagePut(fileKey, Buffer.from(imageBuffer), 'image/jpeg');
-    console.log('[AI_GOAL] Storage upload successful', { storedUrl });
-    if (!storedUrl) {
-      console.error('[AI_GOAL] Storage URL is empty');
-      throw new Error('Failed to store generated image');
-    }
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const buffer = Buffer.from(imageBuffer);
+    console.log('[AI_GOAL] Image buffer created', { size: buffer.length });
 
-    // Create new body photo record
+    // Upload to storage
+    console.log('[AI_GOAL] Uploading to storage', { fileKey: `ai-goals/${userId}/${sourcePhotoId}-goal-${Date.now()}.jpg` });
+    const fileKey = `ai-goals/${userId}/${sourcePhotoId}-goal-${Date.now()}.jpg`;
+    const { url: storedUrl } = await storagePut(fileKey, buffer, 'image/jpeg');
+    console.log('[AI_GOAL] Storage upload successful', { url: storedUrl });
+
+    // Create body photo record
     console.log('[AI_GOAL] Creating body photo record', { userId, uploadedAt: new Date().toISOString().split('T')[0] });
-    const result = await db.insert(bodyPhotos).values({
-      userId,
-      photoUrl: storedUrl,
-      storageKey: fileKey,
-      description: `AI Goal Simulation (-${Math.abs(deltaKg)}kg)`,
-      tags: `AI Goal, -${Math.abs(deltaKg)}kg`,
-      uploadedAt: new Date().toISOString().split('T')[0],
-    });
+    const uploadedAt = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    const result = await db
+      .insert(bodyPhotos)
+      .values({
+        userId,
+        photoUrl: storedUrl,
+        storageKey: fileKey,
+        description: `AI Goal Simulation (${deltaKg}kg)`,
+        tags: `AI Goal, ${deltaKg}kg`,
+        uploadedAt,
+      });
 
-    const newPhotoId = (result as any).insertId;
+    const newPhotoId = (result as any)?.insertId || (result as any)?.[0]?.insertId || 0;
     console.log('[AI_GOAL] Body photo created successfully', { newPhotoId });
 
     // Log activity
     console.log('[AI_GOAL] Logging activity');
-    await logActivity({
-      userId,
-      actionType: 'UPLOAD_PHOTO',
-      entityType: 'body_photo',
-      entityId: newPhotoId,
-      status: 'SUCCESS',
-    });
-
-    console.log('[AI_GOAL] generateGoalPhoto completed successfully', { newPhotoId, photoUrl: storedUrl });
-    return {
-      newPhotoId,
-      photoUrl: storedUrl,
-    };
-  } catch (error) {
-    // Log failed generation
-    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[AI_GOAL] Generation failed', { error: errorMsg });
     try {
       await logActivity({
         userId,
         actionType: 'UPLOAD_PHOTO',
         entityType: 'body_photo',
-        entityId: sourcePhotoId,
-        status: 'FAIL',
-        errorMessage: errorMsg,
+        entityId: newPhotoId || 0,
+        status: 'SUCCESS',
       });
-    } catch (logError) {
-      console.error('[AI_GOAL] Failed to log error activity:', logError);
+    } catch (err) {
+      console.error('[AI_GOAL] Activity logging failed:', err);
+      // Don't throw - activity logging should not block the main operation
     }
 
+    console.log('[AI_GOAL] generateGoalPhoto completed successfully', { newPhotoId, photoUrl: storedUrl });
+    return { newPhotoId, photoUrl: storedUrl };
+  } catch (error) {
+    console.error('[AI_GOAL] generateGoalPhoto failed:', error);
+    
+    // Log failed activity
+    try {
+      await logActivity({
+        userId,
+        actionType: 'UPLOAD_PHOTO',
+        entityType: 'body_photo',
+        entityId: 0,
+        status: 'FAIL',
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
+    } catch (logErr) {
+      console.error('[AI_GOAL] Failed to log error activity:', logErr);
+    }
+    
     throw error;
   }
 }
