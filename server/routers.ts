@@ -6,10 +6,12 @@ import { z } from "zod";
 import * as db from "./db";
 import { bodyMetricsImportRouter } from "./routers/bodyMetricsImport";
 import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
+import { bodyReportRouter } from "./bodyReportRouter";
 import { generateAllRecommendations, type AnalysisData } from "./utils/recommendationEngine";
 
 export const appRouter = router({
   system: systemRouter,
+  bodyReport: bodyReportRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -404,19 +406,27 @@ export const appRouter = router({
       weekAgo.setDate(weekAgo.getDate() - 7);
       const weekAgoStr = weekAgo.toISOString().split('T')[0];
 
-      const [profile, todayFood, todayExercises, weekFood, weekExercises, weightTrend] = await Promise.all([
+      const [profile, todayFood, todayExercises, weekFood, weekExercises, weightTrend, allFitastyProducts] = await Promise.all([
         db.getUserProfile(ctx.user.id),
         db.getFoodLogItems(ctx.user.id, today),
         db.getExercises(ctx.user.id, today),
         db.getFoodLogItemsForDateRange(ctx.user.id, weekAgoStr, today),
         db.getExercisesForDateRange(ctx.user.id, weekAgoStr, today),
         db.getBodyMetrics(ctx.user.id, 7),
+        db.getAllFitastyProducts(),
       ]);
 
       const todayCalories = todayFood.reduce((sum, item) => sum + Number(item.calories), 0);
       const todayExerciseCalories = todayExercises.reduce((sum, ex) => sum + Number(ex.caloriesBurned), 0);
       const weekCalories = weekFood.reduce((sum, item) => sum + Number(item.calories), 0);
       const weekExerciseMinutes = weekExercises.reduce((sum, ex) => sum + ex.durationMinutes, 0);
+
+      // Calculate Fitasty usage ratio
+      const fitastyProductNames = new Set(allFitastyProducts.map((p: any) => p.name.toLowerCase()));
+      const todayFitastyCalories = todayFood.reduce((sum, item) => {
+        return fitastyProductNames.has(item.name.toLowerCase()) ? sum + Number(item.calories) : sum;
+      }, 0);
+      const todayFitastyRatio = todayCalories > 0 ? Math.round((todayFitastyCalories / todayCalories) * 100) : 0;
 
       // Count unique days with data
       const uniqueFoodDays = new Set(weekFood.map((item: any) => item.date)).size;
@@ -429,6 +439,8 @@ export const appRouter = router({
           exerciseCalories: todayExerciseCalories,
           netCalories: todayCalories - todayExerciseCalories,
           exerciseMinutes: todayExercises.reduce((sum, ex) => sum + ex.durationMinutes, 0),
+          fitastyCalories: todayFitastyCalories,
+          fitastyRatio: todayFitastyRatio,
         },
         weekly: {
           avgCalories: uniqueFoodDays > 0 ? weekCalories / uniqueFoodDays : 0,
@@ -776,6 +788,18 @@ export const appRouter = router({
         return db.getFitastyProductsByCategory(input.category);
       }),
 
+    search: publicProcedure
+      .input(z.object({ query: z.string().min(1) }))
+      .query(async ({ input }) => {
+        return db.searchFitastyProducts(input.query);
+      }),
+
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getFitastyProductById(input.id);
+      }),
+
     create: protectedProcedure
       .input(z.object({
         name: z.string().min(1),
@@ -832,6 +856,33 @@ export const appRouter = router({
           throw new Error("Access denied: email not in admin allowlist");
         }
         return db.deleteFitastyProduct(input.id);
+      }),
+
+    addToLog: protectedProcedure
+      .input(z.object({
+        productId: z.number(),
+        date: z.string(),
+        mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+        quantity: z.number().positive().default(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const product = await db.getFitastyProductById(input.productId);
+        if (!product) throw new Error("Product not found");
+        const log = await db.getOrCreateFoodLog(ctx.user.id, input.date);
+        const calories = Number(product.calories) * input.quantity;
+        const proteinG = product.proteinG ? Number(product.proteinG) * input.quantity : null;
+        const carbsG = product.carbsG ? Number(product.carbsG) * input.quantity : null;
+        const fatG = product.fatG ? Number(product.fatG) * input.quantity : null;
+        return db.createFoodLogItem({
+          foodLogId: log.id,
+          userId: ctx.user.id,
+          mealType: input.mealType,
+          name: product.name,
+          calories: calories.toString(),
+          proteinG: proteinG ? proteinG.toString() : null,
+          carbsG: carbsG ? carbsG.toString() : null,
+          fatG: fatG ? fatG.toString() : null,
+        });
       }),
   }),
 });

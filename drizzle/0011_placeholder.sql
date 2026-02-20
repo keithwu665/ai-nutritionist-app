@@ -1,0 +1,2 @@
+-- Placeholder migration (0011 was skipped)
+-- This file exists to maintain migration sequence integrity

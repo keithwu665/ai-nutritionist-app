@@ -103,6 +103,26 @@ export default function Dashboard() {
         </Card>
       </div>
 
+      {/* Fitasty Usage Ratio */}
+      {dashData?.today.fitastyRatio !== undefined && dashData.today.fitastyRatio > 0 && (
+        <Card className="border-emerald-200 bg-emerald-50">
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-emerald-600 font-medium">Fitasty 產品使用</p>
+                <p className="text-2xl font-bold text-emerald-700">{dashData.today.fitastyRatio}%</p>
+                <p className="text-xs text-emerald-600 mt-1">{Math.round(dashData.today.fitastyCalories)} / {Math.round(dashData.today.calories)} kcal</p>
+              </div>
+              <div className="text-right">
+                <div className="w-24 h-24 rounded-full bg-emerald-200 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-emerald-700">{dashData.today.fitastyRatio}%</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Weekly Averages */}
       <Card>
         <CardHeader className="pb-2">

@@ -71,6 +71,27 @@
       "when": 1771598068981,
       "tag": "0009_tiresome_senator_kelly",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1771620598986,
+      "tag": "0010_light_bloodaxe",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1771622794781,
+      "tag": "0011_add_body_report_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1771622836590,
+      "tag": "0012_inbody_boditrax_support",
+      "breakpoints": true
     }
   ]
 }

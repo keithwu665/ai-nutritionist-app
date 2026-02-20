@@ -364,6 +364,39 @@ export async function deleteFitastyProduct(id: number) {
   return true;
 }
 
+export async function searchFitastyProducts(query: string) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    const { like } = await import('drizzle-orm');
+    const result = await db.select().from(fitastyProducts)
+      .where(and(
+        eq(fitastyProducts.isActive, 1),
+        like(fitastyProducts.name, `%${query}%`)
+      ))
+      .orderBy(fitastyProducts.category, fitastyProducts.name)
+      .limit(20);
+    return result;
+  } catch (error) {
+    console.error('Error searching Fitasty products:', error);
+    return [];
+  }
+}
+
+export async function getFitastyProductById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.select().from(fitastyProducts)
+      .where(and(eq(fitastyProducts.id, id), eq(fitastyProducts.isActive, 1)))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('Error fetching Fitasty product by ID:', error);
+    return null;
+  }
+}
+
 
 export async function getBodyMetricByDate(userId: number, date: string) {
   const db = await getDb();

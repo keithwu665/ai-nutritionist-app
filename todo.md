@@ -501,3 +501,80 @@
 - [x] All 64 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint and production use
+
+
+## PHASE 2: Fitasty Product Integration - IN PROGRESS
+
+### A) Admin CRUD for Fitasty Products
+- [ ] List all Fitasty products (paginated, searchable)
+- [ ] Create new product (name, category, serving size, macros)
+- [ ] Edit existing product
+- [ ] Delete product
+- [ ] Bulk import products from CSV
+- [ ] Admin page UI with table and action buttons
+
+### B) Food Log Search + One-Click Add
+- [ ] Search Fitasty products by name/category
+- [ ] Display search results with macros
+- [ ] One-click add to daily food log
+- [ ] Confirm add with quantity selector
+- [ ] Update daily macros totals immediately
+
+### C) Dashboard Macros Ratio Visualization
+- [ ] Display daily macro breakdown (protein, carbs, fat)
+- [ ] Show percentage breakdown (pie chart or bar chart)
+- [ ] Show daily totals vs recommended targets
+- [ ] Visual progress indicator
+
+### D) Simple Recommendation Rules Engine
+- [ ] Rule: If protein < 30% of calories, suggest protein-rich foods
+- [ ] Rule: If carbs > 60% of calories, suggest balanced meals
+- [ ] Rule: If fat > 35% of calories, suggest lean options
+- [ ] Display recommendations on dashboard
+
+## PHASE 2: InBody / Boditrax Photo Import - PENDING
+
+### A) Template System
+- [ ] Create body_report_templates table schema
+- [ ] Global seed templates for InBody and Boditrax
+- [ ] User can save custom templates
+- [ ] Template field mapping UI
+
+### B) Storage Bucket Integration
+- [ ] Upload photo to S3 storage
+- [ ] Store reference in database
+- [ ] Generate presigned URL for viewing
+
+### C) Import Confirmation Flow
+- [ ] Upload photo
+- [ ] Select template
+- [ ] Preview extracted fields
+- [ ] Confirm import (source='photo')
+- [ ] Save to body_metrics with source='photo'
+
+### D) Verification
+- [ ] Test InBody photo import
+- [ ] Test Boditrax photo import
+- [ ] Verify metrics stored correctly
+- [ ] Verify source='photo' in database
+
+
+## PHASE 2 MODULE 1: Fitasty Product Integration (FULL) - IN PROGRESS
+- [ ] A) UI: Add Fitasty search in food log add screen with one-click add
+- [ ] A) Verify calorie + macros auto-fill correctly
+- [ ] B) Dashboard: Calculate today's Fitasty usage ratio
+- [ ] B) Show % of calories from Fitasty products with visual indicator
+- [ ] C) Goal-based recommendations: Fat loss → low-cal Fitasty items
+- [ ] C) Goal-based recommendations: Muscle gain → high-protein Fitasty items
+- [ ] D) End-to-end test: Add product → food log → dashboard ratio
+
+## PHASE 2 MODULE 3: InBody/Boditrax Photo Import + Template System - NOT STARTED
+- [ ] 3A) Create body-reports storage bucket with upload access
+- [ ] 3B) Update body_metrics schema (source, report_photo_url, measured_at, fat_mass_kg, ffm_kg)
+- [ ] 3B) Create body_report_templates table with provider, user_id, fields (jsonb)
+- [ ] 3B) Seed 2 global templates (InBody standard, Boditrax standard)
+- [ ] 3C) Build import flow: upload → storage → confirmation page → editable fields → save
+- [ ] 3D) Build template system: provider selection, auto-apply mapping, save custom template
+- [ ] 3D) Auto-load last used template, prevent deletion of required fields
+- [ ] 3E) Create BodyReportParserProvider interface (extensible, manual override allowed)
+- [ ] Verify: Database migrations, new tables, UI screens, successful import examples

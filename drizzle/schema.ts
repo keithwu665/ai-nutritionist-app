@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, int, varchar, decimal, text, timestamp, mysqlEnum, tinyint, index } from "drizzle-orm/mysql-core"
+import { mysqlTable, int, varchar, decimal, text, timestamp, mysqlEnum, tinyint, primaryKey } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm"
 
 export const bodyMetrics = mysqlTable("body_metrics", {
@@ -9,18 +9,34 @@ export const bodyMetrics = mysqlTable("body_metrics", {
 	bodyFatPercent: decimal({ precision: 4, scale: 1 }),
 	muscleMassKg: decimal({ precision: 5, scale: 1 }),
 	note: text(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	source: varchar({ length: 50 }), // 'manual', 'photo', 'device'
+	report_photo_url: varchar({ length: 500 }), // S3 URL of the report photo
+	measured_at: timestamp({ mode: 'string' }), // When the measurement was taken
+	fat_mass_kg: decimal({ precision: 5, scale: 1 }), // Fat mass in kg
+	ffm_kg: decimal({ precision: 5, scale: 1 }), // Fat-free mass in kg
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
 export const bodyReportTemplates = mysqlTable("body_report_templates", {
 	id: int().autoincrement().notNull(),
-	userId: int(),
+	userId: int(), // null = global template, userId = user custom template
 	provider: mysqlEnum(['inbody','boditrax','other']).notNull(),
 	name: varchar({ length: 255 }).notNull(),
-	fieldsJson: text().notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	fieldsJson: text().notNull(), // JSON mapping of field names
+	isGlobal: tinyint().default(0).notNull(), // 1 = global template, 0 = user template
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const bodyReportPhotos = mysqlTable("body_report_photos", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	provider: mysqlEnum(['inbody','boditrax']).notNull(),
+	photoUrl: varchar({ length: 500 }).notNull(),
+	storageKey: varchar({ length: 500 }).notNull(),
+	parsedData: text(), // JSON of parsed data from the report
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 export const dailyTips = mysqlTable("daily_tips", {
@@ -28,7 +44,7 @@ export const dailyTips = mysqlTable("daily_tips", {
 	category: varchar({ length: 100 }).notNull(),
 	type: mysqlEnum(['encouragement','tip','warning']).notNull(),
 	content: text().notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 export const exercises = mysqlTable("exercises", {
@@ -40,21 +56,22 @@ export const exercises = mysqlTable("exercises", {
 	caloriesBurned: decimal({ precision: 8, scale: 1 }).notNull(),
 	intensity: mysqlEnum(['low','moderate','high']),
 	note: text(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
-	export const bodyPhotos = mysqlTable("body_photos", {
-		id: int().autoincrement().notNull(),
-		userId: int().notNull(),
-		photoUrl: varchar({ length: 500 }).notNull(),
-		storageKey: varchar({ length: 500 }),
-		description: text(),
-		tags: varchar({ length: 255 }),
-		uploadedAt: varchar({ length: 10 }).notNull(),
-		createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-	});
+export const bodyPhotos = mysqlTable("body_photos", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	photoUrl: varchar({ length: 500 }).notNull(),
+	storageKey: varchar({ length: 500 }),
+	description: text(),
+	tags: varchar({ length: 255 }),
+	uploadedAt: varchar({ length: 10 }).notNull(),
+	source: varchar({ length: 50 }), // 'manual', 'inbody', 'boditrax'
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
 
 export const fitastyProducts = mysqlTable("fitasty_products", {
 	id: int().autoincrement().notNull(),
@@ -68,7 +85,7 @@ export const fitastyProducts = mysqlTable("fitasty_products", {
 	description: text(),
 	imageUrl: varchar({ length: 500 }),
 	isActive: tinyint().default(1).notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 	deletedAt: timestamp({ mode: 'string' }),
 });
@@ -83,7 +100,7 @@ export const foodLogItems = mysqlTable("food_log_items", {
 	proteinG: decimal({ precision: 6, scale: 1 }),
 	carbsG: decimal({ precision: 6, scale: 1 }),
 	fatG: decimal({ precision: 6, scale: 1 }),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
@@ -91,7 +108,7 @@ export const foodLogs = mysqlTable("food_logs", {
 	id: int().autoincrement().notNull(),
 	userId: int().notNull(),
 	date: varchar({ length: 10 }).notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
@@ -100,46 +117,34 @@ export const userProfiles = mysqlTable("user_profiles", {
 	userId: int().notNull(),
 	gender: mysqlEnum(['male','female']).notNull(),
 	age: int().notNull(),
-	heightCm: decimal({ precision: 5, scale: 1 }).notNull(),
-	weightKg: decimal({ precision: 5, scale: 1 }).notNull(),
+	heightCm: varchar({ length: 10 }).notNull(),
+	weightKg: varchar({ length: 10 }).notNull(),
 	fitnessGoal: mysqlEnum(['lose','maintain','gain']).notNull(),
 	activityLevel: mysqlEnum(['sedentary','light','moderate','high']).notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-},
-(table) => [
-	index("user_profiles_userId_unique").on(table.userId),
-]);
+});
 
 export const users = mysqlTable("users", {
-	id: int().autoincrement().notNull(),
-	openId: varchar({ length: 64 }).notNull(),
-	name: text(),
-	email: varchar({ length: 320 }),
-	loginMethod: varchar({ length: 64 }),
+	id: int().autoincrement().notNull().primaryKey(),
+	openId: varchar({ length: 255 }).notNull().unique(),
+	email: varchar({ length: 255 }),
+	name: varchar({ length: 255 }),
+	loginMethod: varchar({ length: 50 }),
+	lastSignedIn: timestamp({ mode: 'string' }),
 	role: mysqlEnum(['user','admin']).default('user').notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-	lastSignedIn: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-},
-(table) => [
-	index("users_openId_unique").on(table.openId),
-]);
-
+});
 
 export const activityLogs = mysqlTable("activity_logs", {
 	id: int().autoincrement().notNull(),
 	userId: int().notNull(),
-	actionType: mysqlEnum(['UPLOAD_PHOTO', 'DELETE_PHOTO', 'GENERATE_NUTRITION_PDF', 'IMPORT_BODY_CSV', 'CREATE_BODY_METRIC', 'UPDATE_BODY_METRIC']).notNull(),
-	entityType: varchar({ length: 100 }),
-	entityId: varchar({ length: 255 }),
-	status: mysqlEnum(['SUCCESS', 'FAIL']).notNull(),
+	actionType: varchar({ length: 50 }).notNull(),
+	entityType: varchar({ length: 50 }),
+	entityId: varchar({ length: 50 }),
+	status: mysqlEnum(['success','failed','pending']).default('pending').notNull(),
 	errorMessage: text(),
-	metadata: text(), // JSON stored as string
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-},
-(table) => [
-	index("activity_logs_userId_idx").on(table.userId),
-	index("activity_logs_actionType_idx").on(table.actionType),
-	index("activity_logs_createdAt_idx").on(table.createdAt),
-]);
+	metadata: text(),
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
