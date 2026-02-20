@@ -453,14 +453,13 @@ export async function createBodyPhoto(data: {
   description?: string;
   tags?: string;
   uploadedAt: string;
-  isAiGenerated?: number | boolean;
-  sourcePhotoId?: number;
-  aiGoalDeltaKg?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   const { encryptMetadata } = await import("./encryption");
+  
+  console.log('[UPLOAD_PHOTO] Starting insert', { userId: data.userId, photoUrl: data.photoUrl, uploadedAt: data.uploadedAt });
   
   const result = await db.insert(bodyPhotos).values({
     userId: data.userId,
@@ -469,11 +468,9 @@ export async function createBodyPhoto(data: {
     description: data.description ? encryptMetadata(data.description) : null,
     tags: data.tags ? encryptMetadata(data.tags) : null,
     uploadedAt: data.uploadedAt,
-    isAiGenerated: (data.isAiGenerated ? 1 : 0) as any,
-    sourcePhotoId: data.sourcePhotoId || null,
-    aiGoalDeltaKg: data.aiGoalDeltaKg || null,
   });
   
+  console.log('[UPLOAD_PHOTO] Insert successful', { result });
   return result;
 }
 
@@ -491,14 +488,17 @@ export async function getBodyPhotos(userId: number) {
     .where(eq(bodyPhotos.userId, userId))
     .orderBy(desc(bodyPhotos.uploadedAt));
   
-  console.log('[GET_PHOTOS] Query result', { userId, count: photos.length, firstRow: photos[0] ? { id: photos[0].id, userId: photos[0].userId, isAiGenerated: photos[0].isAiGenerated } : null });
+  console.log('[GET_PHOTOS] Query result', { userId, count: photos.length, firstRow: photos[0] ? { id: photos[0].id, userId: photos[0].userId, photoUrl: photos[0].photoUrl } : null });
   
   // Decrypt metadata for display
-  return photos.map(photo => ({
+  const decrypted = photos.map(photo => ({
     ...photo,
     description: photo.description ? decryptMetadata(photo.description) : null,
     tags: photo.tags ? decryptMetadata(photo.tags) : null,
   }));
+  
+  console.log('[GET_PHOTOS] Decryption complete', { count: decrypted.length });
+  return decrypted;
 }
 
 export async function getBodyPhoto(photoId: number, userId: number) {

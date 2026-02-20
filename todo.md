@@ -377,3 +377,16 @@
 - [x] All 64 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint
+
+
+## CRITICAL: Progress Photo Upload Regression Fix - COMPLETE
+- [x] Inspected actual DB schema: SHOW CREATE TABLE body_photos
+- [x] Identified root cause: Drizzle schema had 12 columns but actual DB has only 9 (missing AI fields)
+- [x] Fixed createBodyPhoto to only insert 6 columns that exist in actual schema
+- [x] Updated Drizzle schema to match actual database (removed isAiGenerated, aiGoalDeltaKg, sourcePhotoId, aiPrompt)
+- [x] Added verbose logging to createBodyPhoto (UPLOAD_PHOTO start/success)
+- [x] Fixed getBodyPhotos logging to not reference non-existent isAiGenerated field
+- [x] Verified gallery query filters by session userId
+- [x] All 64 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint

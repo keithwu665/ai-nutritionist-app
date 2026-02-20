@@ -1,0 +1,26 @@
+{
+  "query": "SHOW CREATE TABLE body_photos;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SHOW CREATE TABLE body_photos;",
+  "rows": [
+    {
+      "Table": "body_photos",
+      "Create Table": "CREATE TABLE `body_photos` ("
+    }
+  ],
+  "messages": [
+    "  `id` int NOT NULL AUTO_INCREMENT,",
+    "  `userId` int NOT NULL,",
+    "  `photoUrl` varchar(500) NOT NULL,",
+    "  `storageKey` varchar(500) DEFAULT NULL,",
+    "  `description` text DEFAULT NULL,",
+    "  `tags` varchar(255) DEFAULT NULL,",
+    "  `uploadedAt` varchar(10) NOT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=120001"
+  ],
+  "stdout": "Table\tCreate Table\nbody_photos\tCREATE TABLE `body_photos` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `userId` int NOT NULL,\n  `photoUrl` varchar(500) NOT NULL,\n  `storageKey` varchar(500) DEFAULT NULL,\n  `description` text DEFAULT NULL,\n  `tags` varchar(255) DEFAULT NULL,\n  `uploadedAt` varchar(10) NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=120001\n",
+  "stderr": "",
+  "execution_time_ms": 1508
+}
