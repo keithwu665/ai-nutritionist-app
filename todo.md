@@ -204,3 +204,15 @@
 - [x] Verify PDF output quality and data accuracy
 - [x] All 50 tests passing
 - [x] TypeScript: 0 errors
+
+## Nutrition Report UI - Visible Section on FoodLog - COMPLETE
+- [x] Add Nutrition Report card/section directly under macro summary
+- [x] Add 7/30-day range selector (buttons or dropdown)
+- [x] Add "Download PDF" primary button with loading state
+- [x] Implement PDF download handler with Blob + URL.createObjectURL
+- [x] Handle iOS Safari popup blockers and mobile download
+- [x] Show loading state and disable button during generation
+- [x] Show error toast on failure
+- [x] Add integration test for report download (10 tests)
+- [x] All 50 tests passing
+- [x] TypeScript: 0 errors

@@ -22,7 +22,6 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFitastySearch, setShowFitastySearch] = useState(false);
   const [reportDateRange, setReportDateRange] = useState<'7d' | '30d'>('7d');
-  const [isDownloadingReport, setIsDownloadingReport] = useState(false);
   const [newItem, setNewItem] = useState({
     mealType: 'lunch' as typeof mealTypes[number],
     name: '',
@@ -211,6 +210,53 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
               <p className="text-xs text-gray-400">g</p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Nutrition Report Section */}
+      <Card className="border-emerald-200 bg-emerald-50">
+        <CardHeader>
+          <CardTitle className="text-emerald-700">營養報告</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+            <div className="flex gap-2">
+              <Button
+                variant={reportDateRange === '7d' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setReportDateRange('7d')}
+                className="flex-1 sm:flex-none"
+              >
+                最近7天
+              </Button>
+              <Button
+                variant={reportDateRange === '30d' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setReportDateRange('30d')}
+                className="flex-1 sm:flex-none"
+              >
+                最近30天
+              </Button>
+            </div>
+            <Button
+              onClick={handleDownloadReport}
+              disabled={downloadPDFMutation.isPending}
+              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              {downloadPDFMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  生成中...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4 mr-2" />
+                  下載PDF報告
+                </>
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-gray-600">下載{reportDateRange === '7d' ? '最近7天' : '最近30天'}的營養詳細報告（包含每日巨量營養素分析）</p>
         </CardContent>
       </Card>
 
