@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 
 interface AIGoalPhotoModalProps {
@@ -23,21 +24,26 @@ export function AIGoalPhotoModal({
   const [selectedDelta, setSelectedDelta] = useState(-15);
   const generateMutation = trpc.bodyPhotos.generateGoalPhoto.useMutation({
     onSuccess: () => {
-      console.log('AI goal photo generated successfully');
+      console.log('[AI_GENERATE] AI goal photo generated successfully');
+      toast.success('AI目標相片生成成功');
       onOpenChange(false);
       onSuccess();
     },
     onError: (error) => {
-      console.error('Failed to generate AI goal photo:', error);
+      const errorMsg = error instanceof Error ? error.message : '未知錯誤';
+      console.error('[AI_GENERATE] Failed to generate AI goal photo:', errorMsg);
+      toast.error(`生成失敗: ${errorMsg}`);
     },
   });
 
   const handleGenerate = async () => {
     if (!selectedPhotoId) {
-      alert('請先選擇一張相片');
+      console.log('[AI_GENERATE] No photo selected');
+      toast.error('請先選擇一張相片');
       return;
     }
 
+    console.log('[AI_GENERATE] Starting generation', { sourcePhotoId: selectedPhotoId, deltaKg: selectedDelta });
     generateMutation.mutate({
       sourcePhotoId: selectedPhotoId,
       deltaKg: selectedDelta,
@@ -89,6 +95,17 @@ export function AIGoalPhotoModal({
           <div className="bg-blue-50 p-3 rounded-md text-sm text-blue-900">
             <p>AI 模擬結果僅供參考，不代表實際成果。</p>
           </div>
+
+          {/* Progress Indicator */}
+          {generateMutation.isPending && (
+            <div className="bg-blue-50 p-4 rounded-md flex items-center gap-3">
+              <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+              <div className="text-sm text-blue-900">
+                <p className="font-medium">正在生成AI目標相片...</p>
+                <p className="text-xs text-blue-700 mt-1">此過程可能需要 30-60 秒</p>
+              </div>
+            </div>
+          )}
 
           {/* Buttons */}
           <div className="flex gap-3 justify-end">

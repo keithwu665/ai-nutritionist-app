@@ -106,15 +106,15 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
   };
 
   const handleUpload = async () => {
-    console.log('UPLOAD_CLICKED', { file: file?.name, date, preview: !!preview });
+    console.log('[UPLOAD] Button clicked', { file: file?.name, date, preview: !!preview });
     
     if (!validateForm()) {
-      console.log('VALIDATION_FAILED', { file: !!file, date: !!date });
+      console.log('[UPLOAD] Validation failed', { file: !!file, date: !!date });
       return;
     }
 
     if (!file || !preview) {
-      console.log('MISSING_FILE_OR_PREVIEW');
+      console.log('[UPLOAD] Missing file or preview');
       setErrors(prev => ({
         ...prev,
         file: '請選擇照片'
@@ -122,12 +122,25 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
       return;
     }
 
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+      console.log('[UPLOAD] Invalid date format', { date });
+      setErrors(prev => ({
+        ...prev,
+        date: '日期格式無效 (應為 YYYY-MM-DD)'
+      }));
+      return;
+    }
+
     setIsLoading(true);
-    console.log('UPLOAD_START', { fileName: file.name, fileSize: file.size, mimeType: file.type });
+    console.log('[UPLOAD] Starting upload', { fileName: file.name, fileSize: file.size, mimeType: file.type, uploadedAt: date });
     try {
       // Convert base64 preview to base64 data
       const base64Data = preview.split(',')[1];
+      console.log('[UPLOAD] Base64 data prepared', { length: base64Data.length });
 
+      console.log('[UPLOAD] Calling uploadFile mutation', { uploadedAt: date });
       await uploadMutation.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -138,6 +151,8 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
         uploadedAt: date,
       });
 
+      console.log('[UPLOAD] Mutation completed successfully');
+      
       // Reset form
       setFile(null);
       setPreview(null);
@@ -150,14 +165,17 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
       }
 
       // Invalidate queries to refresh the gallery
-      console.log('UPLOAD_SUCCESS');
+      console.log('[UPLOAD] Invalidating bodyPhotos query');
       await queryClient.invalidateQueries({ queryKey: ['bodyPhotos'] });
+      console.log('[UPLOAD] Upload success - calling onUploadSuccess callback');
       onUploadSuccess?.();
     } catch (error) {
-      console.error('UPLOAD_FAIL', error);
+      console.error('[UPLOAD] Upload failed', error);
+      const errorMsg = error instanceof Error ? error.message : '未知錯誤';
+      console.error('[UPLOAD] Error message:', errorMsg);
       setErrors(prev => ({
         ...prev,
-        submit: `上傳失敗: ${error instanceof Error ? error.message : '未知錯誤'}`
+        submit: `上傳失敗: ${errorMsg}`
       }));
     } finally {
       setIsLoading(false);

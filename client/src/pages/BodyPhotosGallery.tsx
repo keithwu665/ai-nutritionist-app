@@ -39,6 +39,25 @@ export default function BodyPhotosGallery() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
 
+  // Handle modal state to prevent overlap
+  const handleUploadModalOpen = (open: boolean) => {
+    console.log('[MODAL] Upload modal state changed', { open });
+    if (open && aiModalOpen) {
+      console.log('[MODAL] Closing AI modal to prevent overlap');
+      setAiModalOpen(false);
+    }
+    setDialogOpen(open);
+  };
+
+  const handleAIModalOpen = (open: boolean) => {
+    console.log('[MODAL] AI modal state changed', { open });
+    if (open && dialogOpen) {
+      console.log('[MODAL] Closing upload modal to prevent overlap');
+      setDialogOpen(false);
+    }
+    setAiModalOpen(open);
+  };
+
   const { data: photos, isLoading } = trpc.bodyPhotos.list.useQuery();
   const { data: bodyMetrics } = trpc.bodyMetrics.list.useQuery({});
   const utils = trpc.useUtils();
@@ -280,9 +299,9 @@ export default function BodyPhotosGallery() {
                   <Button
                     onClick={handleStartCompare}
                     disabled={selectedPhotos.size !== 2}
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                    className="flex-1"
                   >
-                    開始比較 ({selectedPhotos.size}/2)
+                    開始比較
                   </Button>
                 </div>
               </>
@@ -298,7 +317,7 @@ export default function BodyPhotosGallery() {
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h1 className="text-2xl font-bold">進度照片</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="flex gap-2 flex-wrap">
           <Button
             onClick={() => setAiModalOpen(true)}
             className="bg-blue-600 hover:bg-blue-700"
@@ -306,27 +325,30 @@ export default function BodyPhotosGallery() {
           >
             <Zap className="h-4 w-4 mr-1" /> 生成目標相片 (AI)
           </Button>
-          <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700">
-              <Plus className="h-4 w-4 mr-1" /> 上傳照片
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>上傳進度照片</DialogTitle>
-            </DialogHeader>
-            <BodyPhotosUpload onUploadSuccess={() => {
-              setDialogOpen(false);
-            }} />
+          <Dialog open={dialogOpen} onOpenChange={handleUploadModalOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="h-4 w-4 mr-1" /> 上傳照片
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>上傳進度照片</DialogTitle>
+              </DialogHeader>
+              <BodyPhotosUpload onUploadSuccess={() => {
+                setDialogOpen(false);
+              }} />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
       <AIGoalPhotoModal
         open={aiModalOpen}
-        onOpenChange={setAiModalOpen}
+        onOpenChange={handleAIModalOpen}
         photos={sortedPhotos}
         onSuccess={() => utils.bodyPhotos.list.invalidate()}
       />
-          </DialogContent>
-        </Dialog>
-      </div>
 
       {/* Compare buttons */}
       {sortedPhotos.length >= 2 && (
@@ -363,57 +385,51 @@ export default function BodyPhotosGallery() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedPhotos.map((photo) => (
             <Card key={photo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative group">
-
-                <img
-                  src={photo.photoUrl}
-                  alt={photo.description || 'Photo'}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => setPhotoToDelete(photo.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" /> 刪除
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>刪除照片？</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          此操作無法復原，照片將被永久刪除。
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <div className="flex gap-2">
-                        <AlertDialogCancel>取消</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(photo.id)}
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          刪除
-                        </AlertDialogAction>
-                      </div>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
-              <CardContent className="p-3 space-y-2">
-                <p className="text-sm font-medium text-gray-600">{photo.uploadedAt}</p>
-                <p className="text-sm text-gray-700 line-clamp-2">{photo.description}</p>
-
+              <img
+                src={photo.photoUrl}
+                alt={photo.description || 'Progress photo'}
+                className="w-full h-48 object-cover"
+              />
+              <CardContent className="p-4 space-y-2">
+                <p className="text-xs text-gray-500">{photo.uploadedAt}</p>
+                {photo.description && <p className="text-sm text-gray-700">{photo.description}</p>}
                 {photo.tags && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {photo.tags.split(',').map((tag, i) => (
-                      <span key={i} className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                  <div className="flex flex-wrap gap-1">
+                    {photo.tags.split(',').map((tag: string, i: number) => (
+                      <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
                         {tag.trim()}
                       </span>
                     ))}
                   </div>
                 )}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="w-full mt-2"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" /> 刪除
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>確認刪除</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        此操作無法撤銷。您確定要刪除此照片嗎?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="flex gap-3">
+                      <AlertDialogCancel>取消</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(photo.id)}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        刪除
+                      </AlertDialogAction>
+                    </div>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
           ))}

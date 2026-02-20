@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, userId, photoUrl, description, uploadedAt FROM body_photos ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, userId, photoUrl, description, uploadedAt FROM body_photos ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "150004",
+      "userId": "1",
+      "photoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/1/1771600068110-test_photo_3.jpg",
+      "description": "bce56a583e402108b5b56125032c8384:f13deb7fb4d439dd194712799c2fb993:71e17a31599e7b843095665c9426824cca713680f3d4194a8c",
+      "uploadedAt": "2026-02-20"
+    },
+    {
+      "id": "150003",
+      "userId": "6",
+      "photoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/6/1771599107761-image.jpg",
+      "description": "5a8961b4c0daf4713de15b0f9cb0213c:04cfe94a989019b16ed08aa19a459118:b2d4d8f50c37",
+      "uploadedAt": "2026-02-20"
+    },
+    {
+      "id": "150002",
+      "userId": "6",
+      "photoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/6/1771599087749-IMG_1571.png",
+      "description": "NULL",
+      "uploadedAt": "2026-02-20"
+    },
+    {
+      "id": "150001",
+      "userId": "6",
+      "photoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/6/1771599073618-IMG_1570.png",
+      "description": "NULL",
+      "uploadedAt": "2026-02-20"
+    },
+    {
+      "id": "120001",
+      "userId": "1",
+      "photoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/1/1771598181949-test_photo.jpg",
+      "description": "8181b8d9bad13a8ab2441b0b277e2059:6c577661585bc27490196f27b02fceba:2f7a93fad94ef04d22d1c9684ff8dc1685",
+      "uploadedAt": "2026-02-20"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tphotoUrl\tdescription\tuploadedAt\n150004\t1\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/1/1771600068110-test_photo_3.jpg\tbce56a583e402108b5b56125032c8384:f13deb7fb4d439dd194712799c2fb993:71e17a31599e7b843095665c9426824cca713680f3d4194a8c\t2026-02-20\n150003\t6\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/6/1771599107761-image.jpg\t5a8961b4c0daf4713de15b0f9cb0213c:04cfe94a989019b16ed08aa19a459118:b2d4d8f50c37\t2026-02-20\n150002\t6\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/6/1771599087749-IMG_1571.png\tNULL\t2026-02-20\n150001\t6\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/6/1771599073618-IMG_1570.png\tNULL\t2026-02-20\n120001\t1\thttps://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/body-photos/1/1771598181949-test_photo.jpg\t8181b8d9bad13a8ab2441b0b277e2059:6c577661585bc27490196f27b02fceba:2f7a93fad94ef04d22d1c9684ff8dc1685\t2026-02-20\n",
+  "stderr": "",
+  "execution_time_ms": 1624
+}

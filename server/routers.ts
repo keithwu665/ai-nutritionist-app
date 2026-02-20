@@ -579,14 +579,17 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         // Session-locked: userId is immutable from session context
         const userId = ctx.user.id;
+        console.log('[SERVER] uploadFile mutation received', { userId, fileName: input.fileName, uploadedAt: input.uploadedAt });
         if (!userId) throw new Error("User ID not found in session");
         
         const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
         if (!allowedMimes.includes(input.mimeType)) {
+          console.error('[SERVER] Invalid MIME type', { mimeType: input.mimeType });
           throw new Error("Invalid file type");
         }
         const MAX_SIZE = 10 * 1024 * 1024;
         if (input.fileSize > MAX_SIZE) {
+          console.error('[SERVER] File too large', { fileSize: input.fileSize });
           throw new Error("File too large");
         }
         const { logActivity } = await import("./activityLogger");
@@ -595,15 +598,29 @@ export const appRouter = router({
         try {
           // Check rate limits (admin users are exempt)
           const isAdmin = ctx.user.role === 'admin';
+          console.log('[SERVER] Checking upload rate limit', { userId, isAdmin });
           const rateLimitCheck = await checkUploadRateLimit(userId, isAdmin);
           if (!rateLimitCheck.allowed) {
+            console.error('[SERVER] Rate limit exceeded', { reason: rateLimitCheck.reason });
             throw new Error(rateLimitCheck.reason || 'Upload limit exceeded');
           }
           
+          console.log('[SERVER] Converting base64 to buffer', { base64Length: input.base64Data.length });
           const buffer = Buffer.from(input.base64Data, "base64");
           const { storagePut } = await import("./storage");
           const fileKey = `body-photos/${userId}/${Date.now()}-${input.fileName}`;
+          console.log('[SERVER] Uploading to storage', { fileKey });
           const { url } = await storagePut(fileKey, buffer, input.mimeType);
+          console.log('[SERVER] Storage upload successful', { url });
+          
+          // Validate date format (YYYY-MM-DD)
+          const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+          if (!dateRegex.test(input.uploadedAt)) {
+            console.error('[SERVER] Invalid date format', { uploadedAt: input.uploadedAt });
+            throw new Error(`Invalid date format: ${input.uploadedAt} (expected YYYY-MM-DD)`);
+          }
+          
+          console.log('[SERVER] Creating body photo record', { userId, uploadedAt: input.uploadedAt });
           const photo = await db.createBodyPhoto({
             userId: userId,
             photoUrl: url,
@@ -612,9 +629,12 @@ export const appRouter = router({
             tags: input.tags,
             uploadedAt: input.uploadedAt,
           });
+          console.log('[SERVER] Body photo created successfully', { insertResult: photo });
           
           // Log successful upload (non-blocking - don't block upload if logging fails)
-          const photoId = (photo as any)?.id || (photo as any)?.[0]?.id;
+          // Extract photoId from Drizzle insert result: result is an array with ResultSetHeader at [0]
+          const photoId = (photo as any)?.[0]?.insertId || (photo as any)?.insertId;
+          console.log('[SERVER] Extracted photoId from insert result', { photoId, photoType: typeof photoId, success: !!photoId });
           if (photoId) {
             try {
               await logActivity({

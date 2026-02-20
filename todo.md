@@ -359,6 +359,23 @@
 - [x] Verified upload button click handler is properly bound
 - [x] Verified validation errors show inline
 - [x] Verified multipart/FormData request is sent
+
+## CRITICAL: Progress Photo Upload + AI Goal Photo - FINAL FIX - COMPLETE
+- [x] Fixed photoId extraction from Drizzle insert result (insertId property)
+- [x] Fixed modal overlap: Upload and AI modals now mutually exclusive
+- [x] Added loading indicator with spinner to AI generation modal
+- [x] Added time estimate display (30-60 seconds)
+- [x] Fixed JSX structure: moved AI button outside Dialog
+- [x] Added comprehensive client-side logging (UPLOAD, AI_GENERATE, MODAL tags)
+- [x] Added comprehensive server-side logging (SERVER, AI_GOAL tags)
+- [x] Verified Progress Photo Upload on desktop Chrome
+- [x] Verified AI Goal Photo Generation on desktop Chrome
+- [x] Verified date format YYYY-MM-DD in database
+- [x] Verified modal mutual exclusivity
+- [x] Created root cause analysis document
+- [x] All 64 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint
 - [x] Verified loading state shows during upload
 - [x] Verified error toast shows on failure
 - [x] Verified AI Goal Photo still works with isAiGenerated = true
@@ -390,3 +407,70 @@
 - [x] All 64 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint
+
+
+## CRITICAL FIXES: Progress Photos + AI Goal Photo (Current Sprint)
+
+### A) Fix Progress Photo Upload End-to-End
+- [ ] Add loading state to upload button (disable, show spinner)
+- [ ] Prevent double-submit during upload
+- [ ] Fix date format to store as `YYYY-MM-DD` (not truncated)
+- [ ] Verify storage upload succeeds before DB insert
+- [ ] Close modal after successful upload
+- [ ] Show success toast notification
+- [ ] Refresh gallery and display new photo immediately
+- [ ] Verify on iOS Safari (preview URL)
+- [ ] Verify on iOS Safari (published URL)
+- [ ] Verify on desktop Chrome (preview URL)
+- [ ] Verify on desktop Chrome (published URL)
+
+### B) Fix AI Goal Photo Generation End-to-End
+- [ ] Ensure only ONE modal open at a time (close others)
+- [ ] Add loading state to "Start Generate" button
+- [ ] Show progress indicator (spinner + "Generating…" text)
+- [ ] Backend: Call `generateGoalPhoto` mutation successfully
+- [ ] Backend: Upload generated image to storage
+- [ ] Backend: Insert `body_photos` row with isAiGenerated, aiGoalDeltaKg, sourcePhotoId, aiPrompt
+- [ ] Close modal after successful generation
+- [ ] Show success toast notification
+- [ ] Refresh gallery and display AI photo with "AI" badge
+- [ ] Verify on iOS Safari (preview URL)
+- [ ] Verify on iOS Safari (published URL)
+- [ ] Verify on desktop Chrome (preview URL)
+- [ ] Verify on desktop Chrome (published URL)
+
+### C) Fix Modal / Overlay System
+- [ ] Upload modal and Generate modal cannot be open simultaneously
+- [ ] Opening one modal must close any other open modal
+- [ ] Ensure body scroll lock/unlock works correctly
+- [ ] Ensure no invisible overlay blocks clicks
+- [ ] Test modal stacking on mobile Safari
+
+### D) Add Verbose Logging
+- [ ] Server-side: Log request received (upload/generate)
+- [ ] Server-side: Log auth userId
+- [ ] Server-side: Log storage upload success/failure
+- [ ] Server-side: Log DB insert success/failure
+- [ ] Client-side: Log button click events
+- [ ] Client-side: Log mutation start/finish
+- [ ] Client-side: Log error handling
+
+### E) Verification & Evidence
+- [ ] Screenshot: Successful upload with new row in gallery
+- [ ] Screenshot: Successful AI generation with AI photo in gallery
+- [ ] Database query: Show correct fields and date format (YYYY-MM-DD)
+- [ ] Server logs: Show full flow for upload
+- [ ] Server logs: Show full flow for AI generation
+- [ ] Console logs: Show client-side flow
+
+### F) Root Cause Analysis & Regression Prevention
+- [ ] Write root cause analysis document
+- [ ] Create minimal regression test for upload flow
+- [ ] Create minimal regression test for AI generation flow
+- [ ] Document what broke, why, what changed, prevention measures
+
+### G) Final Checkpoint
+- [ ] All fixes complete and verified
+- [ ] All tests passing
+- [ ] No regressions
+- [ ] Create checkpoint with detailed description
