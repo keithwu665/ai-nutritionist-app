@@ -395,13 +395,21 @@ export const appRouter = router({
   // ========================================================================
   bodyPhotos: router({
     list: protectedProcedure.query(async ({ ctx }) => {
-      return db.getBodyPhotos(ctx.user.id);
+      // Session-locked: userId is immutable from session context
+      const userId = ctx.user.id;
+      if (!userId) throw new Error("User ID not found in session");
+      return db.getBodyPhotos(userId);
     }),
 
     get: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
-        return db.getBodyPhoto(input.id, ctx.user.id);
+        // Session-locked: userId is immutable from session context
+        const userId = ctx.user.id;
+        if (!userId) throw new Error("User ID not found in session");
+        const photo = await db.getBodyPhoto(input.id, userId);
+        if (!photo) throw new Error("Photo not found or unauthorized");
+        return photo;
       }),
 
     create: protectedProcedure
@@ -413,8 +421,11 @@ export const appRouter = router({
         uploadedAt: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Session-locked: userId is immutable from session context
+        const userId = ctx.user.id;
+        if (!userId) throw new Error("User ID not found in session");
         return db.createBodyPhoto({
-          userId: ctx.user.id,
+          userId: userId,
           ...input,
         });
       }),
@@ -430,6 +441,10 @@ export const appRouter = router({
         uploadedAt: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Session-locked: userId is immutable from session context
+        const userId = ctx.user.id;
+        if (!userId) throw new Error("User ID not found in session");
+        
         const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
         if (!allowedMimes.includes(input.mimeType)) {
           throw new Error("Invalid file type");
@@ -440,10 +455,10 @@ export const appRouter = router({
         }
         const buffer = Buffer.from(input.base64Data, "base64");
         const { storagePut } = await import("./storage");
-        const fileKey = `body-photos/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+        const fileKey = `body-photos/${userId}/${Date.now()}-${input.fileName}`;
         const { url } = await storagePut(fileKey, buffer, input.mimeType);
         return db.createBodyPhoto({
-          userId: ctx.user.id,
+          userId: userId,
           photoUrl: url,
           storageKey: fileKey,
           description: input.description,
@@ -455,7 +470,11 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        return db.deleteBodyPhoto(input.id, ctx.user.id);
+        // Session-locked: userId is immutable from session context
+        const userId = ctx.user.id;
+        if (!userId) throw new Error("User ID not found in session");
+        // deleteBodyPhoto already verifies ownership and throws if not found
+        return db.deleteBodyPhoto(input.id, userId);
       }),
   }),
 

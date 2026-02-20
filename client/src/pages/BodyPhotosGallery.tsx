@@ -24,6 +24,10 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export default function BodyPhotosGallery() {
+  // Session-locked: Get userId from authenticated session
+  const { data: user } = trpc.auth.me.useQuery();
+  const sessionUserId = user?.id;
+
   const [photoToDelete, setPhotoToDelete] = useState<number | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [comparePhotos, setComparePhotos] = useState<[any, any] | null>(null);
@@ -31,6 +35,19 @@ export default function BodyPhotosGallery() {
 
   const { data: photos, isLoading } = trpc.bodyPhotos.list.useQuery();
   const utils = trpc.useUtils();
+
+  // Session-locked: Validate all photos belong to current user
+  const validatedPhotos = useMemo(() => {
+    if (!photos || !sessionUserId) return [];
+    return photos.filter(photo => {
+      // Verify photo belongs to current session user
+      if (photo.userId !== sessionUserId) {
+        console.warn(`[Security] Attempted access to photo from different user: ${photo.userId} vs ${sessionUserId}`);
+        return false;
+      }
+      return true;
+    });
+  }, [photos, sessionUserId]);
 
   const deleteMutation = trpc.bodyPhotos.delete.useMutation({
     onSuccess: () => {
@@ -42,18 +59,29 @@ export default function BodyPhotosGallery() {
   });
 
   const handleDelete = (photoId: number) => {
+    // Session-locked: Verify photo belongs to current user before delete
+    const photo = validatedPhotos.find(p => p.id === photoId);
+    if (!photo || photo.userId !== sessionUserId) {
+      toast.error('無權限刪除此照片');
+      return;
+    }
     deleteMutation.mutate({ id: photoId });
   };
 
   const handleCompare = (photo1: any, photo2: any) => {
+    // Session-locked: Verify both photos belong to current user before compare
+    if (photo1.userId !== sessionUserId || photo2.userId !== sessionUserId) {
+      toast.error('無權限對比此照片');
+      return;
+    }
     setComparePhotos([photo1, photo2]);
     setCompareMode(true);
   };
 
   const sortedPhotos = useMemo(() => {
-    if (!photos) return [];
-    return [...photos].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
-  }, [photos]);
+    if (!validatedPhotos) return [];
+    return [...validatedPhotos].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+  }, [validatedPhotos]);
 
   if (compareMode && comparePhotos) {
     return (

@@ -493,13 +493,16 @@ export async function deleteBodyPhoto(photoId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Verify ownership before deleting
+  // Verify ownership before deleting (session-locked userId validation)
   const photo = await getBodyPhoto(photoId, userId);
   if (!photo) throw new Error("Photo not found or unauthorized");
   
-  return db.delete(bodyPhotos)
+  // Delete is safe because ownership was verified above
+  await db.delete(bodyPhotos)
     .where(and(
       eq(bodyPhotos.id, photoId),
       eq(bodyPhotos.userId, userId)
     ));
+  
+  return { success: true };
 }

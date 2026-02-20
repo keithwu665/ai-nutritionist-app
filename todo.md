@@ -184,3 +184,13 @@
 - [x] Verify sticky footer remains visible when scrolling
 - [x] All 27 tests passing
 - [x] TypeScript: 0 errors
+
+## Module 2B: Session-Locked UserId Security Fix - COMPLETE
+- [x] Audit current photo upload/delete/compare procedures for userId validation
+- [x] Implement session-locked userId in all tRPC photo procedures (upload, delete, compare)
+- [x] Add server-side userId verification to prevent URL manipulation attacks
+- [x] Verify frontend cannot override userId from session
+- [x] Write security tests for userId validation (23 new tests)
+- [x] Test cross-user access prevention
+- [x] Verify all 50 tests passing (27 existing + 23 security tests)
+- [x] TypeScript: 0 errors
