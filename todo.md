@@ -320,3 +320,21 @@
 - [x] All 60 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint
+
+
+## AI Goal Simulation Photo Feature - COMPLETE
+- [x] Add isAiGenerated, aiGoalDeltaKg, sourcePhotoId, aiPrompt fields to body_photos table
+- [x] Create database migration with indexes on (userId, isAiGenerated) and (userId, date)
+- [x] Create backend generateGoalPhoto mutation with session-locked userId
+- [x] Implement AI image-to-image editing with weight loss simulation prompt
+- [x] Add storage upload for generated AI image
+- [x] Add activity logging for AI_GOAL_GENERATE action
+- [x] Implement error handling for AI failures and storage issues
+- [x] Create frontend modal for photo selection and goal preset
+- [x] Add "生成目標相片 (AI)" button to progress photos page
+- [x] Update gallery to display AI-generated photos with "AI 模擬" badge
+- [x] Add disclaimer text under AI-generated photos
+- [x] Write unit tests for ownership validation and deltaKg validation
+- [x] All 64 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint

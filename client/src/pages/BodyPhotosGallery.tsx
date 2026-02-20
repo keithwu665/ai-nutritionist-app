@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Loader2, Eye, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { BodyPhotosUpload } from '@/components/BodyPhotosUpload';
+import { AIGoalPhotoModal } from '@/components/AIGoalPhotoModal';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -36,6 +37,7 @@ export default function BodyPhotosGallery() {
   const [comparePhotos, setComparePhotos] = useState<[any, any] | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<Set<number>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [aiModalOpen, setAiModalOpen] = useState(false);
 
   const { data: photos, isLoading } = trpc.bodyPhotos.list.useQuery();
   const { data: bodyMetrics } = trpc.bodyMetrics.list.useQuery({});
@@ -294,9 +296,16 @@ export default function BodyPhotosGallery() {
   // Main gallery view
   return (
     <div className="p-4 md:p-8 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h1 className="text-2xl font-bold">進度照片</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Button
+            onClick={() => setAiModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+            disabled={sortedPhotos.length === 0}
+          >
+            <Zap className="h-4 w-4 mr-1" /> 生成目標相片 (AI)
+          </Button>
           <DialogTrigger asChild>
             <Button className="bg-emerald-600 hover:bg-emerald-700">
               <Plus className="h-4 w-4 mr-1" /> 上傳照片
@@ -309,6 +318,12 @@ export default function BodyPhotosGallery() {
             <BodyPhotosUpload onUploadSuccess={() => {
               setDialogOpen(false);
             }} />
+      <AIGoalPhotoModal
+        open={aiModalOpen}
+        onOpenChange={setAiModalOpen}
+        photos={sortedPhotos}
+        onSuccess={() => utils.bodyPhotos.list.invalidate()}
+      />
           </DialogContent>
         </Dialog>
       </div>
@@ -349,6 +364,11 @@ export default function BodyPhotosGallery() {
           {sortedPhotos.map((photo) => (
             <Card key={photo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative group">
+                {photo.isAiGenerated && (
+                  <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 z-10">
+                    <Zap className="h-3 w-3" /> AI
+                  </div>
+                )}
                 <img
                   src={photo.photoUrl}
                   alt={photo.description || 'Photo'}
@@ -385,9 +405,15 @@ export default function BodyPhotosGallery() {
                   </AlertDialog>
                 </div>
               </div>
-              <CardContent className="p-3">
+              <CardContent className="p-3 space-y-2">
                 <p className="text-sm font-medium text-gray-600">{photo.uploadedAt}</p>
                 <p className="text-sm text-gray-700 line-clamp-2">{photo.description}</p>
+                {photo.isAiGenerated && (
+                  <div className="bg-blue-50 border border-blue-200 rounded p-2 text-xs text-blue-800">
+                    <p className="font-semibold">⚠️ AI 生成相片</p>
+                    <p>此相片由 AI 生成，僅供參考。</p>
+                  </div>
+                )}
                 {photo.tags && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {photo.tags.split(',').map((tag, i) => (

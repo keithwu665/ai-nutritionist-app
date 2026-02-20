@@ -52,6 +52,10 @@ export const exercises = mysqlTable("exercises", {
 		description: text(),
 		tags: varchar({ length: 255 }),
 		uploadedAt: varchar({ length: 10 }).notNull(),
+		isAiGenerated: tinyint().default(0).notNull(),
+		aiGoalDeltaKg: int(),
+		sourcePhotoId: int(),
+		aiPrompt: text(),
 		createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 	});

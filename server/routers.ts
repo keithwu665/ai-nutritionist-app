@@ -718,11 +718,23 @@ export const appRouter = router({
           throw error;
         }
       }),
-  }),
 
+    generateGoalPhoto: protectedProcedure
+      .input(z.object({
+        sourcePhotoId: z.number(),
+        deltaKg: z.number().default(-15),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        if (!userId) throw new Error('User ID not found in session');
+        
+        const { generateGoalPhoto } = await import('./aiGoalPhoto');
+        return generateGoalPhoto(userId, input.sourcePhotoId, input.deltaKg);
+      }),
+  }),
   // ========================================================================
   // Fitasty Products (Admin-only)
-  // ========================================================================
+  // =========================================================================
   fitastyProducts: router({
     list: publicProcedure.query(async () => {
       return db.getAllFitastyProducts();
