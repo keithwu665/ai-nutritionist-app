@@ -613,31 +613,41 @@ export const appRouter = router({
             uploadedAt: input.uploadedAt,
           });
           
-          // Log successful upload (non-blocking)
+          // Log successful upload (non-blocking - don't block upload if logging fails)
           const photoId = (photo as any)?.id || (photo as any)?.[0]?.id;
           if (photoId) {
-            await logActivity({
-              userId,
-              actionType: 'UPLOAD_PHOTO',
-              entityType: 'body_photo',
-              entityId: photoId,
-              status: 'SUCCESS',
-              metadata: { fileName: input.fileName, fileSize: input.fileSize, mimeType: input.mimeType },
-            });
+            try {
+              await logActivity({
+                userId,
+                actionType: 'UPLOAD_PHOTO',
+                entityType: 'body_photo',
+                entityId: photoId,
+                status: 'SUCCESS',
+                metadata: { fileName: input.fileName, fileSize: input.fileSize, mimeType: input.mimeType },
+              });
+            } catch (logError) {
+              console.error('[UPLOAD_PHOTO] Failed to log success:', logError);
+              // Don't throw - upload succeeded even if logging failed
+            }
           }
           
           return photo;
         } catch (error) {
-          // Log failed upload (non-blocking)
+          // Log failed upload (non-blocking - don't block error if logging fails)
           const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-          await logActivity({
-            userId,
-            actionType: 'UPLOAD_PHOTO',
-            entityType: 'body_photo',
-            status: 'FAIL',
-            errorMessage: errorMsg,
-            metadata: { fileName: input.fileName, fileSize: input.fileSize },
-          });
+          try {
+            await logActivity({
+              userId,
+              actionType: 'UPLOAD_PHOTO',
+              entityType: 'body_photo',
+              status: 'FAIL',
+              errorMessage: errorMsg,
+              metadata: { fileName: input.fileName, fileSize: input.fileSize },
+            });
+          } catch (logError) {
+            console.error('[UPLOAD_PHOTO] Failed to log error:', logError);
+            // Don't throw - we want to report the original error
+          }
           throw error;
         }
       }),

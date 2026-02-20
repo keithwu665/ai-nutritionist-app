@@ -364,11 +364,7 @@ export default function BodyPhotosGallery() {
           {sortedPhotos.map((photo) => (
             <Card key={photo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative group">
-                {photo.isAiGenerated && (
-                  <div className="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 z-10">
-                    <Zap className="h-3 w-3" /> AI
-                  </div>
-                )}
+
                 <img
                   src={photo.photoUrl}
                   alt={photo.description || 'Photo'}
@@ -408,12 +404,7 @@ export default function BodyPhotosGallery() {
               <CardContent className="p-3 space-y-2">
                 <p className="text-sm font-medium text-gray-600">{photo.uploadedAt}</p>
                 <p className="text-sm text-gray-700 line-clamp-2">{photo.description}</p>
-                {photo.isAiGenerated && (
-                  <div className="bg-blue-50 border border-blue-200 rounded p-2 text-xs text-blue-800">
-                    <p className="font-semibold">⚠️ AI 生成相片</p>
-                    <p>此相片由 AI 生成，僅供參考。</p>
-                  </div>
-                )}
+
                 {photo.tags && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {photo.tags.split(',').map((tag, i) => (

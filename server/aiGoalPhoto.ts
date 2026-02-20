@@ -67,12 +67,6 @@ export async function generateGoalPhoto(
       description: `AI Goal Simulation (-${Math.abs(deltaKg)}kg)`,
       tags: `AI Goal, -${Math.abs(deltaKg)}kg`,
       uploadedAt: new Date().toISOString().split('T')[0],
-      isAiGenerated: 1,
-      aiGoalDeltaKg: deltaKg,
-      sourcePhotoId,
-      aiPrompt: AI_GOAL_PROMPT,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     });
 
     const newPhotoId = (result as any).insertId;
