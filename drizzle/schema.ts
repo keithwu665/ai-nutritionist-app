@@ -44,15 +44,17 @@ export const exercises = mysqlTable("exercises", {
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
-export const bodyPhotos = mysqlTable("body_photos", {
-	id: int().autoincrement().notNull(),
-	userId: int().notNull(),
-	photoUrl: varchar({ length: 500 }).notNull(),
-	description: text(),
-	uploadedAt: varchar({ length: 10 }).notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-});
+	export const bodyPhotos = mysqlTable("body_photos", {
+		id: int().autoincrement().notNull(),
+		userId: int().notNull(),
+		photoUrl: varchar({ length: 500 }).notNull(),
+		storageKey: varchar({ length: 500 }),
+		description: text(),
+		tags: varchar({ length: 255 }),
+		uploadedAt: varchar({ length: 10 }).notNull(),
+		createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	});
 
 export const fitastyProducts = mysqlTable("fitasty_products", {
 	id: int().autoincrement().notNull(),

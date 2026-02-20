@@ -449,7 +449,9 @@ export async function deleteBodyReportTemplate(templateId: number) {
 export async function createBodyPhoto(data: {
   userId: number;
   photoUrl: string;
+  storageKey?: string;
   description?: string;
+  tags?: string;
   uploadedAt: string;
 }) {
   const db = await getDb();
@@ -458,7 +460,9 @@ export async function createBodyPhoto(data: {
   const result = await db.insert(bodyPhotos).values({
     userId: data.userId,
     photoUrl: data.photoUrl,
+    storageKey: data.storageKey || null,
     description: data.description || null,
+    tags: data.tags || null,
     uploadedAt: data.uploadedAt,
   });
   

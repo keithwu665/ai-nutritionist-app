@@ -407,13 +407,48 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         photoUrl: z.string().url(),
+        storageKey: z.string().optional(),
         description: z.string().optional(),
+        tags: z.string().optional(),
         uploadedAt: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.createBodyPhoto({
           userId: ctx.user.id,
           ...input,
+        });
+      }),
+
+    uploadFile: protectedProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileSize: z.number(),
+        mimeType: z.string(),
+        base64Data: z.string(),
+        description: z.string().optional(),
+        tags: z.string().optional(),
+        uploadedAt: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedMimes.includes(input.mimeType)) {
+          throw new Error("Invalid file type");
+        }
+        const MAX_SIZE = 10 * 1024 * 1024;
+        if (input.fileSize > MAX_SIZE) {
+          throw new Error("File too large");
+        }
+        const buffer = Buffer.from(input.base64Data, "base64");
+        const { storagePut } = await import("./storage");
+        const fileKey = `body-photos/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+        return db.createBodyPhoto({
+          userId: ctx.user.id,
+          photoUrl: url,
+          storageKey: fileKey,
+          description: input.description,
+          tags: input.tags,
+          uploadedAt: input.uploadedAt,
         });
       }),
 
@@ -448,6 +483,7 @@ export const appRouter = router({
         carbsG: z.number().nonnegative().optional(),
         fatG: z.number().nonnegative().optional(),
         description: z.string().optional(),
+        tags: z.string().optional(),
         imageUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -473,6 +509,7 @@ export const appRouter = router({
         carbsG: z.number().nonnegative().optional(),
         fatG: z.number().nonnegative().optional(),
         description: z.string().optional(),
+        tags: z.string().optional(),
         imageUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
