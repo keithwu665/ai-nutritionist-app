@@ -168,3 +168,19 @@
 - [x] Implement before/after compare mode with side-by-side view
 - [x] Verify end-to-end on preview
 - [x] Create checkpoint
+
+## Module 2B: Mobile Usability Bug Fix - COMPLETE
+- [x] Fix modal layout for iOS/mobile: max-height constraint with overflow handling
+- [x] Implement sticky footer for Upload button (always visible)
+- [x] Add safe-area-inset-bottom padding for iOS bottom toolbar
+- [x] Implement WebKit smooth scrolling (-webkit-overflow-scrolling: touch)
+- [x] Add keyboard visibility handling with scroll-into-view
+- [x] Implement inline validation with error messages (no alerts)
+- [x] Disable Upload button until file + date selected
+- [x] Add loading state to prevent double submit
+- [x] Test on desktop viewport (modal scrolls, footer sticky)
+- [x] Verify on mobile viewport (390x844 iPhone size)
+- [x] Verify modal scrolls when content exceeds viewport
+- [x] Verify sticky footer remains visible when scrolling
+- [x] All 27 tests passing
+- [x] TypeScript: 0 errors
