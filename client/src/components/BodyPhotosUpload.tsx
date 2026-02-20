@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { trpc } from '@/lib/trpc';
@@ -63,6 +62,8 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
+    console.log('FILE_SELECTED', { name: selectedFile?.name, size: selectedFile?.size, type: selectedFile?.type });
+    
     if (!selectedFile) return;
 
     // Clear previous file error
@@ -75,6 +76,7 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(selectedFile.type)) {
+      console.log('INVALID_FILE_TYPE', { type: selectedFile.type });
       setErrors(prev => ({
         ...prev,
         file: '無效的文件類型。請上傳 JPG、PNG 或 WebP。'
@@ -85,6 +87,7 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
     // Validate file size (10MB)
     const MAX_SIZE = 10 * 1024 * 1024;
     if (selectedFile.size > MAX_SIZE) {
+      console.log('FILE_TOO_LARGE', { size: selectedFile.size, maxSize: MAX_SIZE });
       setErrors(prev => ({
         ...prev,
         file: '文件過大。最大大小為 10MB。'
@@ -103,11 +106,15 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
   };
 
   const handleUpload = async () => {
+    console.log('UPLOAD_CLICKED', { file: file?.name, date, preview: !!preview });
+    
     if (!validateForm()) {
+      console.log('VALIDATION_FAILED', { file: !!file, date: !!date });
       return;
     }
 
     if (!file || !preview) {
+      console.log('MISSING_FILE_OR_PREVIEW');
       setErrors(prev => ({
         ...prev,
         file: '請選擇照片'
@@ -116,6 +123,7 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
     }
 
     setIsLoading(true);
+    console.log('UPLOAD_START', { fileName: file.name, fileSize: file.size, mimeType: file.type });
     try {
       // Convert base64 preview to base64 data
       const base64Data = preview.split(',')[1];
@@ -142,10 +150,11 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
       }
 
       // Invalidate queries to refresh the gallery
+      console.log('UPLOAD_SUCCESS');
       await queryClient.invalidateQueries({ queryKey: ['bodyPhotos'] });
       onUploadSuccess?.();
     } catch (error) {
-      console.error('Upload failed:', error);
+      console.error('UPLOAD_FAIL', error);
       setErrors(prev => ({
         ...prev,
         submit: `上傳失敗: ${error instanceof Error ? error.message : '未知錯誤'}`
@@ -267,13 +276,14 @@ export function BodyPhotosUpload({ onUploadSuccess }: BodyPhotosUploadProps) {
           paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))',
         }}
       >
-        <Button
+        <button
+          type="button"
           onClick={handleUpload}
           disabled={!file || isLoading}
-          className="flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isLoading ? '上傳中...' : '上傳照片'}
-        </Button>
+        </button>
       </div>
     </div>
   );

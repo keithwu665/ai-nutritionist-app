@@ -338,3 +338,17 @@
 - [x] All 64 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint
+
+
+## URGENT: Upload Regression Fix - COMPLETE
+- [x] Reproduce upload regression on mobile Safari and desktop Chrome
+- [x] Add debug logging to track upload flow (UPLOAD_CLICKED, FILE_SELECTED, UPLOAD_START, UPLOAD_SUCCESS/FAIL)
+- [x] Fix button binding: replaced shadcn Button with native <button type="button"> with onClick handler
+- [x] Verify file input is present and accessible
+- [x] Ensure upload request fires and completes
+- [x] Verify DB row inserted with correct userId and isAiGenerated=false
+- [x] Verify gallery refreshes and new photo appears
+- [x] Verify AI Goal Generation feature still works
+- [x] All 64 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint
