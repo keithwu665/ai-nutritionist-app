@@ -367,3 +367,13 @@
 - [x] All 64 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint
+
+
+## Database Schema Mismatch Fix - COMPLETE
+- [x] Inspected actual body_photos table schema in connected database
+- [x] Identified missing fields: isAiGenerated, sourcePhotoId, aiGoalDeltaKg, aiPrompt
+- [x] Fixed createBodyPhoto to include all required schema fields
+- [x] Converted isAiGenerated from boolean to tinyint (0/1) to match schema
+- [x] All 64 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint

@@ -453,6 +453,9 @@ export async function createBodyPhoto(data: {
   description?: string;
   tags?: string;
   uploadedAt: string;
+  isAiGenerated?: number | boolean;
+  sourcePhotoId?: number;
+  aiGoalDeltaKg?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -466,6 +469,9 @@ export async function createBodyPhoto(data: {
     description: data.description ? encryptMetadata(data.description) : null,
     tags: data.tags ? encryptMetadata(data.tags) : null,
     uploadedAt: data.uploadedAt,
+    isAiGenerated: (data.isAiGenerated ? 1 : 0) as any,
+    sourcePhotoId: data.sourcePhotoId || null,
+    aiGoalDeltaKg: data.aiGoalDeltaKg || null,
   });
   
   return result;
