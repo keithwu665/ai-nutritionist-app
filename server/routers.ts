@@ -214,27 +214,53 @@ export const appRouter = router({
         const startDateStr = startDate.toISOString().split('T')[0];
         const endDateStr = endDate.toISOString().split('T')[0];
         const items = await db.getFoodLogItemsForDateRange(ctx.user.id, startDateStr, endDateStr);
+        console.log(`[PDF Report] userId=${ctx.user.id}, dateRange=${input.dateRange}, startDate=${startDateStr}, endDate=${endDateStr}, itemsCount=${items.length}`);
+        
         if (items.length === 0) throw new Error('No nutrition data found');
+        
         const userProfile = await db.getUserProfile(ctx.user.id);
         const dailyData: any = {};
         let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+        
+        // Group items by date and meal type
         items.forEach((item: any) => {
           const date = item.date;
-          if (!dailyData[date]) dailyData[date] = { calories: 0, protein: 0, carbs: 0, fat: 0, meals: [] };
+          if (!dailyData[date]) {
+            dailyData[date] = { 
+              calories: 0, protein: 0, carbs: 0, fat: 0, 
+              meals: { breakfast: [], lunch: [], dinner: [], snack: [] } 
+            };
+          }
+          
           const cal = parseFloat(item.calories.toString());
           const prot = item.proteinG ? parseFloat(item.proteinG.toString()) : 0;
           const carb = item.carbsG ? parseFloat(item.carbsG.toString()) : 0;
           const fat = item.fatG ? parseFloat(item.fatG.toString()) : 0;
+          
           dailyData[date].calories += cal;
           dailyData[date].protein += prot;
           dailyData[date].carbs += carb;
           dailyData[date].fat += fat;
-          dailyData[date].meals.push(item);
+          
+          // Group by meal type
+          const mealType = item.mealType || 'snack';
+          const meals = dailyData[date].meals as any;
+          if (!meals[mealType]) meals[mealType] = [];
+          meals[mealType].push({
+            name: item.name,
+            calories: cal,
+            protein: prot,
+            carbs: carb,
+            fat: fat,
+          });
+          
           totalCalories += cal;
           totalProtein += prot;
           totalCarbs += carb;
           totalFat += fat;
         });
+        
+        console.log(`[PDF Report] daysTracked=${Object.keys(dailyData).length}, totalItems=${items.length}`);
         const daysCount = Object.keys(dailyData).length;
         return {
           dateRange: input.dateRange, startDate: startDateStr, endDate: endDateStr, daysCount, dailyData,
@@ -255,27 +281,53 @@ export const appRouter = router({
         const startDateStr = startDate.toISOString().split('T')[0];
         const endDateStr = endDate.toISOString().split('T')[0];
         const items = await db.getFoodLogItemsForDateRange(ctx.user.id, startDateStr, endDateStr);
+        console.log(`[PDF Report] userId=${ctx.user.id}, dateRange=${input.dateRange}, startDate=${startDateStr}, endDate=${endDateStr}, itemsCount=${items.length}`);
+        
         if (items.length === 0) throw new Error('No nutrition data found');
+        
         const userProfile = await db.getUserProfile(ctx.user.id);
         const dailyData: any = {};
         let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+        
+        // Group items by date and meal type
         items.forEach((item: any) => {
           const date = item.date;
-          if (!dailyData[date]) dailyData[date] = { calories: 0, protein: 0, carbs: 0, fat: 0, meals: [] };
+          if (!dailyData[date]) {
+            dailyData[date] = { 
+              calories: 0, protein: 0, carbs: 0, fat: 0, 
+              meals: { breakfast: [], lunch: [], dinner: [], snack: [] } 
+            };
+          }
+          
           const cal = parseFloat(item.calories.toString());
           const prot = item.proteinG ? parseFloat(item.proteinG.toString()) : 0;
           const carb = item.carbsG ? parseFloat(item.carbsG.toString()) : 0;
           const fat = item.fatG ? parseFloat(item.fatG.toString()) : 0;
+          
           dailyData[date].calories += cal;
           dailyData[date].protein += prot;
           dailyData[date].carbs += carb;
           dailyData[date].fat += fat;
-          dailyData[date].meals.push(item);
+          
+          // Group by meal type
+          const mealType = item.mealType || 'snack';
+          const meals = dailyData[date].meals as any;
+          if (!meals[mealType]) meals[mealType] = [];
+          meals[mealType].push({
+            name: item.name,
+            calories: cal,
+            protein: prot,
+            carbs: carb,
+            fat: fat,
+          });
+          
           totalCalories += cal;
           totalProtein += prot;
           totalCarbs += carb;
           totalFat += fat;
         });
+        
+        console.log(`[PDF Report] daysTracked=${Object.keys(dailyData).length}, totalItems=${items.length}`);
         const daysCount = Object.keys(dailyData).length;
         const reportData = {
           dateRange: input.dateRange, startDate: startDateStr, endDate: endDateStr, daysCount, dailyData,

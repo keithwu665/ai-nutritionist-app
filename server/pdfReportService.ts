@@ -144,10 +144,11 @@ export async function generateNutritionPDF(reportData: ReportData): Promise<Buff
           let hasItems = false;
 
           mealTypes.forEach((mealType) => {
-            if (dayData.meals[mealType as keyof typeof dayData.meals] && dayData.meals[mealType as keyof typeof dayData.meals].length > 0) {
+            const meals = dayData.meals as any;
+            if (meals[mealType] && meals[mealType].length > 0) {
               hasItems = true;
               doc.fontSize(10).font('Helvetica-Bold').text(`  ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}`);
-              dayData.meals[mealType as keyof typeof dayData.meals].forEach((item: any) => {
+              meals[mealType].forEach((item: any) => {
                 doc.fontSize(9).font('Helvetica').text(
                   `    • ${item.name} — ${item.calories}kcal, P:${item.protein}g C:${item.carbs}g F:${item.fat}g`,
                   { width: 500 }

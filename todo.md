@@ -225,3 +225,11 @@
 - [x] Implement session-locked userId validation (via protectedProcedure)
 - [x] All 50 tests passing
 - [x] TypeScript: 0 errors
+
+## Food Log Items Join Fix - COMPLETE
+- [x] Fix downloadPDF procedure to properly group food_log_items by meal type
+- [x] Ensure items are fetched via foodLogId foreign key relationship
+- [x] Add debug logging for data counts (itemsCount, daysTracked)
+- [x] Update PDF service to render meals by meal type
+- [x] All 50 tests passing
+- [x] TypeScript: 0 errors
