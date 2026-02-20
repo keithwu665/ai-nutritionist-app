@@ -10,6 +10,7 @@ import {
   exercises,
   fitastyProducts,
   bodyReportTemplates,
+  bodyPhotos,
 } from "../drizzle/schema";
 
 type InsertUser = InferInsertModel<typeof users>;
@@ -20,6 +21,7 @@ type InsertFoodLogItem = InferInsertModel<typeof foodLogItems>;
 type InsertExercise = InferInsertModel<typeof exercises>;
 type InsertFitastyProduct = InferInsertModel<typeof fitastyProducts>;
 type InsertBodyReportTemplate = InferInsertModel<typeof bodyReportTemplates>;
+type InsertBodyPhoto = InferInsertModel<typeof bodyPhotos>;
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -437,4 +439,63 @@ export async function deleteBodyReportTemplate(templateId: number) {
   
   return db.delete(bodyReportTemplates)
     .where(eq(bodyReportTemplates.id, templateId));
+}
+
+
+// ========================================================================
+// Body Photos
+// ========================================================================
+
+export async function createBodyPhoto(data: {
+  userId: number;
+  photoUrl: string;
+  description?: string;
+  uploadedAt: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(bodyPhotos).values({
+    userId: data.userId,
+    photoUrl: data.photoUrl,
+    description: data.description || null,
+    uploadedAt: data.uploadedAt,
+  });
+  
+  return result;
+}
+
+export async function getBodyPhotos(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(bodyPhotos)
+    .where(eq(bodyPhotos.userId, userId))
+    .orderBy(desc(bodyPhotos.uploadedAt));
+}
+
+export async function getBodyPhoto(photoId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(bodyPhotos)
+    .where(and(
+      eq(bodyPhotos.id, photoId),
+      eq(bodyPhotos.userId, userId)
+    ))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function deleteBodyPhoto(photoId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Verify ownership before deleting
+  const photo = await getBodyPhoto(photoId, userId);
+  if (!photo) throw new Error("Photo not found or unauthorized");
+  
+  return db.delete(bodyPhotos)
+    .where(and(
+      eq(bodyPhotos.id, photoId),
+      eq(bodyPhotos.userId, userId)
+    ));
 }

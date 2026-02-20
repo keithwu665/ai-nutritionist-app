@@ -56,6 +56,11 @@ export default function BodyMetrics() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">身體數據</h1>
         <div className="flex gap-2">
+          <Link href="/body/photos">
+            <Button variant="outline">
+              進度照片
+            </Button>
+          </Link>
           <Link href="/body/import-csv">
             <Button variant="outline">
               匯入 CSV

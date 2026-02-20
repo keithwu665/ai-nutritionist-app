@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import BodyMetrics from "./pages/BodyMetrics";
 import BodyMetricsAdd from "./pages/BodyMetricsAdd";
 import BodyMetricsImportCSV from "./pages/BodyMetricsImportCSV";
+import BodyPhotosGallery from "./pages/BodyPhotosGallery";
 import FoodLog from "./pages/FoodLog";
 import ExerciseLog from "./pages/ExerciseLog";
 import Settings from "./pages/Settings";
@@ -46,6 +47,11 @@ function Router() {
       <Route path={"/body/import-csv"}>
         <AppLayout>
           <BodyMetricsImportCSV />
+        </AppLayout>
+      </Route>
+      <Route path={"/body/photos"}>
+        <AppLayout>
+          <BodyPhotosGallery />
         </AppLayout>
       </Route>
       <Route path={"/food"}>

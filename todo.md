@@ -159,3 +159,12 @@
 - [x] Test duplicate handling (overwrite mode)
 - [x] Verify database writes
 - [x] Verify dashboard updates
+
+## Module 2B: Progress Photos (MVP 1-4) - COMPLETE
+- [x] Create body_photos table schema (id, userId, photoUrl, uploadedAt, description)
+- [x] Implement photo upload tRPC procedure with S3 storage
+- [x] Create /body/photos page with timeline gallery (date-sorted)
+- [x] Implement delete with ownership enforcement
+- [x] Implement before/after compare mode with side-by-side view
+- [x] Verify end-to-end on preview
+- [x] Create checkpoint

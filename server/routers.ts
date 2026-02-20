@@ -391,6 +391,40 @@ export const appRouter = router({
   }),
 
   // ========================================================================
+  // Body Photos
+  // ========================================================================
+  bodyPhotos: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return db.getBodyPhotos(ctx.user.id);
+    }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.getBodyPhoto(input.id, ctx.user.id);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        photoUrl: z.string().url(),
+        description: z.string().optional(),
+        uploadedAt: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.createBodyPhoto({
+          userId: ctx.user.id,
+          ...input,
+        });
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.deleteBodyPhoto(input.id, ctx.user.id);
+      }),
+  }),
+
+  // ========================================================================
   // Fitasty Products (Admin-only)
   // ========================================================================
   fitastyProducts: router({
