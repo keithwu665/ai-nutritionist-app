@@ -216,3 +216,12 @@
 - [x] Add integration test for report download (10 tests)
 - [x] All 50 tests passing
 - [x] TypeScript: 0 errors
+
+## Combined Nutrition + Body Metrics PDF Report - COMPLETE
+- [x] Update FoodLog UI: add section checkboxes (Macro Summary, Food Log Details, Body Metrics)
+- [x] Update downloadPDF mutation to accept section selections
+- [x] Enhance pdfReportService to include food log details section
+- [x] Add body metrics section to PDF (weight/body fat/muscle trends)
+- [x] Implement session-locked userId validation (via protectedProcedure)
+- [x] All 50 tests passing
+- [x] TypeScript: 0 errors

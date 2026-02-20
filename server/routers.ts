@@ -205,7 +205,7 @@ export const appRouter = router({
       }),
 
     generateReport: protectedProcedure
-      .input(z.object({ dateRange: z.enum(['7d', '30d']) }))
+      .input(z.object({ dateRange: z.enum(['7d', '30d']), sections: z.object({ macroSummary: z.boolean(), foodLogDetails: z.boolean(), bodyMetrics: z.boolean() }).optional() }))
       .query(async ({ ctx, input }) => {
         const endDate = new Date();
         const startDate = new Date();
@@ -245,7 +245,7 @@ export const appRouter = router({
       }),
 
     downloadPDF: protectedProcedure
-      .input(z.object({ dateRange: z.enum(['7d', '30d']) }))
+      .input(z.object({ dateRange: z.enum(['7d', '30d']), sections: z.object({ macroSummary: z.boolean(), foodLogDetails: z.boolean(), bodyMetrics: z.boolean() }).optional() }))
       .mutation(async ({ ctx, input }) => {
         const { generateNutritionPDF } = await import('./pdfReportService');
         const endDate = new Date();

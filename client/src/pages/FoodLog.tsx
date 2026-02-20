@@ -22,6 +22,11 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFitastySearch, setShowFitastySearch] = useState(false);
   const [reportDateRange, setReportDateRange] = useState<'7d' | '30d'>('7d');
+  const [reportSections, setReportSections] = useState({
+    macroSummary: true,
+    foodLogDetails: true,
+    bodyMetrics: true,
+  });
   const [newItem, setNewItem] = useState({
     mealType: 'lunch' as typeof mealTypes[number],
     name: '',
@@ -113,7 +118,7 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
   });
 
   const handleDownloadReport = () => {
-    downloadPDFMutation.mutate({ dateRange: reportDateRange });
+    downloadPDFMutation.mutate({ dateRange: reportDateRange, sections: reportSections });
   };
 
   const totals = useMemo(() => {
@@ -256,6 +261,39 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
               )}
             </Button>
           </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-700">報告內容：</p>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reportSections.macroSummary}
+                  onChange={(e) => setReportSections({...reportSections, macroSummary: e.target.checked})}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-gray-700">巨量營養素摘要</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reportSections.foodLogDetails}
+                  onChange={(e) => setReportSections({...reportSections, foodLogDetails: e.target.checked})}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-gray-700">飲食記錄詳情</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reportSections.bodyMetrics}
+                  onChange={(e) => setReportSections({...reportSections, bodyMetrics: e.target.checked})}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm text-gray-700">身體指標變化</span>
+              </label>
+            </div>
+          </div>
+
           <p className="text-xs text-gray-600">下載{reportDateRange === '7d' ? '最近7天' : '最近30天'}的營養詳細報告（包含每日巨量營養素分析）</p>
         </CardContent>
       </Card>
