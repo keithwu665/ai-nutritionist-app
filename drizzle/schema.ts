@@ -125,3 +125,21 @@ export const users = mysqlTable("users", {
 (table) => [
 	index("users_openId_unique").on(table.openId),
 ]);
+
+
+export const activityLogs = mysqlTable("activity_logs", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	actionType: mysqlEnum(['UPLOAD_PHOTO', 'DELETE_PHOTO', 'GENERATE_NUTRITION_PDF', 'IMPORT_BODY_CSV', 'CREATE_BODY_METRIC', 'UPDATE_BODY_METRIC']).notNull(),
+	entityType: varchar({ length: 100 }),
+	entityId: varchar({ length: 255 }),
+	status: mysqlEnum(['SUCCESS', 'FAIL']).notNull(),
+	errorMessage: text(),
+	metadata: text(), // JSON stored as string
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("activity_logs_userId_idx").on(table.userId),
+	index("activity_logs_actionType_idx").on(table.actionType),
+	index("activity_logs_createdAt_idx").on(table.createdAt),
+]);

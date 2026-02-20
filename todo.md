@@ -233,3 +233,25 @@
 - [x] Update PDF service to render meals by meal type
 - [x] All 50 tests passing
 - [x] TypeScript: 0 errors
+
+## Module 2B: Activity Audit Logging (2B-5) - COMPLETE
+- [x] Create activity_logs table schema with userId, actionType, entityType, entityId, status, errorMessage, metadata, createdAt
+- [x] Add logging helper function for recording actions
+- [x] Log photo upload actions (SUCCESS/FAIL)
+- [x] Log photo delete actions (SUCCESS/FAIL)
+- [x] Ensure userId always from session (never from request)
+- [x] Ensure logging doesn't block primary actions
+- [x] Create admin-only /admin/activity page with pagination and filters
+- [x] Add tests for activity logging
+- [x] All 60 tests passing
+- [x] TypeScript: 0 errors
+
+## Module 2B: Upload Rate Limiting (2B-6) - COMPLETE
+- [x] Implement per-user rate limit: max 10 uploads/day
+- [x] Implement per-user rate limit: max 3 uploads/10 minutes
+- [x] Use DB-based counting from activity_logs
+- [x] Return clear error message when limit exceeded
+- [x] Exempt admin users from rate limiting
+- [x] Add tests for rate limiting
+- [x] All 60 tests passing
+- [x] TypeScript: 0 errors

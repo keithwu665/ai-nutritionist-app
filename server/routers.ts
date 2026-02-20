@@ -589,18 +589,57 @@ export const appRouter = router({
         if (input.fileSize > MAX_SIZE) {
           throw new Error("File too large");
         }
-        const buffer = Buffer.from(input.base64Data, "base64");
-        const { storagePut } = await import("./storage");
-        const fileKey = `body-photos/${userId}/${Date.now()}-${input.fileName}`;
-        const { url } = await storagePut(fileKey, buffer, input.mimeType);
-        return db.createBodyPhoto({
-          userId: userId,
-          photoUrl: url,
-          storageKey: fileKey,
-          description: input.description,
-          tags: input.tags,
-          uploadedAt: input.uploadedAt,
-        });
+        const { logActivity } = await import("./activityLogger");
+        const { checkUploadRateLimit } = await import("./rateLimiter");
+        
+        try {
+          // Check rate limits (admin users are exempt)
+          const isAdmin = ctx.user.role === 'admin';
+          const rateLimitCheck = await checkUploadRateLimit(userId, isAdmin);
+          if (!rateLimitCheck.allowed) {
+            throw new Error(rateLimitCheck.reason || 'Upload limit exceeded');
+          }
+          
+          const buffer = Buffer.from(input.base64Data, "base64");
+          const { storagePut } = await import("./storage");
+          const fileKey = `body-photos/${userId}/${Date.now()}-${input.fileName}`;
+          const { url } = await storagePut(fileKey, buffer, input.mimeType);
+          const photo = await db.createBodyPhoto({
+            userId: userId,
+            photoUrl: url,
+            storageKey: fileKey,
+            description: input.description,
+            tags: input.tags,
+            uploadedAt: input.uploadedAt,
+          });
+          
+          // Log successful upload (non-blocking)
+          const photoId = (photo as any)?.id || (photo as any)?.[0]?.id;
+          if (photoId) {
+            await logActivity({
+              userId,
+              actionType: 'UPLOAD_PHOTO',
+              entityType: 'body_photo',
+              entityId: photoId,
+              status: 'SUCCESS',
+              metadata: { fileName: input.fileName, fileSize: input.fileSize, mimeType: input.mimeType },
+            });
+          }
+          
+          return photo;
+        } catch (error) {
+          // Log failed upload (non-blocking)
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+          await logActivity({
+            userId,
+            actionType: 'UPLOAD_PHOTO',
+            entityType: 'body_photo',
+            status: 'FAIL',
+            errorMessage: errorMsg,
+            metadata: { fileName: input.fileName, fileSize: input.fileSize },
+          });
+          throw error;
+        }
       }),
 
     delete: protectedProcedure
@@ -609,8 +648,35 @@ export const appRouter = router({
         // Session-locked: userId is immutable from session context
         const userId = ctx.user.id;
         if (!userId) throw new Error("User ID not found in session");
-        // deleteBodyPhoto already verifies ownership and throws if not found
-        return db.deleteBodyPhoto(input.id, userId);
+        const { logActivity } = await import("./activityLogger");
+        
+        try {
+          // deleteBodyPhoto already verifies ownership and throws if not found
+          const result = await db.deleteBodyPhoto(input.id, userId);
+          
+          // Log successful delete (non-blocking)
+          await logActivity({
+            userId,
+            actionType: 'DELETE_PHOTO',
+            entityType: 'body_photo',
+            entityId: input.id,
+            status: 'SUCCESS',
+          });
+          
+          return result;
+        } catch (error) {
+          // Log failed delete (non-blocking)
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+          await logActivity({
+            userId,
+            actionType: 'DELETE_PHOTO',
+            entityType: 'body_photo',
+            entityId: input.id,
+            status: 'FAIL',
+            errorMessage: errorMsg,
+          });
+          throw error;
+        }
       }),
   }),
 

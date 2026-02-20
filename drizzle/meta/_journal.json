@@ -50,6 +50,13 @@
       "when": 1771561354563,
       "tag": "0006_hesitant_slapstick",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1771589326178,
+      "tag": "0007_fat_gauntlet",
+      "breakpoints": true
     }
   ]
 }
