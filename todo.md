@@ -304,3 +304,19 @@
 - [x] All 60 tests passing
 - [x] TypeScript: 0 errors
 - [x] Ready for checkpoint and deployment
+
+
+## Module 2B #6: Before/After Compare Feature - COMPLETE
+- [x] Add "比較 (Before/After)" button to progress photos page
+- [x] Add "自動比較 (最早 vs 最新)" auto-select button
+- [x] Implement compare mode with photo selection checkboxes
+- [x] Enforce max 2 photos selection
+- [x] Show "開始比較" CTA when 2 selected
+- [x] Create backend query for compare payload with metrics
+- [x] Implement side-by-side compare view
+- [x] Display date labels, tags, and date difference
+- [x] Fetch and display body_metrics for comparison dates
+- [x] Session userId verification for all queries
+- [x] All 60 tests passing
+- [x] TypeScript: 0 errors
+- [x] Ready for checkpoint

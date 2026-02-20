@@ -2,9 +2,10 @@ import { useState, useMemo } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Loader2, Eye } from 'lucide-react';
+import { Plus, Trash2, Loader2, Eye, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { BodyPhotosUpload } from '@/components/BodyPhotosUpload';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -23,14 +24,17 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
+type CompareMode = 'view' | 'select' | null;
+
 export default function BodyPhotosGallery() {
   // Session-locked: Get userId from authenticated session
   const { data: user } = trpc.auth.me.useQuery();
   const sessionUserId = user?.id;
 
   const [photoToDelete, setPhotoToDelete] = useState<number | null>(null);
-  const [compareMode, setCompareMode] = useState(false);
+  const [compareMode, setCompareMode] = useState<CompareMode>(null);
   const [comparePhotos, setComparePhotos] = useState<[any, any] | null>(null);
+  const [selectedPhotos, setSelectedPhotos] = useState<Set<number>>(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: photos, isLoading } = trpc.bodyPhotos.list.useQuery();
@@ -41,7 +45,6 @@ export default function BodyPhotosGallery() {
   const validatedPhotos = useMemo(() => {
     if (!photos || !sessionUserId) return [];
     return photos.filter(photo => {
-      // Verify photo belongs to current session user
       if (photo.userId !== sessionUserId) {
         console.warn(`[Security] Attempted access to photo from different user: ${photo.userId} vs ${sessionUserId}`);
         return false;
@@ -60,7 +63,6 @@ export default function BodyPhotosGallery() {
   });
 
   const handleDelete = (photoId: number) => {
-    // Session-locked: Verify photo belongs to current user before delete
     const photo = validatedPhotos.find(p => p.id === photoId);
     if (!photo || photo.userId !== sessionUserId) {
       toast.error('無權限刪除此照片');
@@ -69,27 +71,67 @@ export default function BodyPhotosGallery() {
     deleteMutation.mutate({ id: photoId });
   };
 
-  const handleCompare = (photo1: any, photo2: any) => {
-    // Session-locked: Verify both photos belong to current user before compare
-    if (photo1.userId !== sessionUserId || photo2.userId !== sessionUserId) {
-      toast.error('無權限對比此照片');
-      return;
-    }
-    setComparePhotos([photo1, photo2]);
-    setCompareMode(true);
-  };
-
   const sortedPhotos = useMemo(() => {
     if (!validatedPhotos) return [];
     return [...validatedPhotos].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
   }, [validatedPhotos]);
 
-  if (compareMode && comparePhotos) {
+  const handlePhotoSelect = (photoId: number) => {
+    const newSelected = new Set(selectedPhotos);
+    if (newSelected.has(photoId)) {
+      newSelected.delete(photoId);
+    } else {
+      if (newSelected.size >= 2) {
+        toast.error('最多只能選擇2張照片');
+        return;
+      }
+      newSelected.add(photoId);
+    }
+    setSelectedPhotos(newSelected);
+  };
+
+  const handleStartCompare = () => {
+    if (selectedPhotos.size !== 2) {
+      toast.error('請選擇2張照片進行比較');
+      return;
+    }
+    const ids = Array.from(selectedPhotos);
+    const photo1 = validatedPhotos.find(p => p.id === ids[0]);
+    const photo2 = validatedPhotos.find(p => p.id === ids[1]);
+    
+    if (!photo1 || !photo2) {
+      toast.error('無法找到選定的照片');
+      return;
+    }
+
+    // Order by date: older first (Before), newer second (After)
+    const ordered = new Date(photo1.uploadedAt) < new Date(photo2.uploadedAt) 
+      ? [photo1, photo2] 
+      : [photo2, photo1];
+    
+    setComparePhotos(ordered as [any, any]);
+    setCompareMode('view');
+    setSelectedPhotos(new Set());
+  };
+
+  const handleAutoCompare = () => {
+    if (sortedPhotos.length < 2) {
+      toast.error('至少需要2張照片進行比較');
+      return;
+    }
+    // sortedPhotos is newest first, so reverse to get oldest first
+    const oldest = sortedPhotos[sortedPhotos.length - 1];
+    const newest = sortedPhotos[0];
+    setComparePhotos([oldest, newest]);
+    setCompareMode('view');
+  };
+
+  // Compare view
+  if (compareMode === 'view' && comparePhotos) {
     const date1 = new Date(comparePhotos[0].uploadedAt);
     const date2 = new Date(comparePhotos[1].uploadedAt);
     const daysDiff = Math.floor((date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24));
     
-    // Find metrics for comparison dates
     const dateStr1 = comparePhotos[0].uploadedAt.split('T')[0];
     const dateStr2 = comparePhotos[1].uploadedAt.split('T')[0];
     const metrics1 = bodyMetrics?.find((m: any) => m.date === dateStr1);
@@ -106,7 +148,10 @@ export default function BodyPhotosGallery() {
               </div>
               <Button
                 variant="outline"
-                onClick={() => setCompareMode(false)}
+                onClick={() => {
+                  setCompareMode(null);
+                  setComparePhotos(null);
+                }}
               >
                 關閉對比
               </Button>
@@ -115,13 +160,23 @@ export default function BodyPhotosGallery() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm font-medium mb-2">{comparePhotos[0].uploadedAt}</p>
+                <p className="text-sm font-medium mb-2">開始 (Before)</p>
+                <p className="text-xs text-gray-500 mb-2">{comparePhotos[0].uploadedAt}</p>
                 <img
                   src={comparePhotos[0].photoUrl}
                   alt="Before"
                   className="w-full h-64 object-cover rounded-lg mb-3"
                 />
-                <p className="text-sm text-gray-600 mb-3">{comparePhotos[0].description}</p>
+                {comparePhotos[0].description && <p className="text-sm text-gray-600 mb-2">{comparePhotos[0].description}</p>}
+                {comparePhotos[0].tags && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {comparePhotos[0].tags.split(',').map((tag: string, i: number) => (
+                      <span key={i} className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {metrics1 && (
                   <div className="bg-white p-3 rounded-lg text-sm">
                     <p className="font-medium">身體指標</p>
@@ -132,13 +187,23 @@ export default function BodyPhotosGallery() {
                 )}
               </div>
               <div>
-                <p className="text-sm font-medium mb-2">{comparePhotos[1].uploadedAt}</p>
+                <p className="text-sm font-medium mb-2">現在 (After)</p>
+                <p className="text-xs text-gray-500 mb-2">{comparePhotos[1].uploadedAt}</p>
                 <img
                   src={comparePhotos[1].photoUrl}
                   alt="After"
                   className="w-full h-64 object-cover rounded-lg mb-3"
                 />
-                <p className="text-sm text-gray-600 mb-3">{comparePhotos[1].description}</p>
+                {comparePhotos[1].description && <p className="text-sm text-gray-600 mb-2">{comparePhotos[1].description}</p>}
+                {comparePhotos[1].tags && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {comparePhotos[1].tags.split(',').map((tag: string, i: number) => (
+                      <span key={i} className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {metrics2 && (
                   <div className="bg-white p-3 rounded-lg text-sm">
                     <p className="font-medium">身體指標</p>
@@ -155,6 +220,78 @@ export default function BodyPhotosGallery() {
     );
   }
 
+  // Selection mode
+  if (compareMode === 'select') {
+    return (
+      <div className="p-4 md:p-8">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">選擇照片進行比較</CardTitle>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCompareMode(null);
+                  setSelectedPhotos(new Set());
+                }}
+              >
+                取消
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {sortedPhotos.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">還沒有上傳照片</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {sortedPhotos.map((photo) => (
+                    <div
+                      key={photo.id}
+                      className={`relative border-2 rounded-lg overflow-hidden cursor-pointer transition-all ${
+                        selectedPhotos.has(photo.id)
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                      onClick={() => handlePhotoSelect(photo.id)}
+                    >
+                      <img
+                        src={photo.photoUrl}
+                        alt={photo.description || 'Photo'}
+                        className="w-full h-40 object-cover"
+                      />
+                      <div className="absolute top-2 left-2">
+                        <Checkbox
+                          checked={selectedPhotos.has(photo.id)}
+                          onCheckedChange={() => handlePhotoSelect(photo.id)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
+                      <div className="p-2 bg-white">
+                        <p className="text-xs text-gray-500">{photo.uploadedAt}</p>
+                        <p className="text-xs text-gray-700 line-clamp-1">{photo.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={handleStartCompare}
+                    disabled={selectedPhotos.size !== 2}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    開始比較 ({selectedPhotos.size}/2)
+                  </Button>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Main gallery view
   return (
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -176,6 +313,26 @@ export default function BodyPhotosGallery() {
         </Dialog>
       </div>
 
+      {/* Compare buttons */}
+      {sortedPhotos.length >= 2 && (
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            onClick={() => setCompareMode('select')}
+            variant="outline"
+            className="border-blue-300 text-blue-700 hover:bg-blue-50"
+          >
+            <Eye className="h-4 w-4 mr-1" /> 比較 (Before/After)
+          </Button>
+          <Button
+            onClick={handleAutoCompare}
+            variant="outline"
+            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+          >
+            <Zap className="h-4 w-4 mr-1" /> 自動比較 (最早 vs 最新)
+          </Button>
+        </div>
+      )}
+
       {/* Photos Grid */}
       {isLoading ? (
         <div className="flex justify-center py-12">
@@ -189,7 +346,7 @@ export default function BodyPhotosGallery() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sortedPhotos.map((photo, index) => (
+          {sortedPhotos.map((photo) => (
             <Card key={photo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative group">
                 <img
@@ -198,15 +355,6 @@ export default function BodyPhotosGallery() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                  {index < sortedPhotos.length - 1 && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleCompare(photo, sortedPhotos[index + 1])}
-                    >
-                      <Eye className="h-4 w-4 mr-1" /> 對比
-                    </Button>
-                  )}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button

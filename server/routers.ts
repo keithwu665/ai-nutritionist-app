@@ -642,6 +642,46 @@ export const appRouter = router({
         }
       }),
 
+    getCompare: protectedProcedure
+      .input(z.object({
+        photoId1: z.number(),
+        photoId2: z.number(),
+      }))
+      .query(async ({ ctx, input }) => {
+        // Session-locked: userId is immutable from session context
+        const userId = ctx.user.id;
+        if (!userId) throw new Error("User ID not found in session");
+        
+        // Verify both photos exist and belong to current user
+        const photo1 = await db.getBodyPhoto(input.photoId1, userId);
+        const photo2 = await db.getBodyPhoto(input.photoId2, userId);
+        
+        if (!photo1 || !photo2) {
+          throw new Error("One or both photos not found or unauthorized");
+        }
+        
+        // Get body metrics for comparison if available
+        const allMetrics = await db.getBodyMetrics(userId);
+        const dateStr1 = photo1.uploadedAt.split('T')[0];
+        const dateStr2 = photo2.uploadedAt.split('T')[0];
+        
+        const metrics1 = allMetrics.find((m: any) => m.date === dateStr1);
+        const metrics2 = allMetrics.find((m: any) => m.date === dateStr2);
+        
+        // Calculate days difference
+        const date1 = new Date(photo1.uploadedAt);
+        const date2 = new Date(photo2.uploadedAt);
+        const daysDiff = Math.floor((date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24));
+        
+        return {
+          beforePhoto: photo1,
+          afterPhoto: photo2,
+          daysDiff,
+          beforeMetrics: metrics1 || null,
+          afterMetrics: metrics2 || null,
+        };
+      }),
+
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
