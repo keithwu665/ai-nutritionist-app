@@ -203,6 +203,90 @@ export const appRouter = router({
         }
         return { copied };
       }),
+
+    generateReport: protectedProcedure
+      .input(z.object({ dateRange: z.enum(['7d', '30d']) }))
+      .query(async ({ ctx, input }) => {
+        const endDate = new Date();
+        const startDate = new Date();
+        const days = input.dateRange === '7d' ? 7 : 30;
+        startDate.setDate(endDate.getDate() - days + 1);
+        const startDateStr = startDate.toISOString().split('T')[0];
+        const endDateStr = endDate.toISOString().split('T')[0];
+        const items = await db.getFoodLogItemsForDateRange(ctx.user.id, startDateStr, endDateStr);
+        if (items.length === 0) throw new Error('No nutrition data found');
+        const userProfile = await db.getUserProfile(ctx.user.id);
+        const dailyData: any = {};
+        let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+        items.forEach((item: any) => {
+          const date = item.date;
+          if (!dailyData[date]) dailyData[date] = { calories: 0, protein: 0, carbs: 0, fat: 0, meals: [] };
+          const cal = parseFloat(item.calories.toString());
+          const prot = item.proteinG ? parseFloat(item.proteinG.toString()) : 0;
+          const carb = item.carbsG ? parseFloat(item.carbsG.toString()) : 0;
+          const fat = item.fatG ? parseFloat(item.fatG.toString()) : 0;
+          dailyData[date].calories += cal;
+          dailyData[date].protein += prot;
+          dailyData[date].carbs += carb;
+          dailyData[date].fat += fat;
+          dailyData[date].meals.push(item);
+          totalCalories += cal;
+          totalProtein += prot;
+          totalCarbs += carb;
+          totalFat += fat;
+        });
+        const daysCount = Object.keys(dailyData).length;
+        return {
+          dateRange: input.dateRange, startDate: startDateStr, endDate: endDateStr, daysCount, dailyData,
+          totals: { calories: Math.round(totalCalories), protein: Math.round(totalProtein * 10) / 10, carbs: Math.round(totalCarbs * 10) / 10, fat: Math.round(totalFat * 10) / 10 },
+          averages: { calories: Math.round(totalCalories / daysCount), protein: Math.round(totalProtein / daysCount * 10) / 10, carbs: Math.round(totalCarbs / daysCount * 10) / 10, fat: Math.round(totalFat / daysCount * 10) / 10 },
+          userProfile,
+        };
+      }),
+
+    downloadPDF: protectedProcedure
+      .input(z.object({ dateRange: z.enum(['7d', '30d']) }))
+      .mutation(async ({ ctx, input }) => {
+        const { generateNutritionPDF } = await import('./pdfReportService');
+        const endDate = new Date();
+        const startDate = new Date();
+        const days = input.dateRange === '7d' ? 7 : 30;
+        startDate.setDate(endDate.getDate() - days + 1);
+        const startDateStr = startDate.toISOString().split('T')[0];
+        const endDateStr = endDate.toISOString().split('T')[0];
+        const items = await db.getFoodLogItemsForDateRange(ctx.user.id, startDateStr, endDateStr);
+        if (items.length === 0) throw new Error('No nutrition data found');
+        const userProfile = await db.getUserProfile(ctx.user.id);
+        const dailyData: any = {};
+        let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+        items.forEach((item: any) => {
+          const date = item.date;
+          if (!dailyData[date]) dailyData[date] = { calories: 0, protein: 0, carbs: 0, fat: 0, meals: [] };
+          const cal = parseFloat(item.calories.toString());
+          const prot = item.proteinG ? parseFloat(item.proteinG.toString()) : 0;
+          const carb = item.carbsG ? parseFloat(item.carbsG.toString()) : 0;
+          const fat = item.fatG ? parseFloat(item.fatG.toString()) : 0;
+          dailyData[date].calories += cal;
+          dailyData[date].protein += prot;
+          dailyData[date].carbs += carb;
+          dailyData[date].fat += fat;
+          dailyData[date].meals.push(item);
+          totalCalories += cal;
+          totalProtein += prot;
+          totalCarbs += carb;
+          totalFat += fat;
+        });
+        const daysCount = Object.keys(dailyData).length;
+        const reportData = {
+          dateRange: input.dateRange, startDate: startDateStr, endDate: endDateStr, daysCount, dailyData,
+          totals: { calories: Math.round(totalCalories), protein: Math.round(totalProtein * 10) / 10, carbs: Math.round(totalCarbs * 10) / 10, fat: Math.round(totalFat * 10) / 10 },
+          averages: { calories: Math.round(totalCalories / daysCount), protein: Math.round(totalProtein / daysCount * 10) / 10, carbs: Math.round(totalCarbs / daysCount * 10) / 10, fat: Math.round(totalFat / daysCount * 10) / 10 },
+          userProfile,
+        };
+        const pdfBuffer = await generateNutritionPDF(reportData);
+        return { filename: `nutrition-report-${input.dateRange}-${new Date().toISOString().split('T')[0]}.pdf`, data: pdfBuffer.toString('base64') };
+      }),
+
   }),
 
   // ========================================================================

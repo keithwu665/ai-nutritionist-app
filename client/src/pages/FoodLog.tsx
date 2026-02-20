@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Trash2, Copy, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Copy, Loader2, ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { getMealTypeText } from '@shared/calculations';
 
@@ -21,6 +21,8 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFitastySearch, setShowFitastySearch] = useState(false);
+  const [reportDateRange, setReportDateRange] = useState<'7d' | '30d'>('7d');
+  const [isDownloadingReport, setIsDownloadingReport] = useState(false);
   const [newItem, setNewItem] = useState({
     mealType: 'lunch' as typeof mealTypes[number],
     name: '',
@@ -86,6 +88,33 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
     const d = new Date(date);
     d.setDate(d.getDate() + 1);
     setDate(d.toISOString().split('T')[0]);
+  };
+
+  const downloadPDFMutation = trpc.foodLogs.downloadPDF.useMutation({
+    onSuccess: (result) => {
+      const binaryString = atob(result.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success('報告已下載');
+    },
+    onError: () => {
+      toast.error('下載報告失敗');
+    },
+  });
+
+  const handleDownloadReport = () => {
+    downloadPDFMutation.mutate({ dateRange: reportDateRange });
   };
 
   const totals = useMemo(() => {

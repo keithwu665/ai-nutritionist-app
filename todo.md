@@ -194,3 +194,13 @@
 - [x] Test cross-user access prevention
 - [x] Verify all 50 tests passing (27 existing + 23 security tests)
 - [x] TypeScript: 0 errors
+
+## Weekly Nutrition PDF Report - COMPLETE
+- [x] Audit nutrition data structure and plan PDF report architecture
+- [x] Create tRPC procedure for report generation with 7/30-day range selection
+- [x] Build PDF generation service with macro charts and breakdowns
+- [x] Create frontend UI for report download with date range selector
+- [x] Write tests for report generation across date ranges
+- [x] Verify PDF output quality and data accuracy
+- [x] All 50 tests passing
+- [x] TypeScript: 0 errors
