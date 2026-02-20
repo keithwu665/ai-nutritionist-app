@@ -34,6 +34,7 @@ export default function BodyPhotosGallery() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: photos, isLoading } = trpc.bodyPhotos.list.useQuery();
+  const { data: bodyMetrics } = trpc.bodyMetrics.list.useQuery({});
   const utils = trpc.useUtils();
 
   // Session-locked: Validate all photos belong to current user
@@ -84,12 +85,25 @@ export default function BodyPhotosGallery() {
   }, [validatedPhotos]);
 
   if (compareMode && comparePhotos) {
+    const date1 = new Date(comparePhotos[0].uploadedAt);
+    const date2 = new Date(comparePhotos[1].uploadedAt);
+    const daysDiff = Math.floor((date2.getTime() - date1.getTime()) / (1000 * 60 * 60 * 24));
+    
+    // Find metrics for comparison dates
+    const dateStr1 = comparePhotos[0].uploadedAt.split('T')[0];
+    const dateStr2 = comparePhotos[1].uploadedAt.split('T')[0];
+    const metrics1 = bodyMetrics?.find((m: any) => m.date === dateStr1);
+    const metrics2 = bodyMetrics?.find((m: any) => m.date === dateStr2);
+    
     return (
       <div className="p-4 md:p-8">
         <Card className="border-blue-200 bg-blue-50">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">對比模式</CardTitle>
+              <div>
+                <CardTitle className="text-lg">對比模式</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">時間差異: +{daysDiff} 天</p>
+              </div>
               <Button
                 variant="outline"
                 onClick={() => setCompareMode(false)}
@@ -99,24 +113,40 @@ export default function BodyPhotosGallery() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <p className="text-sm font-medium mb-2">{comparePhotos[0].uploadedAt}</p>
                 <img
                   src={comparePhotos[0].photoUrl}
                   alt="Before"
-                  className="w-full h-64 object-cover rounded-lg"
+                  className="w-full h-64 object-cover rounded-lg mb-3"
                 />
-                <p className="text-sm text-gray-600 mt-2">{comparePhotos[0].description}</p>
+                <p className="text-sm text-gray-600 mb-3">{comparePhotos[0].description}</p>
+                {metrics1 && (
+                  <div className="bg-white p-3 rounded-lg text-sm">
+                    <p className="font-medium">身體指標</p>
+                    <p>體重: {metrics1.weightKg} kg</p>
+                    {metrics1.bodyFatPercent && <p>體脂肪: {metrics1.bodyFatPercent}%</p>}
+                    {metrics1.muscleMassKg && <p>肌肉: {metrics1.muscleMassKg} kg</p>}
+                  </div>
+                )}
               </div>
               <div>
                 <p className="text-sm font-medium mb-2">{comparePhotos[1].uploadedAt}</p>
                 <img
                   src={comparePhotos[1].photoUrl}
                   alt="After"
-                  className="w-full h-64 object-cover rounded-lg"
+                  className="w-full h-64 object-cover rounded-lg mb-3"
                 />
-                <p className="text-sm text-gray-600 mt-2">{comparePhotos[1].description}</p>
+                <p className="text-sm text-gray-600 mb-3">{comparePhotos[1].description}</p>
+                {metrics2 && (
+                  <div className="bg-white p-3 rounded-lg text-sm">
+                    <p className="font-medium">身體指標</p>
+                    <p>體重: {metrics2.weightKg} kg</p>
+                    {metrics2.bodyFatPercent && <p>體脂肪: {metrics2.bodyFatPercent}%</p>}
+                    {metrics2.muscleMassKg && <p>肌肉: {metrics2.muscleMassKg} kg</p>}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

@@ -457,12 +457,14 @@ export async function createBodyPhoto(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  const { encryptMetadata } = await import("./encryption");
+  
   const result = await db.insert(bodyPhotos).values({
     userId: data.userId,
     photoUrl: data.photoUrl,
     storageKey: data.storageKey || null,
-    description: data.description || null,
-    tags: data.tags || null,
+    description: data.description ? encryptMetadata(data.description) : null,
+    tags: data.tags ? encryptMetadata(data.tags) : null,
     uploadedAt: data.uploadedAt,
   });
   
@@ -472,21 +474,42 @@ export async function createBodyPhoto(data: {
 export async function getBodyPhotos(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(bodyPhotos)
+  
+  const { decryptMetadata } = await import("./encryption");
+  
+  const photos = await db.select().from(bodyPhotos)
     .where(eq(bodyPhotos.userId, userId))
     .orderBy(desc(bodyPhotos.uploadedAt));
+  
+  // Decrypt metadata for display
+  return photos.map(photo => ({
+    ...photo,
+    description: photo.description ? decryptMetadata(photo.description) : null,
+    tags: photo.tags ? decryptMetadata(photo.tags) : null,
+  }));
 }
 
 export async function getBodyPhoto(photoId: number, userId: number) {
   const db = await getDb();
   if (!db) return null;
+  
+  const { decryptMetadata } = await import("./encryption");
+  
   const result = await db.select().from(bodyPhotos)
     .where(and(
       eq(bodyPhotos.id, photoId),
       eq(bodyPhotos.userId, userId)
     ))
     .limit(1);
-  return result.length > 0 ? result[0] : null;
+  
+  if (result.length === 0) return null;
+  
+  const photo = result[0];
+  return {
+    ...photo,
+    description: photo.description ? decryptMetadata(photo.description) : null,
+    tags: photo.tags ? decryptMetadata(photo.tags) : null,
+  };
 }
 
 export async function deleteBodyPhoto(photoId: number, userId: number) {
