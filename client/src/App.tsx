@@ -18,6 +18,7 @@ import ExerciseLog from "./pages/ExerciseLog";
 import Settings from "./pages/Settings";
 import Onboarding from "./pages/Onboarding";
 import AdminProducts from "./pages/AdminProducts";
+import BodyReportImport from "./pages/BodyReportImport";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -52,6 +53,11 @@ function Router() {
       <Route path={"/body/photos"}>
         <AppLayout>
           <BodyPhotosGallery />
+        </AppLayout>
+      </Route>
+      <Route path={"/body/import/photo"}>
+        <AppLayout>
+          <BodyReportImport />
         </AppLayout>
       </Route>
       <Route path={"/food"}>

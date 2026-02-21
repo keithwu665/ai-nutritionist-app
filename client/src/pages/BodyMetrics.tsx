@@ -4,7 +4,7 @@ import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Loader2, AlertCircle, Scale } from 'lucide-react';
+import { Plus, Trash2, Loader2, AlertCircle, Scale, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { calculateBMI, getBMIStatus, getBMIStatusText, getBMIStatusColor, getBMIStatusBgColor } from '@shared/calculations';
@@ -64,6 +64,11 @@ export default function BodyMetrics() {
           <Link href="/body/import-csv">
             <Button variant="outline">
               匯入 CSV
+            </Button>
+          </Link>
+          <Link href="/body/import/photo">
+            <Button variant="outline">
+              匯入報告
             </Button>
           </Link>
           <Link href="/body/add">

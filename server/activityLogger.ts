@@ -3,7 +3,7 @@ import { activityLogs } from '../drizzle/schema';
 import { eq, and, gte, sql } from 'drizzle-orm';
 
 export type ActionType = 'UPLOAD_PHOTO' | 'DELETE_PHOTO' | 'GENERATE_NUTRITION_PDF' | 'IMPORT_BODY_CSV' | 'CREATE_BODY_METRIC' | 'UPDATE_BODY_METRIC';
-export type Status = 'SUCCESS' | 'FAIL';
+export type Status = 'success' | 'failed' | 'pending';
 
 export interface LogActivityParams {
   userId: number;
@@ -64,7 +64,7 @@ export async function getActivityLogs(
     const conditions: any[] = [];
     if (userId) conditions.push(eq(activityLogs.userId, userId));
     if (actionType) conditions.push(eq(activityLogs.actionType, actionType));
-    if (status) conditions.push(eq(activityLogs.status, status));
+    if (status) conditions.push(eq(activityLogs.status, status as any));
 
     let query: any = db.select().from(activityLogs);
     if (conditions.length > 0) {
@@ -96,7 +96,7 @@ export async function countUploadsInWindow(userId: number, windowMinutes: number
         and(
           eq(activityLogs.userId, userId),
           eq(activityLogs.actionType, 'UPLOAD_PHOTO'),
-          eq(activityLogs.status, 'SUCCESS'),
+          eq(activityLogs.status, 'success'),
           gte(activityLogs.createdAt, cutoffTime)
         )
       );
