@@ -654,7 +654,7 @@ export const appRouter = router({
                 actionType: 'UPLOAD_PHOTO',
                 entityType: 'body_photo',
                 entityId: photoId,
-                status: 'SUCCESS',
+                status: 'success',
                 metadata: { fileName: input.fileName, fileSize: input.fileSize, mimeType: input.mimeType },
               });
             } catch (logError) {
@@ -672,7 +672,7 @@ export const appRouter = router({
               userId,
               actionType: 'UPLOAD_PHOTO',
               entityType: 'body_photo',
-              status: 'FAIL',
+              status: 'fail',
               errorMessage: errorMsg,
               metadata: { fileName: input.fileName, fileSize: input.fileSize },
             });
@@ -742,7 +742,7 @@ export const appRouter = router({
             actionType: 'DELETE_PHOTO',
             entityType: 'body_photo',
             entityId: input.id,
-            status: 'SUCCESS',
+            status: 'success',
           });
           
           return result;
@@ -754,7 +754,7 @@ export const appRouter = router({
             actionType: 'DELETE_PHOTO',
             entityType: 'body_photo',
             entityId: input.id,
-            status: 'FAIL',
+            status: 'fail',
             errorMessage: errorMsg,
           });
           throw error;

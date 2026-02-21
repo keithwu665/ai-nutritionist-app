@@ -92,6 +92,13 @@
       "when": 1771622836590,
       "tag": "0012_inbody_boditrax_support",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1771709081553,
+      "tag": "0013_friendly_smiling_tiger",
+      "breakpoints": true
     }
   ]
 }

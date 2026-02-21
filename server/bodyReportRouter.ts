@@ -84,7 +84,7 @@ export const bodyReportRouter = router({
         provider: z.enum(['inbody', 'boditrax']),
         saveTemplate: z.boolean().default(false),
         templateName: z.string().optional(),
-        templateFields: z.record(z.string()).optional(),
+        templateFields: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {

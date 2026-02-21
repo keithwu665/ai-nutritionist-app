@@ -14,6 +14,8 @@ export const bodyMetrics = mysqlTable("body_metrics", {
 	measured_at: timestamp({ mode: 'string' }), // When the measurement was taken
 	fat_mass_kg: decimal({ precision: 5, scale: 1 }), // Fat mass in kg
 	ffm_kg: decimal({ precision: 5, scale: 1 }), // Fat-free mass in kg
+	report_roi_photo_url: varchar({ length: 500 }), // S3 URL of the cropped ROI region
+	extraction_json: text(), // Raw AI extraction output with confidence scores
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });

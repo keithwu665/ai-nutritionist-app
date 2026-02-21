@@ -120,7 +120,7 @@ export async function generateGoalPhoto(
         actionType: 'UPLOAD_PHOTO',
         entityType: 'body_photo',
         entityId: newPhotoId || 0,
-        status: 'SUCCESS',
+        status: 'success',
       });
     } catch (err) {
       console.error('[AI_GOAL] Activity logging failed:', err);
@@ -139,7 +139,7 @@ export async function generateGoalPhoto(
         actionType: 'UPLOAD_PHOTO',
         entityType: 'body_photo',
         entityId: 0,
-        status: 'FAIL',
+        status: 'fail',
         errorMessage: error instanceof Error ? error.message : String(error),
       });
     } catch (logErr) {
