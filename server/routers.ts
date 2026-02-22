@@ -123,6 +123,14 @@ export const appRouter = router({
   // Food Logs
   // ========================================================================
   foodLogs: router({
+    searchUnified: publicProcedure
+      .input(z.object({ query: z.string().min(1) }))
+      .query(async ({ input }) => {
+        const { searchUnifiedFood } = await import('./unifiedFoodSearch');
+        const { ENV } = await import('./_core/env');
+        return searchUnifiedFood(input.query, ENV.usdaApiKey);
+      }),
+
     getItems: protectedProcedure
       .input(z.object({ date: z.string() }))
       .query(async ({ ctx, input }) => {
@@ -347,6 +355,25 @@ export const appRouter = router({
   // Exercises
   // ========================================================================
   exercises: router({
+    calculateCalories: protectedProcedure
+      .input(z.object({
+        type: z.string().min(1),
+        intensity: z.enum(['low', 'moderate', 'high']),
+        minutes: z.number().positive(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { calculateCaloriesBurned } = await import('./exerciseMetCalculation');
+        const profile = await db.getUserProfile(ctx.user.id);
+        const weightKg = profile ? parseFloat(profile.weightKg) : 60;
+        return calculateCaloriesBurned(input.type, input.intensity, input.minutes, weightKg);
+      }),
+
+    getExerciseTypes: publicProcedure
+      .query(async () => {
+        const { getAvailableExerciseTypes } = await import('./exerciseMetCalculation');
+        return getAvailableExerciseTypes();
+      }),
+
     list: protectedProcedure
       .input(z.object({ date: z.string() }))
       .query(async ({ ctx, input }) => {

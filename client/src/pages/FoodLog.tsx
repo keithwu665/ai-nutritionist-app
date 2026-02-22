@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -15,53 +17,175 @@ interface FoodLogProps {
 
 const mealTypes = ['breakfast', 'lunch', 'dinner', 'snack'] as const;
 
+interface UnifiedFoodResult {
+  source: 'fitasty' | 'usda' | 'off';
+  id: string;
+  displayName: string;
+  brand?: string;
+  badge: string;
+  kcal_per_100g: number | null;
+  protein_g_per_100g: number | null;
+  carbs_g_per_100g: number | null;
+  fat_g_per_100g: number | null;
+}
+
 export default function FoodLog({ initialDate }: FoodLogProps) {
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(initialDate || today);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showFitastySearch, setShowFitastySearch] = useState(false);
+  const [searchResults, setSearchResults] = useState<UnifiedFoodResult[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [reportDateRange, setReportDateRange] = useState<'7d' | '30d'>('7d');
   const [reportSections, setReportSections] = useState({
     macroSummary: true,
     foodLogDetails: true,
     bodyMetrics: true,
   });
+  const [selectedFood, setSelectedFood] = useState<UnifiedFoodResult | null>(null);
   const [newItem, setNewItem] = useState({
     mealType: 'lunch' as typeof mealTypes[number],
     name: '',
+    grams: '100',
     calories: '',
     proteinG: '',
     carbsG: '',
     fatG: '',
+    source: '',
+    externalId: '',
+    per100gKcal: '',
+    per100gProtein: '',
+    per100gCarbs: '',
+    per100gFat: '',
+    isAutofilled: false,
   });
 
   const { data: items, isLoading } = trpc.foodLogs.getItems.useQuery({ date });
-  const { data: fitastyProducts, isLoading: productsLoading } = trpc.fitastyProducts.list.useQuery();
   const utils = trpc.useUtils();
 
-  const filteredFitastyProducts = useMemo(() => {
-    if (!fitastyProducts || !searchQuery) return [];
-    return fitastyProducts.filter(p => 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [fitastyProducts, searchQuery]);
+  // Search unified food (Fitasty → USDA → OFF)
+  const searchUnified = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      // Call backend search - we'll add this tRPC procedure
+      const response = await fetch('/api/trpc/food.searchUnified?input=' + encodeURIComponent(JSON.stringify({ query })));
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.result?.data || []);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
-  // Debug logging
-  React.useEffect(() => {
-    console.log('fitastyProducts:', fitastyProducts);
-    console.log('productsLoading:', productsLoading);
-    console.log('searchQuery:', searchQuery);
-    console.log('filteredFitastyProducts:', filteredFitastyProducts);
-  }, [fitastyProducts, productsLoading, searchQuery, filteredFitastyProducts]);
+  // Debounced search
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setNewItem({ ...newItem, name: value });
+    setShowSearch(true);
+    
+    // Debounce search
+    const timer = setTimeout(() => {
+      searchUnified(value);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  };
+
+  // Calculate macros from per100g values and grams
+  const calculateMacros = (grams: number, food: UnifiedFoodResult | null) => {
+    if (!food) return { kcal: '', protein: '', carbs: '', fat: '' };
+    
+    const multiplier = grams / 100;
+    const kcal = food.kcal_per_100g ? Math.round(food.kcal_per_100g * multiplier * 10) / 10 : 0;
+    const protein = food.protein_g_per_100g ? Math.round(food.protein_g_per_100g * multiplier * 10) / 10 : 0;
+    const carbs = food.carbs_g_per_100g ? Math.round(food.carbs_g_per_100g * multiplier * 10) / 10 : 0;
+    const fat = food.fat_g_per_100g ? Math.round(food.fat_g_per_100g * multiplier * 10) / 10 : 0;
+    
+    return {
+      kcal: kcal.toString(),
+      protein: protein.toString(),
+      carbs: carbs.toString(),
+      fat: fat.toString(),
+    };
+  };
+
+  // Handle grams change - live recalculation
+  const handleGramsChange = (value: string) => {
+    const grams = parseFloat(value) || 0;
+    setNewItem({ ...newItem, grams: value });
+    
+    if (selectedFood && grams > 0) {
+      const macros = calculateMacros(grams, selectedFood);
+      setNewItem(prev => ({
+        ...prev,
+        calories: macros.kcal,
+        proteinG: macros.protein,
+        carbsG: macros.carbs,
+        fatG: macros.fat,
+      }));
+    }
+  };
+
+  // Select food from search results
+  const selectFood = (food: UnifiedFoodResult) => {
+    setSelectedFood(food);
+    const grams = parseFloat(newItem.grams) || 100;
+    const macros = calculateMacros(grams, food);
+    
+    setNewItem({
+      ...newItem,
+      name: food.displayName,
+      calories: macros.kcal,
+      proteinG: macros.protein,
+      carbsG: macros.carbs,
+      fatG: macros.fat,
+      source: food.source,
+      externalId: food.id,
+      per100gKcal: food.kcal_per_100g?.toString() || '',
+      per100gProtein: food.protein_g_per_100g?.toString() || '',
+      per100gCarbs: food.carbs_g_per_100g?.toString() || '',
+      per100gFat: food.fat_g_per_100g?.toString() || '',
+      isAutofilled: true,
+    });
+    setShowSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   const addMutation = trpc.foodLogs.addItem.useMutation({
     onSuccess: () => {
       toast.success('已新增');
       utils.foodLogs.getItems.invalidate({ date });
       setIsAddOpen(false);
-      setNewItem({ mealType: 'lunch', name: '', calories: '', proteinG: '', carbsG: '', fatG: '' });
+      setNewItem({
+        mealType: 'lunch',
+        name: '',
+        grams: '100',
+        calories: '',
+        proteinG: '',
+        carbsG: '',
+        fatG: '',
+        source: '',
+        externalId: '',
+        per100gKcal: '',
+        per100gProtein: '',
+        per100gCarbs: '',
+        per100gFat: '',
+        isAutofilled: false,
+      });
+      setSelectedFood(null);
     },
     onError: () => toast.error('新增失敗'),
   });
@@ -158,19 +282,6 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
     });
   };
 
-  const selectFitastyProduct = (product: any) => {
-    setNewItem({
-      ...newItem,
-      name: product.name,
-      calories: product.calories.toString(),
-      proteinG: product.proteinG ? product.proteinG.toString() : '',
-      carbsG: product.carbsG ? product.carbsG.toString() : '',
-      fatG: product.fatG ? product.fatG.toString() : '',
-    });
-    setShowFitastySearch(false);
-    setSearchQuery('');
-  };
-
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* Header with Date Navigation */}
@@ -201,17 +312,17 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
             </div>
             <div>
               <p className="text-xs text-gray-500">蛋白質</p>
-              <p className="text-lg font-bold text-blue-600">{Math.round(totals.protein)}</p>
+              <p className="text-lg font-bold text-blue-600">{Math.round(totals.protein * 10) / 10}</p>
               <p className="text-xs text-gray-400">g</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">碳水</p>
-              <p className="text-lg font-bold text-amber-600">{Math.round(totals.carbs)}</p>
+              <p className="text-lg font-bold text-orange-600">{Math.round(totals.carbs * 10) / 10}</p>
               <p className="text-xs text-gray-400">g</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">脂肪</p>
-              <p className="text-lg font-bold text-red-500">{Math.round(totals.fat)}</p>
+              <p className="text-lg font-bold text-yellow-600">{Math.round(totals.fat * 10) / 10}</p>
               <p className="text-xs text-gray-400">g</p>
             </div>
           </div>
@@ -219,126 +330,64 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
       </Card>
 
       {/* Nutrition Report Section */}
-      <Card className="border-emerald-200 bg-emerald-50">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-emerald-700">營養報告</CardTitle>
+          <CardTitle className="text-base">營養報告</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-            <div className="flex gap-2">
-              <Button
-                variant={reportDateRange === '7d' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setReportDateRange('7d')}
-                className="flex-1 sm:flex-none"
-              >
-                最近7天
-              </Button>
-              <Button
-                variant={reportDateRange === '30d' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setReportDateRange('30d')}
-                className="flex-1 sm:flex-none"
-              >
-                最近30天
-              </Button>
-            </div>
-            <Button
-              onClick={handleDownloadReport}
-              disabled={downloadPDFMutation.isPending}
-              className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white"
-            >
-              {downloadPDFMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  生成中...
-                </>
-              ) : (
-                <>
-                  <Download className="h-4 w-4 mr-2" />
-                  下載PDF報告
-                </>
-              )}
+          <div className="flex gap-2">
+            <Button variant={reportDateRange === '7d' ? 'default' : 'outline'} size="sm" onClick={() => setReportDateRange('7d')}>
+              7 天
+            </Button>
+            <Button variant={reportDateRange === '30d' ? 'default' : 'outline'} size="sm" onClick={() => setReportDateRange('30d')}>
+              30 天
             </Button>
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-700">報告內容：</p>
-            <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={reportSections.macroSummary}
-                  onChange={(e) => setReportSections({...reportSections, macroSummary: e.target.checked})}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm text-gray-700">巨量營養素摘要</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={reportSections.foodLogDetails}
-                  onChange={(e) => setReportSections({...reportSections, foodLogDetails: e.target.checked})}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm text-gray-700">飲食記錄詳情</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={reportSections.bodyMetrics}
-                  onChange={(e) => setReportSections({...reportSections, bodyMetrics: e.target.checked})}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm text-gray-700">身體指標變化</span>
-              </label>
-            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={reportSections.macroSummary} onChange={(e) => setReportSections({ ...reportSections, macroSummary: e.target.checked })} />
+              宏量營養摘要
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={reportSections.foodLogDetails} onChange={(e) => setReportSections({ ...reportSections, foodLogDetails: e.target.checked })} />
+              食物日誌詳情
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={reportSections.bodyMetrics} onChange={(e) => setReportSections({ ...reportSections, bodyMetrics: e.target.checked })} />
+              身體指標
+            </label>
           </div>
-
-          <p className="text-xs text-gray-600">下載{reportDateRange === '7d' ? '最近7天' : '最近30天'}的營養詳細報告（包含每日巨量營養素分析）</p>
+          <Button onClick={handleDownloadReport} disabled={downloadPDFMutation.isPending} className="w-full">
+            {downloadPDFMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Download className="h-4 w-4 mr-2" />
+            下載 PDF 報告
+          </Button>
         </CardContent>
       </Card>
 
-      {/* Meal Groups */}
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-        </div>
-      ) : Object.keys(groupedByMeal).length > 0 ? (
-        Object.entries(groupedByMeal).map(([mealType, mealItems]) => (
-          <Card key={mealType}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">{getMealTypeText(mealType)}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {mealItems!.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-gray-400">
-                        {item.calories} kcal
-                        {item.proteinG && ` · ${item.proteinG}g 蛋白`}
-                        {item.carbsG && ` · ${item.carbsG}g 碳水`}
-                        {item.fatG && ` · ${item.fatG}g 脂肪`}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700"
-                      onClick={() => deleteMutation.mutate({ id: item.id })} disabled={deleteMutation.isPending}>
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+      {/* Meals by Type */}
+      {Object.entries(groupedByMeal).map(([mealType, mealItems]) => (
+        <Card key={mealType}>
+          <CardHeader>
+            <CardTitle className="text-base">{getMealTypeText(mealType)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {mealItems.map((item: any) => (
+                <div key={item.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{item.name}</p>
+                    <p className="text-xs text-gray-500">{Math.round(item.calories)} kcal · P:{item.proteinG || 0}g C:{item.carbsG || 0}g F:{item.fatG || 0}g</p>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))
-      ) : (
-        <Card>
-          <CardContent className="py-8 text-center text-gray-400">
-            今日暫無飲食記錄
+                  <Button variant="ghost" size="sm" onClick={() => deleteMutation.mutate({ id: item.id })} disabled={deleteMutation.isPending}>
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
-      )}
+      ))}
 
       {/* Add Food Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
@@ -364,59 +413,83 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Food Name Search */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">食物名稱 * {fitastyProducts && fitastyProducts.length > 0 ? `(${fitastyProducts.length} 產品)` : '(無產品)'}</label>
+              <label className="text-sm font-medium">食物名稱 *</label>
               <div className="relative">
-                <Input 
-                  value={newItem.name} 
-                  onChange={(e) => {
-                    setNewItem({ ...newItem, name: e.target.value });
-                    setSearchQuery(e.target.value);
-                    setShowFitastySearch(true);
-                  }}
-                  onFocus={() => setShowFitastySearch(true)}
-                  placeholder="搜尋或輸入食物名稱"
-                  required 
+                <Input
+                  value={newItem.name}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onFocus={() => setShowSearch(true)}
+                  placeholder="搜尋食物 (支援中文/英文)"
+                  required
                 />
-                {showFitastySearch && filteredFitastyProducts.length > 0 && (
+                {isSearching && (
+                  <div className="absolute right-3 top-2.5">
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  </div>
+                )}
+                {showSearch && searchResults.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
-                    {filteredFitastyProducts.map((product: any) => (
+                    {searchResults.map((food) => (
                       <button
-                        key={product.id}
+                        key={`${food.source}-${food.id}`}
                         type="button"
                         className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b border-gray-100 last:border-0"
-                        onClick={() => selectFitastyProduct(product)}
+                        onClick={() => selectFood(food)}
                       >
-                        <p className="text-sm font-medium">{product.name}</p>
-                        <p className="text-xs text-gray-500">{product.calories} kcal · {product.category}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{food.displayName}</p>
+                            <p className="text-xs text-gray-500">{food.kcal_per_100g || 0} kcal/100g</p>
+                          </div>
+                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">{food.badge}</span>
+                        </div>
                       </button>
                     ))}
                   </div>
                 )}
               </div>
             </div>
+
+            {/* Grams Input */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">熱量 (kcal) *</label>
-              <Input type="number" step="1" min="0" value={newItem.calories}
-                onChange={(e) => setNewItem({ ...newItem, calories: e.target.value })} required />
+              <label className="text-sm font-medium">份量 (克) *</label>
+              <Input
+                type="number"
+                step="1"
+                min="1"
+                value={newItem.grams}
+                onChange={(e) => handleGramsChange(e.target.value)}
+                placeholder="100"
+                required
+              />
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="space-y-1">
-                <label className="text-xs text-gray-500">蛋白質 (g)</label>
-                <Input type="number" step="0.1" min="0" value={newItem.proteinG}
-                  onChange={(e) => setNewItem({ ...newItem, proteinG: e.target.value })} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-gray-500">碳水 (g)</label>
-                <Input type="number" step="0.1" min="0" value={newItem.carbsG}
-                  onChange={(e) => setNewItem({ ...newItem, carbsG: e.target.value })} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-gray-500">脂肪 (g)</label>
-                <Input type="number" step="0.1" min="0" value={newItem.fatG}
-                  onChange={(e) => setNewItem({ ...newItem, fatG: e.target.value })} />
+
+            {/* Auto-calculated Macros */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">營養資訊 {newItem.isAutofilled && <span className="text-xs text-emerald-600">(自動填充)</span>}</label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs text-gray-500">熱量 (kcal)</label>
+                  <Input type="number" step="0.1" min="0" value={newItem.calories} readOnly className="bg-gray-50" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-gray-500">蛋白質 (g)</label>
+                  <Input type="number" step="0.1" min="0" value={newItem.proteinG} readOnly className="bg-gray-50" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-gray-500">碳水 (g)</label>
+                  <Input type="number" step="0.1" min="0" value={newItem.carbsG} readOnly className="bg-gray-50" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-gray-500">脂肪 (g)</label>
+                  <Input type="number" step="0.1" min="0" value={newItem.fatG} readOnly className="bg-gray-50" />
+                </div>
               </div>
             </div>
+
             <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={addMutation.isPending}>
               {addMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               新增
