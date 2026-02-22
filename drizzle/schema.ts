@@ -96,27 +96,35 @@ export const fitastyProducts = mysqlTable("fitasty_products", {
 	deletedAt: timestamp({ mode: 'string' }),
 });
 
-export const foodLogItems = mysqlTable("food_log_items", {
-	id: int().autoincrement().notNull(),
-	foodLogId: int().notNull(),
-	userId: int().notNull(),
-	mealType: mysqlEnum(['breakfast','lunch','dinner','snack']).notNull(),
-	name: varchar({ length: 255 }).notNull(),
-	calories: decimal({ precision: 8, scale: 1 }).notNull(),
-	proteinG: decimal({ precision: 6, scale: 1 }),
-	carbsG: decimal({ precision: 6, scale: 1 }),
-	fatG: decimal({ precision: 6, scale: 1 }),
-	source: varchar({ length: 50 }), // 'fitasty', 'usda', 'off', 'manual'
-	external_id: varchar({ length: 255 }), // fitasty_product_id, usda fdcId, or off code
-	grams: decimal({ precision: 6, scale: 1 }), // Quantity in grams
-	per100g_kcal: decimal({ precision: 8, scale: 1 }), // Kcal per 100g used for calculation
-	per100g_protein: decimal({ precision: 6, scale: 1 }), // Protein per 100g
-	per100g_carbs: decimal({ precision: 6, scale: 1 }), // Carbs per 100g
-	per100g_fat: decimal({ precision: 6, scale: 1 }), // Fat per 100g
-	is_autofilled: tinyint().default(0).notNull(), // 1 = auto-filled, 0 = manual
-	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-});
+	export const foodLogItems = mysqlTable("food_log_items", {
+		id: int().autoincrement().notNull(),
+		foodLogId: int().notNull(),
+		userId: int().notNull(),
+		mealType: mysqlEnum(['breakfast','lunch','dinner','snack']).notNull(),
+		name: varchar({ length: 255 }).notNull(),
+		calories: decimal({ precision: 8, scale: 1 }).notNull(),
+		proteinG: decimal({ precision: 6, scale: 1 }),
+		carbsG: decimal({ precision: 6, scale: 1 }),
+		fatG: decimal({ precision: 6, scale: 1 }),
+		source: varchar({ length: 50 }), // 'fitasty', 'usda', 'off', 'manual', 'ai_photo'
+		external_id: varchar({ length: 255 }), // fitasty_product_id, usda fdcId, or off code
+		grams: decimal({ precision: 6, scale: 1 }), // Quantity in grams
+		per100g_kcal: decimal({ precision: 8, scale: 1 }), // Kcal per 100g used for calculation
+		per100g_protein: decimal({ precision: 6, scale: 1 }), // Protein per 100g
+		per100g_carbs: decimal({ precision: 6, scale: 1 }), // Carbs per 100g
+		per100g_fat: decimal({ precision: 6, scale: 1 }), // Fat per 100g
+		is_autofilled: tinyint().default(0).notNull(), // 1 = auto-filled, 0 = manual
+		photo_url: varchar({ length: 500 }), // S3 URL of food photo for AI extraction
+		ai_suggested_kcal: decimal({ precision: 8, scale: 1 }), // AI suggested kcal
+		ai_suggested_protein_g: decimal({ precision: 6, scale: 1 }), // AI suggested protein
+		ai_suggested_carbs_g: decimal({ precision: 6, scale: 1 }), // AI suggested carbs
+		ai_suggested_fat_g: decimal({ precision: 6, scale: 1 }), // AI suggested fat
+		ai_confidence_json: text(), // JSON with confidence levels per macro
+		ai_prefill_json: text(), // Full AI extraction response
+		is_ai_autofilled: tinyint().default(0).notNull(), // 1 = AI autofilled, 0 = manual
+		createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	});
 
 export const foodLogs = mysqlTable("food_logs", {
 	id: int().autoincrement().notNull(),

@@ -7,11 +7,13 @@ import * as db from "./db";
 import { bodyMetricsImportRouter } from "./routers/bodyMetricsImport";
 import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
+import { foodPhotoRouter } from "./foodPhotoRouter";
 import { generateAllRecommendations, type AnalysisData } from "./utils/recommendationEngine";
 
 export const appRouter = router({
   system: systemRouter,
   bodyReport: bodyReportRouter,
+  foodPhoto: foodPhotoRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
