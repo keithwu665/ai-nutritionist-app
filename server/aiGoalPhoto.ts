@@ -139,7 +139,7 @@ export async function generateGoalPhoto(
         actionType: 'UPLOAD_PHOTO',
         entityType: 'body_photo',
         entityId: 0,
-        status: 'fail',
+        status: 'failed',
         errorMessage: error instanceof Error ? error.message : String(error),
       });
     } catch (logErr) {

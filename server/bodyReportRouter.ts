@@ -48,31 +48,32 @@ export const bodyReportRouter = router({
 
       // Convert base64 to buffer
       const buffer = Buffer.from(input.base64Data, 'base64');
-      const fileKey = `body-reports/${ctx.user.id}/${input.provider}/${Date.now()}-${input.fileName}`;
 
       // Upload to storage
-      const { url: photoUrl } = await storagePut(fileKey, buffer, input.mimeType);
-      console.log(`[bodyReport] Photo uploaded to: ${photoUrl}`);
+      const fileKey = `body-reports/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+      const { url } = await storagePut(fileKey, buffer, input.mimeType);
+
+      console.log(`[bodyReport] Photo uploaded to storage`);
 
       // Save report photo record
-      await saveBodyReportPhoto(ctx.user.id, input.provider, photoUrl, fileKey);
+      await saveBodyReportPhoto(ctx.user.id, input.provider, url, fileKey);
 
-      // Attempt to parse (may return null if parsing not implemented)
-      const parsedData = await bodyReportParserRegistry.parse(input.provider, photoUrl);
-      console.log(`[bodyReport] Parsed data:`, parsedData);
+      // Try to parse with provider parser
+      const parser = bodyReportParserRegistry.getParser(input.provider);
+      const parsedData = parser ? await parser.parse(url) : {};
 
       return {
-        photoUrl,
+        photoUrl: url,
         storageKey: fileKey,
-        parsedData: parsedData || {},
+        parsedData,
       };
     }),
 
-  // Save import with confirmation data
+  // Save import to body_metrics
   saveImport: protectedProcedure
     .input(
       z.object({
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), // YYYY-MM-DD
+        date: z.string(),
         weightKg: z.number().positive(),
         bodyFatPercent: z.number().optional(),
         muscleMassKg: z.number().optional(),
@@ -120,5 +121,29 @@ export const bodyReportRouter = router({
         success: true,
         message: 'Import saved successfully',
       };
+    }),
+
+  // Extract metrics from ROI using Vision LLM
+  extractMetricsFromROI: protectedProcedure
+    .input(
+      z.object({
+        photoUrl: z.string(),
+        provider: z.enum(['inbody', 'boditrax']),
+        roiSelection: z.object({
+          x: z.number(),
+          y: z.number(),
+          width: z.number(),
+          height: z.number(),
+        }),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      console.log(`[bodyReport] extractMetricsFromROI called for user ${ctx.user.id}, provider: ${input.provider}`);
+
+      const { extractMetricsFromReportVision } = await import('./visionMetricsExtractor');
+      const result = await extractMetricsFromReportVision(input.provider, input.photoUrl);
+
+      console.log(`[bodyReport] Extraction complete`);
+      return result;
     }),
 });

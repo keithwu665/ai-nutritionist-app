@@ -672,7 +672,7 @@ export const appRouter = router({
               userId,
               actionType: 'UPLOAD_PHOTO',
               entityType: 'body_photo',
-              status: 'fail',
+              status: 'failed',
               errorMessage: errorMsg,
               metadata: { fileName: input.fileName, fileSize: input.fileSize },
             });
@@ -754,7 +754,7 @@ export const appRouter = router({
             actionType: 'DELETE_PHOTO',
             entityType: 'body_photo',
             entityId: input.id,
-            status: 'fail',
+            status: 'failed',
             errorMessage: errorMsg,
           });
           throw error;
