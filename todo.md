@@ -627,3 +627,22 @@
 - [ ] Frontend: Live search dropdown with result grouping and language enforcement
 - [ ] Unit tests: Ranking, fuzzy match, language filtering, normalization
 - [ ] Production build verification and deployment
+
+
+## Phase 5: Frontend-Backend End-to-End Wiring (CURRENT)
+
+- [ ] Backend: Verify tRPC procedures exported (food.searchUnified, food.usdaPing, exercise.calculateCalories)
+- [ ] Backend: Implement USDA ping endpoint with lightweight call
+- [ ] Backend: Fix language enforcement (English displayName only, Chinese fallback with synonym map)
+- [ ] Frontend: Wire food search dropdown with autofill on selection
+- [ ] Frontend: Implement grams live recalculation with useEffect
+- [ ] Frontend: Add manual override toggle for food macros
+- [ ] Frontend: Wire exercise auto-kcal with live recalculation
+- [ ] Frontend: Add manual override toggle for exercise kcal
+- [ ] Manual verification: Food search "Egg" -> autofill test
+- [ ] Manual verification: Chinese search "雞翼" -> English autofill test
+- [ ] Manual verification: Grams change 100->200 -> macros update test
+- [ ] Manual verification: Exercise auto-kcal test (Running 39 min medium)
+- [ ] Manual verification: USDA ping test
+- [ ] Production build verification (0 errors, successful build)
+- [ ] Publish to production
