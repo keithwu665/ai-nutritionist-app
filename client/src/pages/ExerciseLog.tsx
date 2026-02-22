@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,77 +49,69 @@ export default function ExerciseLog() {
     note: '',
     isAutoCalculated: false,
   });
+  const [manualOverride, setManualOverride] = useState(false);
 
   const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date });
   const utils = trpc.useUtils();
 
-  // Calculate calories using MET formula
-  const calculateCalories = async (type: string, intensity: 'low' | 'moderate' | 'high', minutes: number) => {
-    if (!type || !minutes || minutes <= 0) return;
-    
-    try {
-      const input = { type, intensity, minutes };
-      const response = await fetch(
-        `/api/trpc/exercises.calculateCalories?input=${encodeURIComponent(JSON.stringify(input))}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        const result = data.result?.data;
-        if (result && result.kcal) {
-          setNewExercise(prev => ({
-            ...prev,
-            caloriesBurned: Math.round(result.kcal).toString(),
-            isAutoCalculated: true,
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Failed to calculate calories:', error);
+  // Use tRPC to calculate calories
+  const { data: calculatedCalories, isLoading: isCalculating } = trpc.exercises.calculateCalories.useQuery(
+    {
+      type: newExercise.type,
+      intensity: newExercise.intensity,
+      minutes: parseInt(newExercise.durationMinutes) || 0,
+    },
+    {
+      enabled: !!newExercise.durationMinutes && parseInt(newExercise.durationMinutes) > 0 && !manualOverride,
     }
-  };
+  );
+
+  // Auto-update calories when calculation result changes
+  useEffect(() => {
+    if (calculatedCalories && !manualOverride) {
+      console.log('Calculated calories:', calculatedCalories);
+      setNewExercise(prev => ({
+        ...prev,
+        caloriesBurned: Math.round(calculatedCalories.kcal).toString(),
+        isAutoCalculated: true,
+      }));
+    }
+  }, [calculatedCalories, manualOverride]);
 
   // Handle exercise type change
   const handleTypeChange = (value: string) => {
     setNewExercise(prev => ({
       ...prev,
       type: value,
-      isAutoCalculated: false,
-      caloriesBurned: '',
     }));
+    setManualOverride(false);
   };
 
-  // Handle intensity change - recalculate if auto
+  // Handle intensity change
   const handleIntensityChange = (value: 'low' | 'moderate' | 'high') => {
     setNewExercise(prev => ({
       ...prev,
       intensity: value,
     }));
-    
-    if (newExercise.durationMinutes) {
-      calculateCalories(newExercise.type, value, parseInt(newExercise.durationMinutes));
-    }
+    setManualOverride(false);
   };
 
-  // Handle duration change - recalculate if auto
+  // Handle duration change
   const handleDurationChange = (value: string) => {
     setNewExercise(prev => ({
       ...prev,
       durationMinutes: value,
     }));
-    
-    const minutes = parseInt(value);
-    if (minutes > 0) {
-      calculateCalories(newExercise.type, newExercise.intensity, minutes);
-    }
+    setManualOverride(false);
   };
 
-  // Handle manual calorie input - disable auto-calculation
+  // Handle manual calorie input
   const handleCalorieChange = (value: string) => {
     setNewExercise(prev => ({
       ...prev,
       caloriesBurned: value,
-      isAutoCalculated: false,
     }));
+    setManualOverride(true);
   };
 
   const createMutation = trpc.exercises.create.useMutation({
@@ -135,8 +127,12 @@ export default function ExerciseLog() {
         note: '',
         isAutoCalculated: false,
       });
+      setManualOverride(false);
     },
-    onError: () => toast.error('新增失敗'),
+    onError: (error) => {
+      console.error('Create error:', error);
+      toast.error('新增失敗');
+    },
   });
 
   const deleteMutation = trpc.exercises.delete.useMutation({
@@ -301,15 +297,19 @@ export default function ExerciseLog() {
                 消耗熱量 (kcal) *
                 {newExercise.isAutoCalculated && <span className="text-xs text-emerald-600 ml-2">(自動計算)</span>}
               </label>
-              <Input
-                type="number"
-                min="0"
-                step="1"
-                value={newExercise.caloriesBurned}
-                onChange={(e) => handleCalorieChange(e.target.value)}
-                placeholder="自動計算"
-                required
-              />
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={newExercise.caloriesBurned}
+                  onChange={(e) => handleCalorieChange(e.target.value)}
+                  placeholder={isCalculating ? '計算中...' : '自動計算'}
+                  required
+                  className="flex-1"
+                />
+                {isCalculating && <Loader2 className="h-4 w-4 animate-spin text-emerald-600 mt-2" />}
+              </div>
               {newExercise.isAutoCalculated && (
                 <p className="text-xs text-gray-500">根據運動類型、強度和時長自動計算</p>
               )}

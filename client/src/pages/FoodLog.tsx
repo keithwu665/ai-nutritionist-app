@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,6 @@ interface UnifiedFoodResult {
   source: 'fitasty' | 'usda' | 'off';
   id: string;
   displayName: string;
-  brand?: string;
   badge: string;
   kcal_per_100g: number | null;
   protein_g_per_100g: number | null;
@@ -52,59 +51,29 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
     proteinG: '',
     carbsG: '',
     fatG: '',
-    source: '',
-    externalId: '',
-    per100gKcal: '',
-    per100gProtein: '',
-    per100gCarbs: '',
-    per100gFat: '',
     isAutofilled: false,
   });
+  const [manualOverride, setManualOverride] = useState(false);
 
   const { data: items, isLoading } = trpc.foodLogs.getItems.useQuery({ date });
   const utils = trpc.useUtils();
 
-  // Search unified food (Fitasty → USDA → OFF)
-  const searchUnified = async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    
-    setIsSearching(true);
-    try {
-      // Call backend search - we'll add this tRPC procedure
-      const response = await fetch('/api/trpc/food.searchUnified?input=' + encodeURIComponent(JSON.stringify({ query })));
-      if (response.ok) {
-        const data = await response.json();
-        setSearchResults(data.result?.data || []);
-      } else {
-        setSearchResults([]);
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
+  // Use tRPC for food search
+  const { data: searchData, isLoading: isSearchLoading } = trpc.foodLogs.searchUnified.useQuery(
+    { query: searchQuery },
+    { enabled: !!searchQuery && searchQuery.length > 0 }
+  );
 
-  // Debounced search
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setNewItem({ ...newItem, name: value });
-    setShowSearch(true);
-    
-    // Debounce search
-    const timer = setTimeout(() => {
-      searchUnified(value);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  };
+  // Update search results when data changes
+  useEffect(() => {
+    if (searchData) {
+      console.log('Search results received:', searchData);
+      setSearchResults(searchData);
+    }
+  }, [searchData]);
 
   // Calculate macros from per100g values and grams
-  const calculateMacros = (grams: number, food: UnifiedFoodResult | null) => {
+  const calculateMacros = useCallback((grams: number, food: UnifiedFoodResult | null) => {
     if (!food) return { kcal: '', protein: '', carbs: '', fat: '' };
     
     const multiplier = grams / 100;
@@ -119,6 +88,14 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
       carbs: carbs.toString(),
       fat: fat.toString(),
     };
+  }, []);
+
+  // Handle search input change
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setNewItem({ ...newItem, name: value });
+    setShowSearch(true);
+    setManualOverride(false);
   };
 
   // Handle grams change - live recalculation
@@ -126,7 +103,7 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
     const grams = parseFloat(value) || 0;
     setNewItem({ ...newItem, grams: value });
     
-    if (selectedFood && grams > 0) {
+    if (selectedFood && grams > 0 && !manualOverride) {
       const macros = calculateMacros(grams, selectedFood);
       setNewItem(prev => ({
         ...prev,
@@ -140,6 +117,7 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
 
   // Select food from search results
   const selectFood = (food: UnifiedFoodResult) => {
+    console.log('Selected food:', food);
     setSelectedFood(food);
     const grams = parseFloat(newItem.grams) || 100;
     const macros = calculateMacros(grams, food);
@@ -151,17 +129,18 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
       proteinG: macros.protein,
       carbsG: macros.carbs,
       fatG: macros.fat,
-      source: food.source,
-      externalId: food.id,
-      per100gKcal: food.kcal_per_100g?.toString() || '',
-      per100gProtein: food.protein_g_per_100g?.toString() || '',
-      per100gCarbs: food.carbs_g_per_100g?.toString() || '',
-      per100gFat: food.fat_g_per_100g?.toString() || '',
       isAutofilled: true,
     });
     setShowSearch(false);
     setSearchQuery('');
     setSearchResults([]);
+    setManualOverride(false);
+  };
+
+  // Handle manual macro input
+  const handleMacroChange = (field: string, value: string) => {
+    setNewItem(prev => ({ ...prev, [field]: value }));
+    setManualOverride(true);
   };
 
   const addMutation = trpc.foodLogs.addItem.useMutation({
@@ -177,17 +156,15 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
         proteinG: '',
         carbsG: '',
         fatG: '',
-        source: '',
-        externalId: '',
-        per100gKcal: '',
-        per100gProtein: '',
-        per100gCarbs: '',
-        per100gFat: '',
         isAutofilled: false,
       });
       setSelectedFood(null);
+      setManualOverride(false);
     },
-    onError: () => toast.error('新增失敗'),
+    onError: (error) => {
+      console.error('Add error:', error);
+      toast.error('新增失敗');
+    },
   });
 
   const deleteMutation = trpc.foodLogs.deleteItem.useMutation({
@@ -425,7 +402,7 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
                   placeholder="搜尋食物 (支援中文/英文)"
                   required
                 />
-                {isSearching && (
+                {(isSearchLoading || isSearching) && (
                   <div className="absolute right-3 top-2.5">
                     <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
                   </div>
@@ -473,19 +450,19 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <label className="text-xs text-gray-500">熱量 (kcal)</label>
-                  <Input type="number" step="0.1" min="0" value={newItem.calories} readOnly className="bg-gray-50" />
+                  <Input type="number" step="0.1" min="0" value={newItem.calories} onChange={(e) => handleMacroChange('calories', e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-gray-500">蛋白質 (g)</label>
-                  <Input type="number" step="0.1" min="0" value={newItem.proteinG} readOnly className="bg-gray-50" />
+                  <Input type="number" step="0.1" min="0" value={newItem.proteinG} onChange={(e) => handleMacroChange('proteinG', e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-gray-500">碳水 (g)</label>
-                  <Input type="number" step="0.1" min="0" value={newItem.carbsG} readOnly className="bg-gray-50" />
+                  <Input type="number" step="0.1" min="0" value={newItem.carbsG} onChange={(e) => handleMacroChange('carbsG', e.target.value)} />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-gray-500">脂肪 (g)</label>
-                  <Input type="number" step="0.1" min="0" value={newItem.fatG} readOnly className="bg-gray-50" />
+                  <Input type="number" step="0.1" min="0" value={newItem.fatG} onChange={(e) => handleMacroChange('fatG', e.target.value)} />
                 </div>
               </div>
             </div>
