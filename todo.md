@@ -616,3 +616,14 @@
 - [ ] C3: Run smoke tests (Food + Exercise auto-fill)
 - [ ] C4: Publish to production domain
 - [ ] C5: Provide production URL + verification checklist
+
+
+## Phase 4: Production-Ready Food Search System
+
+- [ ] Database schema: FoodItem, UserFoodStats, TrendingStats with indexes
+- [ ] Ranking algorithm: Exact/prefix/fuzzy match with language + type + popularity weights
+- [ ] tRPC endpoints: search, recent, frequent, trending with grouping
+- [ ] Frontend: Search page with 3-section layout (Recent/Frequent/Trending)
+- [ ] Frontend: Live search dropdown with result grouping and language enforcement
+- [ ] Unit tests: Ranking, fuzzy match, language filtering, normalization
+- [ ] Production build verification and deployment
