@@ -58,6 +58,9 @@ export const exercises = mysqlTable("exercises", {
 	caloriesBurned: decimal({ precision: 8, scale: 1 }).notNull(),
 	intensity: mysqlEnum(['low','moderate','high']),
 	note: text(),
+	source: varchar({ length: 50 }).default('manual'), // 'auto' or 'manual'
+	met_used: decimal({ precision: 4, scale: 1 }), // MET value used for calculation
+	weight_used_kg: decimal({ precision: 5, scale: 1 }), // Weight used for calorie calculation
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
@@ -80,6 +83,7 @@ export const fitastyProducts = mysqlTable("fitasty_products", {
 	name: varchar({ length: 255 }).notNull(),
 	category: varchar({ length: 100 }).notNull(),
 	servingSize: varchar({ length: 100 }),
+	net_weight_g: decimal({ precision: 6, scale: 1 }), // Net weight in grams for per100g calculation
 	calories: decimal({ precision: 8, scale: 1 }).notNull(),
 	proteinG: decimal({ precision: 6, scale: 1 }),
 	carbsG: decimal({ precision: 6, scale: 1 }),
@@ -102,6 +106,14 @@ export const foodLogItems = mysqlTable("food_log_items", {
 	proteinG: decimal({ precision: 6, scale: 1 }),
 	carbsG: decimal({ precision: 6, scale: 1 }),
 	fatG: decimal({ precision: 6, scale: 1 }),
+	source: varchar({ length: 50 }), // 'fitasty', 'usda', 'off', 'manual'
+	external_id: varchar({ length: 255 }), // fitasty_product_id, usda fdcId, or off code
+	grams: decimal({ precision: 6, scale: 1 }), // Quantity in grams
+	per100g_kcal: decimal({ precision: 8, scale: 1 }), // Kcal per 100g used for calculation
+	per100g_protein: decimal({ precision: 6, scale: 1 }), // Protein per 100g
+	per100g_carbs: decimal({ precision: 6, scale: 1 }), // Carbs per 100g
+	per100g_fat: decimal({ precision: 6, scale: 1 }), // Fat per 100g
+	is_autofilled: tinyint().default(0).notNull(), // 1 = auto-filled, 0 = manual
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
@@ -149,4 +161,19 @@ export const activityLogs = mysqlTable("activity_logs", {
 	errorMessage: text(),
 	metadata: text(),
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const generalFoodCache = mysqlTable("general_food_cache", {
+	id: int().autoincrement().notNull(),
+	source: mysqlEnum(['usda','off']).notNull(), // 'usda' or 'off'
+	external_id: varchar({ length: 255 }).notNull(), // USDA fdcId or OFF code
+	display_name: varchar({ length: 255 }).notNull(),
+	brand: varchar({ length: 255 }),
+	kcal_per_100g: decimal({ precision: 8, scale: 1 }),
+	protein_g_per_100g: decimal({ precision: 6, scale: 1 }),
+	carbs_g_per_100g: decimal({ precision: 6, scale: 1 }),
+	fat_g_per_100g: decimal({ precision: 6, scale: 1 }),
+	raw_json: text(), // Raw API response for debugging
+	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });

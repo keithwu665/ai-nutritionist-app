@@ -578,3 +578,41 @@
 - [ ] 3D) Auto-load last used template, prevent deletion of required fields
 - [ ] 3E) Create BodyReportParserProvider interface (extensible, manual override allowed)
 - [ ] Verify: Database migrations, new tables, UI screens, successful import examples
+
+
+## Phase 3: Food Auto-Macros + Exercise Auto-Calorie (NEW)
+
+### A) Food Auto-Macros Implementation
+- [ ] A1: Add USDA_API_KEY environment variable
+- [ ] A2: Create general_food_cache table (source, external_id, display_name, brand, macros, raw_json)
+- [ ] A3: Update fitasty_products schema to support net_weight_g and per100g macros
+- [ ] A4: Create computeFromPer100g utility function
+- [ ] A5: Implement USDA search integration with API calls
+- [ ] A6: Implement Chinese-to-English translation fallback for USDA queries
+- [ ] A7: Implement OpenFoodFacts (OFF) search as fallback
+- [ ] A8: Create unified food.searchUnified tRPC procedure (Fitasty → USDA → OFF)
+- [ ] A9: Update FoodLog modal with search-as-you-type dropdown
+- [ ] A10: Implement grams-only input with auto-macro calculation
+- [ ] A11: Add live recalculation on grams change
+- [ ] A12: Persist source metadata (fitasty_product_id, external_id, source, grams, per100g_values)
+- [ ] A13: Test "Egg" (EN) → USDA auto-fill
+- [ ] A14: Test "雞蛋" (ZH) → USDA translation + auto-fill
+- [ ] A15: Test Fitasty product → auto-fill
+- [ ] A16: Test OFF fallback → auto-fill
+
+### B) Exercise Auto-Calorie Implementation
+- [ ] B1: Create MET estimation table (exercise type → MET value)
+- [ ] B2: Implement exercise.calculateCalories tRPC procedure
+- [ ] B3: Fetch latest body_metrics.weightKg for calorie calculation
+- [ ] B4: Update ExerciseLog modal with auto-kcal display
+- [ ] B5: Implement live recalculation on type/intensity/minutes change
+- [ ] B6: Add manual override toggle
+- [ ] B7: Persist source metadata (auto/manual, metUsed, weightUsed)
+- [ ] B8: Test "Running + 57 min + medium" → auto-kcal appears and saves
+
+### C) Production Deployment
+- [ ] C1: Verify 0 TypeScript errors
+- [ ] C2: Verify production build passes
+- [ ] C3: Run smoke tests (Food + Exercise auto-fill)
+- [ ] C4: Publish to production domain
+- [ ] C5: Provide production URL + verification checklist

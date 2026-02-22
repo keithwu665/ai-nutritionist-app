@@ -8,4 +8,5 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   adminEmailAllowlist: (process.env.ADMIN_EMAIL_ALLOWLIST ?? "").split(",").map(e => e.trim()).filter(Boolean),
+  usdaApiKey: process.env.USDA_API_KEY ?? "",
 };
