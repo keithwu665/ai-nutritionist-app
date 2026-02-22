@@ -54,6 +54,9 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
     isAutofilled: false,
   });
   const [manualOverride, setManualOverride] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
+  const [usdaTestResult, setUsdaTestResult] = useState<any>(null);
+  const [testingUSDA, setTestingUSDA] = useState(false);
 
   const { data: items, isLoading } = trpc.foodLogs.getItems.useQuery({ date });
   const utils = trpc.useUtils();

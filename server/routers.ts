@@ -124,11 +124,16 @@ export const appRouter = router({
   // ========================================================================
   foodLogs: router({
     searchUnified: publicProcedure
-      .input(z.object({ query: z.string().min(1) }))
+      .input(z.object({ query: z.string().min(1), locale: z.enum(['zh-HK', 'en']).optional() }))
       .query(async ({ input }) => {
-        const { searchUnifiedFood } = await import('./unifiedFoodSearch');
-        const { ENV } = await import('./_core/env');
-        return searchUnifiedFood(input.query, ENV.usdaApiKey);
+        const { searchFoodUnified } = await import('./unifiedFoodSearchV2');
+        return searchFoodUnified(input.query, input.locale || 'en');
+      }),
+
+    usdaPing: publicProcedure
+      .query(async () => {
+        const { testUSDAConnection } = await import('./unifiedFoodSearchV2');
+        return testUSDAConnection();
       }),
 
     getItems: protectedProcedure
