@@ -2,6 +2,20 @@ import { z } from 'zod';
 import { router, protectedProcedure } from './_core/trpc';
 import { invokeLLM } from './_core/llm';
 import { storagePut, storageGet } from './storage';
+import { ENV } from './_core/env';
+
+function getStorageConfig() {
+  const baseUrl = ENV.forgeApiUrl;
+  const apiKey = ENV.forgeApiKey;
+  if (!baseUrl || !apiKey) {
+    throw new Error('Storage proxy credentials missing');
+  }
+  return { baseUrl: baseUrl.replace(/\/+$/, ''), apiKey };
+}
+
+function ensureTrailingSlash(value: string): string {
+  return value.endsWith('/') ? value : `${value}/`;
+}
 import { foodLogItems } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import * as db from './db';
@@ -47,11 +61,31 @@ export const foodPhotoRouter = router({
       const uuid = crypto.randomUUID();
       const objectPath = `food-photos/${userId}/${date}/${uuid}.jpg`;
 
-      // Generate signed upload URL
-      const { url } = await storagePut(objectPath, Buffer.from(''), 'image/jpeg');
+      // Generate signed upload URL directly via Forge API
+      const { baseUrl, apiKey } = getStorageConfig();
+      const uploadApiUrl = new URL('v1/storage/uploadUrl', ensureTrailingSlash(baseUrl));
+      uploadApiUrl.searchParams.set('path', objectPath);
+      
+      const response = await fetch(uploadApiUrl, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      
+      if (!response.ok) {
+        const message = await response.text().catch(() => response.statusText);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to generate upload URL: ${message}`,
+          cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
+        });
+      }
+      
+      const { url: uploadUrl } = await response.json();
+      
+      console.log(`[createUploadUrl] Generated upload URL for path=${objectPath}`);
       
       return {
-        uploadUrl: url,
+        uploadUrl,
         objectPath,
       };
     }),
