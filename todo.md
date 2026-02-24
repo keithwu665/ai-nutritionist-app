@@ -646,3 +646,26 @@
 - [ ] Manual verification: USDA ping test
 - [ ] Production build verification (0 errors, successful build)
 - [ ] Publish to production
+
+
+## Phase 5: Photo AI Fix (Production Ready)
+
+- [ ] A1: Add structured logging to foodPhotoRouter (createUploadUrl, extractFromPhoto, vision call)
+- [ ] A2: Update error responses with code, message, debugId
+- [ ] A3: Verify tRPC procedure registration in routers.ts
+- [ ] B1: Confirm production env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VISION_AI_API_KEY)
+- [ ] B2: Implement fail-fast env validation with ENV_MISSING error
+- [ ] C1: Create food-photos storage bucket (private)
+- [ ] C2: Implement server-side image download (no CORS issues)
+- [ ] C3: Create food_photo_entries table for history
+- [ ] D1: Fix Vision extraction with strict JSON schema
+- [ ] D2: Add retry logic for JSON parse failures
+- [ ] D3: Implement confidence scores (high/medium/low)
+- [ ] E1: Wire frontend Photo tab with tRPC call
+- [ ] E2: Show loading skeleton and disable button during analysis
+- [ ] E3: Autofill form with confidence badges
+- [ ] E4: Handle errors with user-friendly messages
+- [ ] F1: Implement history view with thumbnails
+- [ ] F2: Add "Use again" button to duplicate values
+- [ ] G1: End-to-end testing (upload, analyze, save, history)
+- [ ] G2: Production deployment and verification

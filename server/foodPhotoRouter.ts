@@ -5,6 +5,7 @@ import { storagePut, storageGet } from './storage';
 import { foodLogItems } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import * as db from './db';
+import { TRPCError } from '@trpc/server';
 
 // Vision LLM extraction response schema
 const AIExtractionSchema = z.object({
@@ -188,8 +189,14 @@ Rules:
           photoUrl,
         };
       } catch (error) {
-        console.error('Photo extraction error:', error);
-        throw new Error(`Failed to extract nutrition from photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        const debugId = crypto.randomUUID();
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`[Photo extraction error] debugId=${debugId}, message=${message}`, error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to extract nutrition from photo: ${message}`,
+          cause: { debugId, code: 'VISION_CALL_FAILED' },
+        });
       }
     }),
 
