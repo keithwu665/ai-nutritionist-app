@@ -28,6 +28,16 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  // Boot-time secret verification (production-safe: log only presence and length, not values)
+  const secretsStatus = {
+    hasForgeKey: !!process.env.BUILT_IN_FORGE_API_KEY,
+    forgeKeyLen: process.env.BUILT_IN_FORGE_API_KEY?.length ?? 0,
+    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+    hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    hasVisionModel: !!process.env.VISION_MODEL_NAME,
+  };
+  console.log('[BOOT] Production secrets status:', secretsStatus);
+  
   const app = express();
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
