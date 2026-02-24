@@ -252,9 +252,24 @@ export default function FoodLog({ initialDate }: FoodLogProps) {
 
       toast.success('AI 分析完成');
     } catch (error) {
-      const message = error instanceof Error ? error.message : '分析失敗';
-      setExtractionError(message);
-      toast.error(message);
+      console.error('PhotoAI full error:', error);
+      
+      // Extract error code from tRPC error structure
+      const code =
+        (error as any)?.data?.code ||
+        (error as any)?.shape?.data?.code ||
+        (error as any)?.message ||
+        'UNKNOWN_ERROR';
+      
+      const message =
+        (error as any)?.data?.message ||
+        (error as any)?.shape?.message ||
+        (error as any)?.message ||
+        '分析失敗';
+      
+      const displayMessage = `${code}: ${message}`;
+      setExtractionError(displayMessage);
+      toast.error(displayMessage);
     } finally {
       setIsExtracting(false);
     }
