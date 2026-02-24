@@ -9,4 +9,6 @@ export const ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   adminEmailAllowlist: (process.env.ADMIN_EMAIL_ALLOWLIST ?? "").split(",").map(e => e.trim()).filter(Boolean),
   usdaApiKey: process.env.USDA_API_KEY ?? "",
+  supabaseUrl: process.env.VITE_SUPABASE_URL ?? "",
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
 };

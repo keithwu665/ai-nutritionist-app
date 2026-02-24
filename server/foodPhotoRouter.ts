@@ -3,19 +3,9 @@ import { router, protectedProcedure } from './_core/trpc';
 import { invokeLLM } from './_core/llm';
 import { storagePut, storageGet } from './storage';
 import { ENV } from './_core/env';
+import crypto from 'crypto';
 
-function getStorageConfig() {
-  const baseUrl = ENV.forgeApiUrl;
-  const apiKey = ENV.forgeApiKey;
-  if (!baseUrl || !apiKey) {
-    throw new Error('Storage proxy credentials missing');
-  }
-  return { baseUrl: baseUrl.replace(/\/+$/, ''), apiKey };
-}
 
-function ensureTrailingSlash(value: string): string {
-  return value.endsWith('/') ? value : `${value}/`;
-}
 import { foodLogItems } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import * as db from './db';
@@ -59,35 +49,65 @@ export const foodPhotoRouter = router({
       const userId = ctx.user?.id || 1;
       const date = new Date().toISOString().split('T')[0];
       const uuid = crypto.randomUUID();
-      const objectPath = `food-photos/${userId}/${date}/${uuid}.jpg`;
+      const filePath = `${userId}/${date}/${uuid}.jpg`;
+      const bucketName = 'food-photos';
 
-      // Generate signed upload URL directly via Forge API
-      const { baseUrl, apiKey } = getStorageConfig();
-      const uploadApiUrl = new URL('v1/storage/uploadUrl', ensureTrailingSlash(baseUrl));
-      uploadApiUrl.searchParams.set('path', objectPath);
-      
-      const response = await fetch(uploadApiUrl, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${apiKey}` },
-      });
-      
-      if (!response.ok) {
-        const message = await response.text().catch(() => response.statusText);
+      try {
+        // Initialize Supabase client with service role key
+        const supabaseUrl = ENV.supabaseUrl;
+        const supabaseServiceKey = ENV.supabaseServiceRoleKey;
+        
+        if (!supabaseUrl || !supabaseServiceKey) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Supabase credentials missing',
+            cause: { code: 'ENV_MISSING' },
+          });
+        }
+        
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+        
+        console.log(`[createUploadUrl] START bucket=${bucketName}, filePath=${filePath}`);
+        
+        // Use official Supabase SDK to create signed upload URL
+        const { data, error } = await supabase
+          .storage
+          .from(bucketName)
+          .createSignedUploadUrl(filePath);
+        
+        if (error) {
+          console.error(`[createUploadUrl] ERROR: ${error.message}`);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `Failed to generate upload URL: ${error.message}`,
+            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
+          });
+        }
+        
+        if (!data?.signedUrl) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'No signed URL returned from Supabase',
+            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
+          });
+        }
+        
+        console.log(`[createUploadUrl] SUCCESS bucket=${bucketName}, filePath=${filePath}`);
+        
+        return {
+          uploadUrl: data.signedUrl,
+          objectPath: filePath,
+          bucket: bucketName,
+        };
+      } catch (err: any) {
+        console.error(`[createUploadUrl] EXCEPTION: ${err.message}`);
+        if (err instanceof TRPCError) throw err;
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: `Failed to generate upload URL: ${message}`,
+          message: `Upload URL creation failed: ${err.message}`,
           cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
         });
       }
-      
-      const { url: uploadUrl } = await response.json();
-      
-      console.log(`[createUploadUrl] Generated upload URL for path=${objectPath}`);
-      
-      return {
-        uploadUrl,
-        objectPath,
-      };
     }),
 
   // Extract nutrition from photo using Vision LLM
