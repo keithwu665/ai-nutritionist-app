@@ -669,3 +669,14 @@
 - [ ] F2: Add "Use again" button to duplicate values
 - [ ] G1: End-to-end testing (upload, analyze, save, history)
 - [ ] G2: Production deployment and verification
+
+
+## Photo AI Production Fix - Connectivity & Runtime Issues
+- [x] Force Node.js runtime in tRPC server configuration
+- [x] Add production secret validation with explicit error codes (SUPABASE_URL_MISSING, SUPABASE_SERVICE_ROLE_KEY_MISSING)
+- [x] Implement Supabase connectivity health check (fetch auth/v1/health)
+- [x] Create dedicated Supabase admin client using SERVICE_ROLE_KEY
+- [x] Fix createSignedUploadUrl to use official Supabase SDK
+- [x] Ensure food-photos bucket exists and is properly configured
+- [x] Verify frontend Photo AI tab wiring and error handling
+- [x] Deploy to production and verify end-to-end Photo AI flow

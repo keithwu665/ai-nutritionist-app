@@ -5,12 +5,11 @@ import { storagePut, storageGet } from './storage';
 import { ENV } from './_core/env';
 import crypto from 'crypto';
 
-
 import { foodLogItems } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import * as db from './db';
 import { TRPCError } from '@trpc/server';
-import { createClient } from '@supabase/supabase-js';
+import { initializeSupabaseAdmin, ensureFoodPhotosBucket } from './utils/supabaseClient';
 
 // Vision LLM extraction response schema
 const AIExtractionSchema = z.object({
@@ -53,30 +52,27 @@ export const foodPhotoRouter = router({
       const bucketName = 'food-photos';
 
       try {
-        // Initialize Supabase client with service role key
-        const supabaseUrl = ENV.supabaseUrl;
-        const supabaseServiceKey = ENV.supabaseServiceRoleKey;
+        // Initialize Supabase client with validation and connectivity checks
+        const supabase = await initializeSupabaseAdmin(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
         
-        if (!supabaseUrl || !supabaseServiceKey) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Supabase credentials missing',
-            cause: { code: 'ENV_MISSING' },
-          });
-        }
+        // Ensure food-photos bucket exists
+        await ensureFoodPhotosBucket(supabase);
         
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-        
-        console.log(`[createUploadUrl] START bucket=${bucketName}, filePath=${filePath}`);
+        console.log(`[createUploadUrl] Creating signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
         
         // Use official Supabase SDK to create signed upload URL
+        console.log('[createUploadUrl] Calling createSignedUploadUrl...');
         const { data, error } = await supabase
           .storage
           .from(bucketName)
           .createSignedUploadUrl(filePath);
         
         if (error) {
-          console.error(`[createUploadUrl] ERROR: ${error.message}`);
+          console.error(`[createUploadUrl] ERROR creating signed URL:`, {
+            errorName: (error as any).name,
+            errorMessage: error.message,
+            errorStatus: (error as any).status || (error as any).statusCode,
+          });
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: `Failed to generate upload URL: ${error.message}`,
@@ -85,6 +81,7 @@ export const foodPhotoRouter = router({
         }
         
         if (!data?.signedUrl) {
+          console.error('[createUploadUrl] No signed URL in response');
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: 'No signed URL returned from Supabase',
@@ -92,27 +89,29 @@ export const foodPhotoRouter = router({
           });
         }
         
-        console.log(`[createUploadUrl] SUCCESS bucket=${bucketName}, filePath=${filePath}`);
+        console.log(`[createUploadUrl] SUCCESS: Generated signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
         
         return {
           uploadUrl: data.signedUrl,
           objectPath: filePath,
           bucket: bucketName,
         };
-      } catch (err: any) {
-        console.error(`[createUploadUrl] EXCEPTION: ${err.message}`);
-        if (err instanceof TRPCError) throw err;
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: `Upload URL creation failed: ${err.message}`,
-          cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
-        });
-      }
-    }),
-
+        } catch (err: any) {
+          console.error(`[createUploadUrl] EXCEPTION:`, {
+            message: err.message,
+            code: err.cause?.code || 'UNKNOWN',
+            isTRPCError: err instanceof TRPCError,
+          });
+          if (err instanceof TRPCError) throw err;
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `Upload URL creation failed: ${err.message}`,
+            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
+          });
+        }
+      }),
   // Extract nutrition from photo using Vision LLM
-  extractFromPhoto: protectedProcedure
-    .input(z.object({
+  extractFromPhoto: protectedProcedure    .input(z.object({
       objectPath: z.string(),
       grams_g: z.number().default(100),
     }))
@@ -129,17 +128,9 @@ export const foodPhotoRouter = router({
         let imageBuffer: Buffer;
         try {
           // Initialize Supabase client with service role key
-          const supabaseUrl = process.env.SUPABASE_URL;
-          const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          const supabase = await initializeSupabaseAdmin(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
           
-          if (!supabaseUrl || !supabaseServiceKey) {
-            console.error(`[extractFromPhoto] ENV_MISSING: SUPABASE_URL=${!!supabaseUrl}, SUPABASE_SERVICE_ROLE_KEY=${!!supabaseServiceKey}`);
-            throw new Error('ENV_MISSING');
-          }
-
-          const supabase = createClient(supabaseUrl, supabaseServiceKey);
-          
-          console.log(`[extractFromPhoto] Downloading: bucket=food-photos, path=${input.objectPath}`);
+          console.log(`[extractFromPhoto] Phase 1: Downloading from Supabase storage, path=${input.objectPath}`);
           
           const { data, error } = await supabase
             .storage
@@ -153,6 +144,7 @@ export const foodPhotoRouter = router({
               photoPath: input.objectPath,
               userId,
               errorCode: (error as any).statusCode,
+              errorName: (error as any).name,
             });
             throw new Error(`STORAGE_DOWNLOAD_FAILED: ${error.message}`);
           }
@@ -171,7 +163,11 @@ export const foodPhotoRouter = router({
 
         } catch (storageError) {
           const message = storageError instanceof Error ? storageError.message : 'Unknown storage error';
-          console.error(`[extractFromPhoto] Storage layer error: ${message}`, storageError);
+          console.error(`[extractFromPhoto] Storage layer error: ${message}`);
+          
+          // If it's already a TRPCError from initializeSupabaseAdmin, re-throw it
+          if (storageError instanceof TRPCError) throw storageError;
+          
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: `Storage download failed: ${message}`,
