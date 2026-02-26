@@ -28,15 +28,43 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  // Explicit Node.js runtime configuration
+  console.log('[BOOT] Runtime environment:', {
+    nodeVersion: process.version,
+    runtime: 'nodejs',
+    env: process.env.NODE_ENV,
+    platform: process.platform,
+  });
+
   // Boot-time secret verification (production-safe: log only presence and length, not values)
+  const supabaseUrl = (process.env.SUPABASE_URL || '').trim();
+  const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+  
   const secretsStatus = {
     hasForgeKey: !!process.env.BUILT_IN_FORGE_API_KEY,
     forgeKeyLen: process.env.BUILT_IN_FORGE_API_KEY?.length ?? 0,
-    hasSupabaseUrl: !!process.env.SUPABASE_URL,
-    hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    hasSupabaseUrl: !!supabaseUrl,
+    supabaseUrlLen: supabaseUrl.length,
+    supabaseUrlValid: supabaseUrl.startsWith('https://') && !supabaseUrl.endsWith('/'),
+    hasSupabaseKey: !!supabaseKey,
+    supabaseKeyLen: supabaseKey.length,
     hasVisionModel: !!process.env.VISION_MODEL_NAME,
   };
   console.log('[BOOT] Production secrets status:', secretsStatus);
+  
+  // Validate Supabase configuration early
+  if (!supabaseUrl) {
+    console.error('[BOOT] ERROR: SUPABASE_URL is not configured');
+  }
+  if (!supabaseKey) {
+    console.error('[BOOT] ERROR: SUPABASE_SERVICE_ROLE_KEY is not configured');
+  }
+  if (supabaseUrl && !supabaseUrl.startsWith('https://')) {
+    console.error('[BOOT] ERROR: SUPABASE_URL must start with https://');
+  }
+  if (supabaseUrl && supabaseUrl.endsWith('/')) {
+    console.error('[BOOT] ERROR: SUPABASE_URL should not end with /');
+  }
   
   const app = express();
   const server = createServer(app);

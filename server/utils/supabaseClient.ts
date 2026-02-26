@@ -33,8 +33,15 @@ export async function initializeSupabaseAdmin(
     });
   }
 
-  // Sanitize URL
-  if (!url.startsWith('https://')) {
+  // Sanitize URL - remove trailing slash if present
+  let sanitizedUrl = url;
+  if (sanitizedUrl.endsWith('/')) {
+    sanitizedUrl = sanitizedUrl.slice(0, -1);
+    console.log('[initializeSupabaseAdmin] Removed trailing slash from URL');
+  }
+
+  // Validate URL format
+  if (!sanitizedUrl.startsWith('https://')) {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
       message: 'SUPABASE_URL must start with https://',
@@ -42,44 +49,68 @@ export async function initializeSupabaseAdmin(
     });
   }
 
-  // Test connectivity
+  // Test connectivity with detailed diagnostics
   console.log('[initializeSupabaseAdmin] Testing Supabase connectivity...');
   try {
-    const healthUrl = url + '/auth/v1/health';
+    const healthUrl = sanitizedUrl + '/auth/v1/health';
     console.log('[initializeSupabaseAdmin] Health check URL:', healthUrl);
+    console.log('[initializeSupabaseAdmin] Health check timeout: 5000ms');
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const timeoutId = setTimeout(() => {
+      console.log('[initializeSupabaseAdmin] Aborting health check due to timeout');
+      controller.abort();
+    }, 5000);
 
     try {
+      console.log('[initializeSupabaseAdmin] Sending health check request...');
       const response = await fetch(healthUrl, {
         method: 'GET',
         signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       clearTimeout(timeoutId);
 
-      console.log('[initializeSupabaseAdmin] Health check status:', response.status);
+      console.log('[initializeSupabaseAdmin] Health check status:', response.status, response.statusText);
+      console.log('[initializeSupabaseAdmin] Response headers:', {
+        contentType: response.headers.get('content-type'),
+        contentLength: response.headers.get('content-length'),
+      });
 
       if (!response.ok) {
-        console.error('[initializeSupabaseAdmin] Health check failed:', response.status);
-        throw new Error(`Health check returned ${response.status}`);
+        const responseText = await response.text().catch(() => '(unable to read body)');
+        console.error('[initializeSupabaseAdmin] Health check failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: responseText.substring(0, 200),
+        });
+        throw new Error(`Health check returned ${response.status} ${response.statusText}`);
       }
+
+      console.log('[initializeSupabaseAdmin] Health check PASSED');
     } finally {
       clearTimeout(timeoutId);
     }
   } catch (error: any) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    console.error('[initializeSupabaseAdmin] CONNECTIVITY_FAILED:', errorMsg);
+    const errorName = error instanceof Error ? error.name : 'Unknown';
+    console.error('[initializeSupabaseAdmin] CONNECTIVITY_FAILED:', {
+      errorName,
+      errorMsg,
+      errorType: typeof error,
+    });
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
       message: `Supabase connectivity failed: ${errorMsg}`,
-      cause: { code: 'SUPABASE_CONNECTIVITY_FAILED' },
+      cause: { code: 'SUPABASE_CONNECTIVITY_FAILED', errorName },
     });
   }
 
   // Create and return client
   console.log('[initializeSupabaseAdmin] Creating Supabase admin client...');
-  const client = createClient(url, key, {
+  const client = createClient(sanitizedUrl, key, {
     auth: { persistSession: false },
   });
 
