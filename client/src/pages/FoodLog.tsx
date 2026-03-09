@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ChevronLeft, ChevronRight, Loader2, Upload, X } from 'lucide-react';
+import { Plus, Trash2, ChevronLeft, ChevronRight, Loader2, Upload, X, ChevronRight as ChevronRightIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
 
 export default function FoodLog() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -34,6 +35,8 @@ export default function FoodLog() {
     { query: searchQuery },
     { enabled: searchQuery.length >= 2 }
   );
+  const { data: userProfile } = trpc.profile.get.useQuery();
+  const { data: allFoodLogs } = trpc.foodLogs.getItems.useQuery({ date: '' });
   const utils = trpc.useUtils();
 
   // Mutations
@@ -68,6 +71,23 @@ export default function FoodLog() {
   const createUploadUrlMutation = trpc.foodPhoto.createUploadUrl.useMutation();
   const extractFromPhotoMutation = trpc.foodPhoto.extractFromPhoto.useMutation();
 
+  // Calculate daily calorie goal
+  const dailyCalorieGoal = useMemo(() => {
+    if (!userProfile) return 1642; // Default goal
+    try {
+      const bmr = calculateBMR(
+        userProfile.gender as 'male' | 'female',
+        Number(userProfile.weightKg),
+        Number(userProfile.heightCm),
+        userProfile.age
+      );
+      const tdee = calculateTDEE(bmr, userProfile.activityLevel as any);
+      return Math.round(calculateDailyCalorieTarget(tdee, userProfile.fitnessGoal as any));
+    } catch (e) {
+      return 1642; // Default goal
+    }
+  }, [userProfile]);
+
   // Calculate daily totals
   const dailyTotals = useMemo(() => {
     if (!items) return { kcal: 0, protein: 0, carbs: 0, fat: 0 };
@@ -81,6 +101,26 @@ export default function FoodLog() {
       { kcal: 0, protein: 0, carbs: 0, fat: 0 }
     );
   }, [items]);
+
+  // Get daily totals for a specific date
+  const getDailyTotalsForDate = useCallback((dateStr: string) => {
+    if (!allFoodLogs) return { kcal: 0 };
+    const dayLogs = allFoodLogs.filter((log: any) => {
+      const logDate = new Date(log.createdAt).toISOString().split('T')[0];
+      return logDate === dateStr;
+    });
+    return {
+      kcal: dayLogs.reduce((sum: number, log: any) => sum + (Number(log.calories) || 0), 0),
+    };
+  }, [allFoodLogs]);
+
+  // Get calendar status for a date
+  const getCalendarStatus = useCallback((dateStr: string) => {
+    const dayTotals = getDailyTotalsForDate(dateStr);
+    if (dayTotals.kcal === 0) return 'empty'; // grey - no records
+    if (dayTotals.kcal >= dailyCalorieGoal) return 'exceeded'; // red - exceeded goal
+    return 'achieved'; // green - under goal
+  }, [getDailyTotalsForDate, dailyCalorieGoal]);
 
   // Calendar helpers
   const getDaysInMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
@@ -532,20 +572,33 @@ export default function FoodLog() {
                 const dateStr = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const isSelected = date === dateStr;
                 const isToday = dateStr === new Date().toISOString().split('T')[0];
+                const status = getCalendarStatus(dateStr);
+
+                let bgColor = 'bg-gray-100 text-gray-900 hover:bg-gray-200';
+                let dotColor = 'bg-gray-300'; // empty
+                
+                if (status === 'achieved') {
+                  dotColor = 'bg-emerald-500'; // green - under goal
+                } else if (status === 'exceeded') {
+                  dotColor = 'bg-red-500'; // red - exceeded goal
+                }
+
+                if (isSelected) {
+                  bgColor = 'bg-emerald-500 text-white ring-2 ring-emerald-300';
+                } else if (isToday) {
+                  bgColor = 'bg-emerald-100 text-emerald-700';
+                }
 
                 return (
                   <button
                     key={day}
                     onClick={() => setDate(dateStr)}
-                    className={`aspect-square rounded-lg flex items-center justify-center font-medium text-sm cursor-pointer transition-colors ${
-                      isSelected
-                        ? 'bg-emerald-500 text-white ring-2 ring-emerald-300'
-                        : isToday
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    className={`aspect-square rounded-lg flex flex-col items-center justify-center font-medium text-sm cursor-pointer transition-colors relative ${
+                      bgColor
                     }`}
                   >
-                    {day}
+                    <span>{day}</span>
+                    <div className={`w-1.5 h-1.5 rounded-full mt-1 ${dotColor}`} />
                   </button>
                 );
               })}
@@ -553,10 +606,10 @@ export default function FoodLog() {
           </CardContent>
         </Card>
 
-        {/* Today's Food Log */}
+        {/* Recent Records */}
         <Card className="border-0 shadow-sm">
           <CardHeader>
-            <CardTitle>今日飲食</CardTitle>
+            <CardTitle>最近記錄</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -565,29 +618,60 @@ export default function FoodLog() {
               </div>
             ) : items && items.length > 0 ? (
               <div className="space-y-3">
-                {items.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{item.name}</div>
-                      <div className="text-sm text-gray-600">{getMealTypeText(item.mealType)}</div>
-                      <div className="text-sm text-emerald-600 font-medium mt-1">{item.calories} kcal</div>
+                {/* Today's Section */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 px-2">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-semibold text-sm">
+                      {new Date().getDate()}
                     </div>
-                    <button
-                      onClick={() => deleteMutation.mutate({ id: item.id })}
-                      className="p-2 hover:bg-red-100 rounded-lg text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">今日</div>
+                      <div className="text-xs text-gray-500">{date}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-emerald-600">{Math.round(dailyTotals.kcal)} kcal</div>
+                      <div className="text-xs text-gray-600">目標 {dailyCalorieGoal} kcal · {Math.round((dailyTotals.kcal / dailyCalorieGoal) * 100)}%</div>
+                    </div>
                   </div>
-                ))}
+                  {/* Progress Bar */}
+                  <div className="px-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          dailyTotals.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
+                        }`}
+                        style={{
+                          width: `${Math.min((dailyTotals.kcal / dailyCalorieGoal) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Food Items */}
+                <div className="space-y-2 mt-4">
+                  {items.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">{item.name}</div>
+                        <div className="text-sm text-gray-600">{getMealTypeText(item.mealType)}</div>
+                      </div>
+                      <div className="text-right mr-2">
+                        <div className="text-sm font-medium text-emerald-600">{item.calories} kcal</div>
+                      </div>
+                      <button
+                        onClick={() => deleteMutation.mutate({ id: item.id })}
+                        className="p-2 hover:bg-red-100 rounded-lg text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
 
                 {/* Daily Summary */}
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex justify-between font-medium text-gray-900">
-                    <span>今日總計</span>
-                    <span>{Math.round(dailyTotals.kcal)} kcal</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-gray-600 mt-2">
+                  <div className="flex justify-between text-sm text-gray-600">
                     <span>蛋白質: {dailyTotals.protein.toFixed(1)}g</span>
                     <span>碳水: {dailyTotals.carbs.toFixed(1)}g</span>
                     <span>脂肪: {dailyTotals.fat.toFixed(1)}g</span>
