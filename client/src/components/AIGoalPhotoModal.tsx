@@ -22,16 +22,18 @@ export function AIGoalPhotoModal({
 }: AIGoalPhotoModalProps) {
   const [selectedPhotoId, setSelectedPhotoId] = useState<number | null>(null);
   const [selectedDelta, setSelectedDelta] = useState(-15);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const generateMutation = trpc.bodyPhotos.generateGoalPhoto.useMutation({
-    onSuccess: () => {
-      console.log('[AI_GENERATE] AI goal photo generated successfully');
+    onSuccess: (data: any) => {
+      console.log('[AI_GENERATE] AI goal photo generated successfully', data);
+      console.log('[AI_GENERATE] Generated image URL:', data?.photoUrl);
+      setGeneratedImageUrl(data?.photoUrl || null);
       toast.success('AI目標相片生成成功');
-      onOpenChange(false);
-      onSuccess();
     },
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : '未知錯誤';
       console.error('[AI_GENERATE] Failed to generate AI goal photo:', errorMsg);
+      console.error('[AI_GENERATE] Full error:', error);
       
       let userMessage = '生成失敗';
       if (errorMsg.includes('500') || errorMsg.includes('Internal Server Error')) {
@@ -54,6 +56,8 @@ export function AIGoalPhotoModal({
     }
 
     console.log('[AI_GENERATE] Starting generation', { sourcePhotoId: selectedPhotoId, deltaKg: selectedDelta });
+    console.log('[AI_GENERATE] Request payload:', { sourcePhotoId: selectedPhotoId, deltaKg: selectedDelta });
+    setGeneratedImageUrl(null);
     generateMutation.mutate({
       sourcePhotoId: selectedPhotoId,
       deltaKg: selectedDelta,
@@ -117,14 +121,36 @@ export function AIGoalPhotoModal({
             </div>
           )}
 
+          {/* Generated Image Display */}
+          {generatedImageUrl && (
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">生成結果</Label>
+              <div className="bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={generatedImageUrl}
+                  alt="AI Generated Goal Photo"
+                  className="w-full h-auto object-cover"
+                  onError={() => {
+                    console.error('[AI_GENERATE] Failed to load generated image:', generatedImageUrl);
+                    toast.error('無法載入生成的圖片');
+                  }}
+                />
+              </div>
+              <p className="text-xs text-gray-600">這是AI模擬的目標身材預覽</p>
+            </div>
+          )}
+
           {/* Buttons */}
           <div className="flex gap-3 justify-end">
             <Button
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                setGeneratedImageUrl(null);
+                onOpenChange(false);
+              }}
               disabled={generateMutation.isPending}
             >
-              取消
+              {generatedImageUrl ? '關閉' : '取消'}
             </Button>
             <Button
               onClick={handleGenerate}
