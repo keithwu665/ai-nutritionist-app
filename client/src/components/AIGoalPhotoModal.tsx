@@ -32,7 +32,17 @@ export function AIGoalPhotoModal({
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : '未知錯誤';
       console.error('[AI_GENERATE] Failed to generate AI goal photo:', errorMsg);
-      toast.error(`生成失敗: ${errorMsg}`);
+      
+      let userMessage = '生成失敗';
+      if (errorMsg.includes('500') || errorMsg.includes('Internal Server Error')) {
+        userMessage = '服務暫時無法使用，請稍後重試';
+      } else if (errorMsg.includes('fetch failed')) {
+        userMessage = '網絡連接失敗，請檢查網絡';
+      } else if (errorMsg.includes('not found')) {
+        userMessage = '相片不存在，請重新選擇';
+      }
+      
+      toast.error(userMessage);
     },
   });
 

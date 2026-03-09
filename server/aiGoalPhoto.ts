@@ -5,28 +5,19 @@ import { getDb } from './db';
 import { bodyPhotos } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 
-const AI_GOAL_PROMPT = `You are performing a strong visible body transformation.
+const AI_GOAL_PROMPT = `Edit this photo to show a person after losing 15kg of body fat.
 
-This must look clearly different from the original image.
+Make these changes:
+- Reduce body fat visibly
+- Make waist slimmer
+- Create abdominal definition
+- Sharpen chest and shoulder muscles
+- Tighten the torso
 
-Simulate a dramatic and clearly visible 15kg fat loss.
-
-Reduce body fat significantly.
-Make the waist much slimmer.
-Create strong visible abdominal definition.
-Sharpen chest and shoulder muscles.
-Tighten the torso visibly.
-
-The transformation must be obvious at first glance.
-The result must look lean and athletic.
-
-Keep the same identity, same face, same pose and same background.
-
-Do NOT produce subtle changes.
-Make the transformation clearly noticeable.
-
-Photorealistic.
-High resolution.`;
+The transformation must be obvious and clearly noticeable.
+Keep the same face, pose, and background.
+Make it look photorealistic and natural.
+High quality result.`;
 
 export async function generateGoalPhoto(
   userId: number,
@@ -60,13 +51,23 @@ export async function generateGoalPhoto(
   console.log('[AI_GOAL] Source photo found', { photoUrl: sourcePhoto.photoUrl });
 
   try {
-    // Call AI image generation service
-    console.log('[AI_GOAL] Calling generateImage service', { sourcePhotoUrl: sourcePhoto.photoUrl });
+    // Fetch and convert source photo to base64 for proper image-to-image transformation
+    console.log('[AI_GOAL] Fetching source photo for base64 conversion', { sourcePhotoUrl: sourcePhoto.photoUrl });
+    const photoResponse = await fetch(sourcePhoto.photoUrl);
+    if (!photoResponse.ok) {
+      throw new Error(`Failed to fetch source photo: ${photoResponse.statusText}`);
+    }
+    const photoBuffer = await photoResponse.arrayBuffer();
+    const base64Photo = Buffer.from(photoBuffer).toString('base64');
+    console.log('[AI_GOAL] Source photo converted to base64', { base64Length: base64Photo.length });
+
+    // Call AI image generation service with base64 image data
+    console.log('[AI_GOAL] Calling generateImage service with base64 image');
     const { url: generatedImageUrl } = await generateImage({
       prompt: AI_GOAL_PROMPT,
       originalImages: [
         {
-          url: sourcePhoto.photoUrl,
+          b64Json: base64Photo,
           mimeType: 'image/jpeg',
         },
       ],
