@@ -722,3 +722,10 @@
 - [x] Verify all functionality still works
 - [x] Deploy to production
 - [x] Provide live URL and summary
+
+
+## Progress Photo Upload & AI Generation Fix
+- [ ] Fix Progress Photo upload flow (frontend button, file picker, upload request, storage, database)
+- [ ] Fix AI Goal Photo generation (backend request, provider config, model compatibility)
+- [ ] Add comprehensive error handling and logging for both features
+- [ ] Test both features end-to-end and verify functionality

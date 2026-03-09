@@ -66,10 +66,12 @@ export async function generateImage(
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
+    console.error('[IMAGE_GEN] Image generation failed', { status: response.status, statusText: response.statusText, detail });
     throw new Error(
       `Image generation request failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`
     );
   }
+  console.log('[IMAGE_GEN] Image generation response successful', { status: response.status });
 
   const result = (await response.json()) as {
     image: {
@@ -78,14 +80,18 @@ export async function generateImage(
     };
   };
   const base64Data = result.image.b64Json;
+  console.log('[IMAGE_GEN] Image data extracted', { base64Length: base64Data.length, mimeType: result.image.mimeType });
   const buffer = Buffer.from(base64Data, "base64");
+  console.log('[IMAGE_GEN] Buffer created', { size: buffer.length });
 
   // Save to S3
+  console.log('[IMAGE_GEN] Uploading to S3');
   const { url } = await storagePut(
     `generated/${Date.now()}.png`,
     buffer,
     result.image.mimeType
   );
+  console.log('[IMAGE_GEN] Image saved to S3', { url });
   return {
     url,
   };

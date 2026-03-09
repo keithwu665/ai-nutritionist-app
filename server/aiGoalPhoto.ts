@@ -61,7 +61,7 @@ export async function generateGoalPhoto(
 
   try {
     // Call AI image generation service
-    console.log('[AI_GOAL] Calling generateImage service');
+    console.log('[AI_GOAL] Calling generateImage service', { sourcePhotoUrl: sourcePhoto.photoUrl });
     const { url: generatedImageUrl } = await generateImage({
       prompt: AI_GOAL_PROMPT,
       originalImages: [
@@ -73,6 +73,7 @@ export async function generateGoalPhoto(
     });
 
     if (!generatedImageUrl) {
+      console.error('[AI_GOAL] Image generation returned no URL');
       throw new Error('Image generation returned no URL');
     }
 
@@ -130,7 +131,8 @@ export async function generateGoalPhoto(
     console.log('[AI_GOAL] generateGoalPhoto completed successfully', { newPhotoId, photoUrl: storedUrl });
     return { newPhotoId, photoUrl: storedUrl };
   } catch (error) {
-    console.error('[AI_GOAL] generateGoalPhoto failed:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('[AI_GOAL] generateGoalPhoto failed:', { errorMsg, errorType: error instanceof Error ? error.constructor.name : typeof error });
     
     // Log failed activity
     try {
