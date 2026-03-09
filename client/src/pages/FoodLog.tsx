@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,6 +44,7 @@ export default function FoodLog() {
     onSuccess: () => {
       toast.success('已新增');
       utils.foodLogs.getItems.invalidate();
+      checkNutritionAlert();
       setIsAddOpen(false);
       setNewItem({ mealType: 'breakfast', name: '', calories: '', proteinG: '', carbsG: '', fatG: '' });
       setPhotoFile(null);
@@ -121,6 +122,77 @@ export default function FoodLog() {
     if (dayTotals.kcal >= dailyCalorieGoal) return 'exceeded'; // red - exceeded goal
     return 'achieved'; // green - under goal
   }, [getDailyTotalsForDate, dailyCalorieGoal]);
+
+  // Get last 7 days of food logs
+  const getLast7Days = useCallback(() => {
+    if (!allFoodLogs) return [];
+    const dayMap = new Map<string, any[]>();
+    
+    allFoodLogs.forEach((log: any) => {
+      const logDate = new Date(log.createdAt).toISOString().split('T')[0];
+      if (!dayMap.has(logDate)) {
+        dayMap.set(logDate, []);
+      }
+      dayMap.get(logDate)!.push(log);
+    });
+
+    const last7 = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const logs = dayMap.get(dateStr) || [];
+      const kcal = logs.reduce((sum: number, log: any) => sum + (Number(log.calories) || 0), 0);
+      last7.push({ dateStr, date: d, logs, kcal });
+    }
+    return last7;
+  }, [allFoodLogs]);
+
+  // Copy yesterday's meals
+  const copyYesterdaysMeals = useCallback(async () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    if (!allFoodLogs) return;
+    const yesterdayLogs = allFoodLogs.filter((log: any) => {
+      const logDate = new Date(log.createdAt).toISOString().split('T')[0];
+      return logDate === yesterdayStr;
+    });
+
+    if (yesterdayLogs.length === 0) {
+      toast.error('昨天沒有記錄');
+      return;
+    }
+
+    let copiedCount = 0;
+    for (const log of yesterdayLogs) {
+      try {
+        await addMutation.mutateAsync({
+          date,
+          mealType: log.mealType,
+          name: log.name,
+          calories: (log.calories || 0).toString(),
+          proteinG: (log.proteinG || 0).toString(),
+          carbsG: (log.carbsG || 0).toString(),
+          fatG: (log.fatG || 0).toString(),
+        });
+        copiedCount++;
+      } catch (e) {
+        console.error('Failed to copy meal:', e);
+      }
+    }
+    toast.success(`已複製 ${copiedCount} 項餐點`);
+  }, [allFoodLogs, date, addMutation]);
+
+  // Check and show nutrition alerts
+  const checkNutritionAlert = useCallback(() => {
+    if (dailyTotals.kcal > dailyCalorieGoal * 1.1) {
+      toast.warning(`⚠️ 熱量已超過目標 ${Math.round(dailyTotals.kcal - dailyCalorieGoal)} kcal`);
+    } else if (dailyTotals.kcal < dailyCalorieGoal * 0.7 && dailyTotals.kcal > 0) {
+      toast.info(`💡 今天熱量還差 ${Math.round(dailyCalorieGoal - dailyTotals.kcal)} kcal`);
+    }
+  }, [dailyTotals.kcal, dailyCalorieGoal]);
 
   // Calendar helpers
   const getDaysInMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
@@ -609,78 +681,86 @@ export default function FoodLog() {
         {/* Recent Records */}
         <Card className="border-0 shadow-sm">
           <CardHeader>
-            <CardTitle>最近記錄</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>最近記錄</CardTitle>
+              {getLast7Days().some(d => d.kcal > 0) && (
+                <button
+                  onClick={copyYesterdaysMeals}
+                  className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full hover:bg-emerald-200 transition-colors"
+                >
+                  複製昨天
+                </button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
               </div>
-            ) : items && items.length > 0 ? (
-              <div className="space-y-3">
-                {/* Today's Section */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 px-2">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-semibold text-sm">
-                      {new Date().getDate()}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">今日</div>
-                      <div className="text-xs text-gray-500">{date}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-emerald-600">{Math.round(dailyTotals.kcal)} kcal</div>
-                      <div className="text-xs text-gray-600">目標 {dailyCalorieGoal} kcal · {Math.round((dailyTotals.kcal / dailyCalorieGoal) * 100)}%</div>
-                    </div>
-                  </div>
-                  {/* Progress Bar */}
-                  <div className="px-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${
-                          dailyTotals.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
-                        }`}
-                        style={{
-                          width: `${Math.min((dailyTotals.kcal / dailyCalorieGoal) * 100, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Food Items */}
-                <div className="space-y-2 mt-4">
-                  {items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900">{item.name}</div>
-                        <div className="text-sm text-gray-600">{getMealTypeText(item.mealType)}</div>
-                      </div>
-                      <div className="text-right mr-2">
-                        <div className="text-sm font-medium text-emerald-600">{item.calories} kcal</div>
-                      </div>
-                      <button
-                        onClick={() => deleteMutation.mutate({ id: item.id })}
-                        className="p-2 hover:bg-red-100 rounded-lg text-red-600"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Daily Summary */}
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>蛋白質: {dailyTotals.protein.toFixed(1)}g</span>
-                    <span>碳水: {dailyTotals.carbs.toFixed(1)}g</span>
-                    <span>脂肪: {dailyTotals.fat.toFixed(1)}g</span>
-                  </div>
-                </div>
-              </div>
             ) : (
-              <div className="text-center py-8 text-gray-600">
-                <p>今天還沒有記錄</p>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {/* 7-Day History */}
+                {getLast7Days().map((day) => {
+                  const isToday = day.dateStr === date;
+                  const percentage = Math.round((day.kcal / dailyCalorieGoal) * 100);
+                  const dayNum = day.date.getDate();
+                  const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'][day.date.getDay()];
+                  const isCurrentDate = day.dateStr === new Date().toISOString().split('T')[0];
+                  
+                  return (
+                    <button
+                      key={day.dateStr}
+                      onClick={() => setDate(day.dateStr)}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        isToday ? 'bg-emerald-50 border-2 border-emerald-300' : 'bg-gray-50 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Date Badge */}
+                        <div className={`w-12 h-12 rounded-full flex flex-col items-center justify-center font-semibold text-sm flex-shrink-0 ${
+                          day.kcal === 0 ? 'bg-gray-200 text-gray-600' :
+                          day.kcal >= dailyCalorieGoal ? 'bg-red-100 text-red-700' :
+                          'bg-emerald-100 text-emerald-700'
+                        }`}>
+                          <span>{dayNum}</span>
+                          <span className="text-xs">週{dayOfWeek}</span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="text-sm text-gray-600 mb-1">{day.dateStr}</div>
+                          {/* Progress Bar */}
+                          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden mb-1">
+                            <div
+                              className={`h-full transition-all ${
+                                day.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
+                              }`}
+                              style={{
+                                width: `${Math.min((day.kcal / dailyCalorieGoal) * 100, 100)}%`,
+                              }}
+                            />
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            目標 {dailyCalorieGoal} kcal · {percentage}%
+                          </div>
+                        </div>
+
+                        {/* Kcal Display */}
+                        <div className="text-right flex-shrink-0">
+                          <div className={`text-lg font-bold ${
+                            day.kcal === 0 ? 'text-gray-400' :
+                            day.kcal >= dailyCalorieGoal ? 'text-red-600' :
+                            'text-emerald-600'
+                          }`}>
+                            {Math.round(day.kcal)} kcal
+                          </div>
+                          <ChevronRightIcon className="w-4 h-4 text-gray-400 mt-1" />
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </CardContent>
