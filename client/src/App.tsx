@@ -66,9 +66,9 @@ function Router() {
         </AppLayout>
       </Route>
       <Route path={"/food/:date"}>
-        {(params: { date: string }) => (
+        {() => (
           <AppLayout>
-            <FoodLog initialDate={params.date} />
+            <FoodLog />
           </AppLayout>
         )}
       </Route>
