@@ -68,11 +68,28 @@ export default function BodyMetrics() {
       <div className="sticky top-0 bg-background z-10 p-4 md:p-8 border-b border-border">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <h1 className="text-2xl md:text-3xl font-bold">身體數據</h1>
-          <Link href="/body/add">
-            <Button className="bg-primary hover:bg-primary/90 rounded-full px-6">
-              <Plus className="h-4 w-4 mr-2" /> 新增量度
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/body/photos">
+              <Button variant="outline" className="rounded-full px-4 text-sm">
+                進度照片
+              </Button>
+            </Link>
+            <Link href="/body/import-csv">
+              <Button variant="outline" className="rounded-full px-4 text-sm">
+                匯入 CSV
+              </Button>
+            </Link>
+            <Link href="/body/import/photo">
+              <Button variant="outline" className="rounded-full px-4 text-sm">
+                匯入報告
+              </Button>
+            </Link>
+            <Link href="/body/add">
+              <Button className="bg-primary hover:bg-primary/90 rounded-full px-6">
+                <Plus className="h-4 w-4 mr-2" /> 新增量度
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
