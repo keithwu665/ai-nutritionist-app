@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, LogOut, User, Save } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Loader2, LogOut, User, Save, ChevronRight, Download, Lock, HelpCircle, Star, LogOutIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget, getFitnessGoalText, getActivityLevelText } from '@shared/calculations';
+import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
 
 export default function Settings() {
   const { user, logout } = useAuth();
@@ -21,6 +22,11 @@ export default function Settings() {
     weightKg: '',
     fitnessGoal: 'maintain' as 'lose' | 'maintain' | 'gain',
     activityLevel: 'moderate' as 'sedentary' | 'light' | 'moderate' | 'high',
+  });
+
+  const [notifications, setNotifications] = useState({
+    dailyReminder: true,
+    foodReminder: true,
   });
 
   useEffect(() => {
@@ -72,141 +78,292 @@ export default function Settings() {
     );
   }
 
+  const fitnessGoalLabels: Record<string, string> = {
+    'lose': '減脂',
+    'maintain': '維持',
+    'gain': '增肌',
+  };
+
+  const activityLevelLabels: Record<string, string> = {
+    'sedentary': '久坐',
+    'light': '輕量',
+    'moderate': '中量',
+    'high': '高量',
+  };
+
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold">設定</h1>
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto pb-20">
+      <h1 className="text-3xl font-bold">設定</h1>
 
-      {/* User Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" /> 帳戶資訊
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">名稱</span>
-              <span className="text-sm font-medium">{user?.name || '未設定'}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">電郵</span>
-              <span className="text-sm font-medium">{user?.email || '未設定'}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Profile Summary Card */}
+      {profile && (
+        <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-0">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              {/* Avatar */}
+              <div className="w-16 h-16 bg-emerald-400 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl font-bold">{user?.name?.charAt(0) || 'U'}</span>
+              </div>
 
-      {/* Metabolic Summary */}
-      {metabolicData && (
-        <Card>
-          <CardHeader>
-            <CardTitle>代謝數據</CardTitle>
-            <CardDescription>根據您的個人資訊計算</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <p className="text-xs text-gray-500">BMR</p>
-                <p className="text-lg font-bold">{Math.round(metabolicData.bmr)}</p>
-                <p className="text-xs text-gray-400">kcal/日</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">TDEE</p>
-                <p className="text-lg font-bold">{Math.round(metabolicData.tdee)}</p>
-                <p className="text-xs text-gray-400">kcal/日</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">目標熱量</p>
-                <p className="text-lg font-bold text-emerald-600">{Math.round(metabolicData.target)}</p>
-                <p className="text-xs text-gray-400">kcal/日</p>
+              {/* User Info */}
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xl font-bold">{user?.name || '用戶'}</h2>
+                <p className="text-sm text-emerald-100">{user?.email || '未設定'}</p>
+                <div className="mt-2 flex gap-2">
+                  <span className="text-xs bg-emerald-400 bg-opacity-50 px-2 py-1 rounded">
+                    {fitnessGoalLabels[profile.fitnessGoal]}
+                  </span>
+                  <span className="text-xs bg-emerald-400 bg-opacity-50 px-2 py-1 rounded">
+                    {activityLevelLabels[profile.activityLevel]}
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Profile Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle>個人資訊</CardTitle>
-          <CardDescription>更新您的身體數據和目標</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">性別</label>
-                <Select value={formData.gender} onValueChange={(v) => setFormData({ ...formData, gender: v as any })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">男</SelectItem>
-                    <SelectItem value="female">女</SelectItem>
-                  </SelectContent>
-                </Select>
+      {/* Stats Cards */}
+      {metabolicData && (
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="text-center">
+            <CardContent className="pt-4 pb-4">
+              <p className="text-2xl font-bold text-emerald-600">14</p>
+              <p className="text-xs text-gray-600 mt-1">連續記錄天數</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="pt-4 pb-4">
+              <p className="text-2xl font-bold text-emerald-600">{Math.round(metabolicData.target)}</p>
+              <p className="text-xs text-gray-600 mt-1">每日熱量目標</p>
+            </CardContent>
+          </Card>
+          <Card className="text-center">
+            <CardContent className="pt-4 pb-4">
+              <p className="text-2xl font-bold text-emerald-600">109g</p>
+              <p className="text-xs text-gray-600 mt-1">蛋白質目標</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Personal Information Section */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold">個人資料</h3>
+        
+        {/* Edit Profile */}
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="h-5 w-5 text-blue-600" />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">年齡</label>
-                <Input type="number" min="1" max="150" value={formData.age}
-                  onChange={(e) => setFormData({ ...formData, age: e.target.value })} />
+              <div>
+                <p className="font-medium">編輯個人資料</p>
+                <p className="text-xs text-gray-500">姓名、性別、年齡、身高</p>
               </div>
             </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">身高 (cm)</label>
-                <Input type="number" step="0.1" value={formData.heightCm}
-                  onChange={(e) => setFormData({ ...formData, heightCm: e.target.value })} />
+        {/* Goal Settings */}
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-lg">🎯</span>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">體重 (kg)</label>
-                <Input type="number" step="0.1" value={formData.weightKg}
-                  onChange={(e) => setFormData({ ...formData, weightKg: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">健身目標</label>
-                <Select value={formData.fitnessGoal} onValueChange={(v) => setFormData({ ...formData, fitnessGoal: v as any })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lose">減脂</SelectItem>
-                    <SelectItem value="maintain">維持</SelectItem>
-                    <SelectItem value="gain">增肌</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">活動量</label>
-                <Select value={formData.activityLevel} onValueChange={(v) => setFormData({ ...formData, activityLevel: v as any })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sedentary">久坐</SelectItem>
-                    <SelectItem value="light">輕量</SelectItem>
-                    <SelectItem value="moderate">中量</SelectItem>
-                    <SelectItem value="high">高量</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div>
+                <p className="font-medium">目標設定</p>
+                <p className="text-xs text-gray-500">目標：{fitnessGoalLabels[profile?.fitnessGoal || 'maintain']}、每日 {Math.round(metabolicData?.target || 1642)} kcal</p>
               </div>
             </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
 
-            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              保存更新
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        {/* InBody / Boditrax */}
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <span className="text-lg">📱</span>
+              </div>
+              <div>
+                <p className="font-medium">InBody / Boditrax 整合</p>
+                <p className="text-xs text-gray-500">CSV 匯入、API 接入（即將推出）</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Logout */}
-      <Card>
-        <CardContent className="pt-6">
-          <Button variant="outline" className="w-full text-red-600 border-red-200 hover:bg-red-50" onClick={() => logout()}>
-            <LogOut className="h-4 w-4 mr-2" /> 登出
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Notification Settings */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold">通知設定</h3>
+        
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                <span className="text-lg">🔔</span>
+              </div>
+              <div>
+                <p className="font-medium">每日提醒</p>
+                <p className="text-xs text-gray-500">每日記錄提醒</p>
+              </div>
+            </div>
+            <Switch checked={notifications.dailyReminder} onCheckedChange={(v) => setNotifications({ ...notifications, dailyReminder: v })} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                <span className="text-lg">🍽️</span>
+              </div>
+              <div>
+                <p className="font-medium">飲食提醒</p>
+                <p className="text-xs text-gray-500">餐前 30 分鐘提醒</p>
+              </div>
+            </div>
+            <Switch checked={notifications.foodReminder} onCheckedChange={(v) => setNotifications({ ...notifications, foodReminder: v })} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Privacy & Security */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold">私隱與安全</h3>
+        
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+                <Lock className="h-5 w-5 text-teal-600" />
+              </div>
+              <div>
+                <p className="font-medium">分享權限管理</p>
+                <p className="text-xs text-gray-500">管理教練／朋友的查看權限</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <Download className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="font-medium">匯出我的資料</p>
+                <p className="text-xs text-gray-500">下載所有記錄（CSV / JSON）</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Support */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold">支援</h3>
+        
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                <HelpCircle className="h-5 w-5 text-gray-600" />
+              </div>
+              <div>
+                <p className="font-medium">常見問題</p>
+                <p className="text-xs text-gray-500">使用指南、FAQ</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                <Star className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="font-medium">評分 Fitasty</p>
+                <p className="text-xs text-gray-500">你的評分對我們很重要</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Dangerous Operations */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold text-red-600">危險操作</h3>
+        
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-red-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                <LogOutIcon className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <p className="font-medium">登出帳戶</p>
+                <p className="text-xs text-gray-500">返回登入頁面</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4 flex items-center justify-between cursor-pointer hover:bg-red-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <p className="font-medium text-red-600">刪除帳戶</p>
+                <p className="text-xs text-gray-500">永久刪除所有資料（不可復原）</p>
+              </div>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Fitasty Footer */}
+      <div className="mt-12 pt-8 border-t text-center space-y-2">
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm">F</div>
+          <span className="font-bold text-lg">Fitasty</span>
+        </div>
+        <p className="text-xs text-gray-500">版本 1.0.0 · © 2026 Fitasty Limited</p>
+        <div className="flex justify-center gap-4 text-xs text-gray-500">
+          <a href="#" className="hover:text-emerald-600">私隱政策</a>
+          <span>·</span>
+          <a href="#" className="hover:text-emerald-600">使用條款</a>
+          <span>·</span>
+          <a href="#" className="hover:text-emerald-600">聯絡我們</a>
+        </div>
+      </div>
+
+      {/* Logout Button (Hidden but functional) */}
+      <Button
+        variant="outline"
+        className="w-full text-red-600 border-red-200 hover:bg-red-50 mb-8"
+        onClick={() => logout()}
+      >
+        <LogOut className="h-4 w-4 mr-2" /> 登出
+      </Button>
     </div>
   );
 }
