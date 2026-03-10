@@ -1,771 +1,671 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { trpc } from '@/lib/trpc';
-import { Button } from '@/components/ui/button';
+import { useAuth } from '@/_core/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Trash2, ChevronLeft, ChevronRight, Loader2, Upload, X, ChevronRight as ChevronRightIcon } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
+import { ChevronRightIcon, Plus, X } from 'lucide-react';
+// Calculation functions
 
 export default function FoodLog() {
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [calendarDate, setCalendarDate] = useState(new Date());
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'manual' | 'photo'>('manual');
-  const [portionGrams, setPortionGrams] = useState('100');
-  const [selectedFood, setSelectedFood] = useState<any>(null);
+  const { user } = useAuth() || {};
+  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [showModal, setShowModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('manual');
+
+  // Manual input form state
+  const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
+  const [foodName, setFoodName] = useState('');
+  const [portionGrams, setPortionGrams] = useState<string>('100');
+  const [calories, setCalories] = useState<string>('');
+  const [proteinG, setProteinG] = useState<string>('');
+  const [carbsG, setCarbsG] = useState<string>('');
+  const [fatG, setFatG] = useState<string>('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  // Photo input state
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoPreview, setPhotoPreview] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [newItem, setNewItem] = useState({
-    mealType: 'breakfast' as const,
-    name: '',
-    calories: '',
-    proteinG: '',
-    carbsG: '',
-    fatG: '',
-  });
 
   // Queries
-  const { data: items, isLoading } = trpc.foodLogs.getItems.useQuery({ date });
-  const { data: searchData, isLoading: isSearching } = trpc.foodLogs.searchUnified.useQuery(
-    { query: searchQuery },
-    { enabled: searchQuery.length >= 2 }
-  );
+  const { data: items = [] } = trpc.foodLogs.getItems.useQuery({ date });
+  const { data: userAuth } = trpc.auth.me.useQuery();
   const { data: userProfile } = trpc.profile.get.useQuery();
-  const { data: allFoodLogs } = trpc.foodLogs.getItems.useQuery({ date: '' });
-  const utils = trpc.useUtils();
+  const { data: last7Days = [] } = trpc.foodLogs.getItemsForRange.useQuery({ startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] });
 
   // Mutations
-  const addMutation = trpc.foodLogs.addItem.useMutation({
-    onSuccess: () => {
-      toast.success('已新增');
-      utils.foodLogs.getItems.invalidate();
-      checkNutritionAlert();
-      setIsAddOpen(false);
-      setNewItem({ mealType: 'breakfast', name: '', calories: '', proteinG: '', carbsG: '', fatG: '' });
-      setPhotoFile(null);
-      setPhotoPreview(null);
-      setActiveTab('manual');
-      setSearchQuery('');
-      setSelectedFood(null);
-      setPortionGrams('100');
-    },
-    onError: (error) => {
-      toast.error(`新增失敗: ${error.message}`);
-    },
-  });
-
-  const deleteMutation = trpc.foodLogs.deleteItem.useMutation({
-    onSuccess: () => {
-      toast.success('已刪除');
-      utils.foodLogs.getItems.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`刪除失敗: ${error.message}`);
-    },
-  });
-
-  const createUploadUrlMutation = trpc.foodPhoto.createUploadUrl.useMutation();
-  const extractFromPhotoMutation = trpc.foodPhoto.extractFromPhoto.useMutation();
+  const addItemMutation = trpc.foodLogs.addItem.useMutation();
+  const deleteItemMutation = trpc.foodLogs.deleteItem.useMutation();
+  const photoUploadMutation = trpc.foodPhoto.createUploadUrl.useMutation();
+  const photoAnalysisMutation = trpc.foodPhoto.extractFromPhoto.useMutation();
 
   // Calculate daily calorie goal
-  const dailyCalorieGoal = useMemo(() => {
-    if (!userProfile) return 1642; // Default goal
-    try {
-      const bmr = calculateBMR(
-        userProfile.gender as 'male' | 'female',
-        Number(userProfile.weightKg),
-        Number(userProfile.heightCm),
-        userProfile.age
-      );
-      const tdee = calculateTDEE(bmr, userProfile.activityLevel as any);
-      return Math.round(calculateDailyCalorieTarget(tdee, userProfile.fitnessGoal as any));
-    } catch (e) {
-      return 1642; // Default goal
-    }
-  }, [userProfile]);
+  // Calculate daily calorie goal - use default for now
+  const dailyCalorieGoal = 1642;
 
-  // Calculate daily totals
-  const dailyTotals = useMemo(() => {
-    if (!items) return { kcal: 0, protein: 0, carbs: 0, fat: 0 };
+  // Calculate totals
+  const totals = useMemo(() => {
     return items.reduce(
       (acc, item) => ({
-        kcal: acc.kcal + (Number(item.calories) || 0),
-        protein: acc.protein + (Number(item.proteinG) || 0),
-        carbs: acc.carbs + (Number(item.carbsG) || 0),
-        fat: acc.fat + (Number(item.fatG) || 0),
+        kcal: acc.kcal + (typeof item.calories === 'number' ? item.calories : parseInt(item.calories || '0') || 0),
+        protein: acc.protein + (typeof item.proteinG === 'number' ? item.proteinG : parseFloat(item.proteinG || '0') || 0),
+        carbs: acc.carbs + (typeof item.carbsG === 'number' ? item.carbsG : parseFloat(item.carbsG || '0') || 0),
+        fat: acc.fat + (typeof item.fatG === 'number' ? item.fatG : parseFloat(item.fatG || '0') || 0),
       }),
       { kcal: 0, protein: 0, carbs: 0, fat: 0 }
     );
   }, [items]);
 
-  // Get daily totals for a specific date
-  const getDailyTotalsForDate = useCallback((dateStr: string) => {
-    if (!allFoodLogs) return { kcal: 0 };
-    const dayLogs = allFoodLogs.filter((log: any) => {
-      const logDate = new Date(log.createdAt).toISOString().split('T')[0];
-      return logDate === dateStr;
-    });
-    return {
-      kcal: dayLogs.reduce((sum: number, log: any) => sum + (Number(log.calories) || 0), 0),
-    };
-  }, [allFoodLogs]);
-
-  // Get calendar status for a date
-  const getCalendarStatus = useCallback((dateStr: string) => {
-    const dayTotals = getDailyTotalsForDate(dateStr);
-    if (dayTotals.kcal === 0) return 'empty'; // grey - no records
-    if (dayTotals.kcal >= dailyCalorieGoal) return 'exceeded'; // red - exceeded goal
-    return 'achieved'; // green - under goal
-  }, [getDailyTotalsForDate, dailyCalorieGoal]);
-
-  // Get last 7 days of food logs
-  const getLast7Days = useCallback(() => {
-    if (!allFoodLogs) return [];
-    const dayMap = new Map<string, any[]>();
-    
-    allFoodLogs.forEach((log: any) => {
-      const logDate = new Date(log.createdAt).toISOString().split('T')[0];
-      if (!dayMap.has(logDate)) {
-        dayMap.set(logDate, []);
-      }
-      dayMap.get(logDate)!.push(log);
-    });
-
-    const last7 = [];
+  // Get last 7 days data
+  const getLast7Days = () => {
+    const days = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
-      const logs = dayMap.get(dateStr) || [];
-      const kcal = logs.reduce((sum: number, log: any) => sum + (Number(log.calories) || 0), 0);
-      last7.push({ dateStr, date: d, logs, kcal });
+      const dayData = last7Days.find((x: any) => x.date === dateStr) || { date: dateStr, kcal: 0 };
+      days.push({ ...dayData, dateStr, date: d });
     }
-    return last7;
-  }, [allFoodLogs]);
-
-  // Copy yesterday's meals
-  const copyYesterdaysMeals = useCallback(async () => {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
-    
-    if (!allFoodLogs) return;
-    const yesterdayLogs = allFoodLogs.filter((log: any) => {
-      const logDate = new Date(log.createdAt).toISOString().split('T')[0];
-      return logDate === yesterdayStr;
-    });
-
-    if (yesterdayLogs.length === 0) {
-      toast.error('昨天沒有記錄');
-      return;
-    }
-
-    let copiedCount = 0;
-    for (const log of yesterdayLogs) {
-      try {
-        await addMutation.mutateAsync({
-          date,
-          mealType: log.mealType,
-          name: log.name,
-          calories: (log.calories || 0).toString(),
-          proteinG: (log.proteinG || 0).toString(),
-          carbsG: (log.carbsG || 0).toString(),
-          fatG: (log.fatG || 0).toString(),
-        });
-        copiedCount++;
-      } catch (e) {
-        console.error('Failed to copy meal:', e);
-      }
-    }
-    toast.success(`已複製 ${copiedCount} 項餐點`);
-  }, [allFoodLogs, date, addMutation]);
-
-  // Check and show nutrition alerts
-  const checkNutritionAlert = useCallback(() => {
-    if (dailyTotals.kcal > dailyCalorieGoal * 1.1) {
-      toast.warning(`⚠️ 熱量已超過目標 ${Math.round(dailyTotals.kcal - dailyCalorieGoal)} kcal`);
-    } else if (dailyTotals.kcal < dailyCalorieGoal * 0.7 && dailyTotals.kcal > 0) {
-      toast.info(`💡 今天熱量還差 ${Math.round(dailyCalorieGoal - dailyTotals.kcal)} kcal`);
-    }
-  }, [dailyTotals.kcal, dailyCalorieGoal]);
-
-  // Calendar helpers
-  const getDaysInMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-  const getFirstDayOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1).getDay();
-
-  const getCalendarDays = () => {
-    const daysInMonth = getDaysInMonth(calendarDate);
-    const firstDay = getFirstDayOfMonth(calendarDate);
-    const days: any[] = [];
-    for (let i = 0; i < firstDay; i++) days.push(null);
-    for (let i = 1; i <= daysInMonth; i++) days.push(i);
     return days;
   };
 
-  const getMealTypeText = (type: string) => {
-    const map: Record<string, string> = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐', snack: '零食' };
-    return map[type] || type;
+  // Get calendar dates for current month
+  const getCalendarDates = () => {
+    const [year, month] = date.split('-');
+    const firstDay = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const lastDay = new Date(parseInt(year), parseInt(month), 0);
+    const dates = [];
+
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      const d = new Date(parseInt(year), parseInt(month) - 1, i);
+      const dateStr = d.toISOString().split('T')[0];
+      const dayData = last7Days.find((x: any) => x.date === dateStr);
+      let status = 'empty'; // grey
+      if (dayData && dayData.kcal > 0) {
+        status = dayData.kcal >= dailyCalorieGoal ? 'exceeded' : 'achieved'; // red or green
+      }
+      dates.push({ day: i, dateStr, status });
+    }
+    return dates;
   };
 
-  // Auto-fill nutrition when food is selected
-  const handleSelectFood = useCallback((food: any) => {
-    const grams = parseFloat(portionGrams) || 100;
-    const multiplier = grams / 100;
-    
-    const newItemData = {
-      mealType: newItem.mealType,
-      name: food.displayName,
-      calories: Math.round((food.kcal_per_100g || 0) * multiplier).toString(),
-      proteinG: food.protein_g_per_100g ? ((food.protein_g_per_100g * multiplier).toFixed(1)) : '',
-      carbsG: food.carbs_g_per_100g ? ((food.carbs_g_per_100g * multiplier).toFixed(1)) : '',
-      fatG: food.fat_g_per_100g ? ((food.fat_g_per_100g * multiplier).toFixed(1)) : '',
-    };
-    setNewItem(newItemData);
-    setSelectedFood(food);
-    setSearchQuery('');
-  }, [portionGrams, newItem.mealType]);
-
-  // Recalculate nutrition when portion grams change
-  const handlePortionChange = useCallback((grams: string) => {
-    setPortionGrams(grams);
-    if (selectedFood) {
-      const multiplier = (parseFloat(grams) || 100) / 100;
-      setNewItem(prev => {
-        const updated = { ...prev };
-        updated.calories = Math.round((selectedFood.kcal_per_100g || 0) * multiplier).toString();
-        if (selectedFood.protein_g_per_100g) {
-          updated.proteinG = (selectedFood.protein_g_per_100g * multiplier).toFixed(1);
-        }
-        if (selectedFood.carbs_g_per_100g) {
-          updated.carbsG = (selectedFood.carbs_g_per_100g * multiplier).toFixed(1);
-        }
-        if (selectedFood.fat_g_per_100g) {
-          updated.fatG = (selectedFood.fat_g_per_100g * multiplier).toFixed(1);
-        }
-        return updated;
-      });
-    }
-  }, [selectedFood]);
-
-  // Handle photo file selection
-  const handlePhotoSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('請選擇一張圖片');
+  // Search food
+  const handleSearch = async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
       return;
     }
 
-    setPhotoFile(file);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setPhotoPreview(event.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  }, []);
+    try {
+      // Use tRPC client to fetch search results
+      const results = await fetch(`/api/trpc/foodLogs.searchUnified?input=${JSON.stringify({ query })}`)
+        .then(r => r.json())
+        .then(data => data.result?.data || []);
+      setSearchResults(results);
+      setShowSearchResults(true);
+    } catch (error) {
+      toast.error('搜尋失敗');
+    }
+  };
 
-  // Analyze photo with AI
-  const handleAnalyzePhoto = useCallback(async () => {
-    if (!photoFile) {
-      toast.error('請選擇一張圖片');
+  // Select food from search
+  const handleSelectFood = (food: any) => {
+    setFoodName(food.name);
+    setCalories(String(food.kcal || 0));
+    setProteinG(String(food.proteinG || 0));
+    setCarbsG(String(food.carbsG || 0));
+    setFatG(String(food.fatG || 0));
+    setShowSearchResults(false);
+    setSearchResults([]);
+  };
+
+  // Recalculate nutrition based on portion
+  const handlePortionChange = (grams: string) => {
+    setPortionGrams(grams);
+    if (grams && calories && parseInt(calories) > 0) {
+      const ratio = parseInt(grams) / 100;
+      setCalories(String(Math.round((parseInt(calories) || 0) * ratio)));
+      setProteinG(String(((parseFloat(proteinG) || 0) * ratio).toFixed(1)));
+      setCarbsG(String(((parseFloat(carbsG) || 0) * ratio).toFixed(1)));
+      setFatG(String(((parseFloat(fatG) || 0) * ratio).toFixed(1)));
+    }
+  };
+
+  // Handle photo upload
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPhotoPreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Analyze photo
+  const handleAnalyzePhoto = async () => {
+    if (!photoPreview) {
+      toast.error('請選擇照片');
       return;
     }
 
     setIsAnalyzing(true);
     try {
-      // Step 1: Get upload URL
-      const uploadUrlRes = await createUploadUrlMutation.mutateAsync({
-        fileName: photoFile.name,
+      const response = await photoAnalysisMutation.mutateAsync({
+        objectPath: photoPreview,
       });
 
-      // Step 2: Upload file to Supabase
-      const uploadRes = await fetch(uploadUrlRes.uploadUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': photoFile.type,
-        },
-        body: photoFile,
-      });
-
-      if (!uploadRes.ok) {
-        throw new Error(`上傳失敗: ${uploadRes.statusText}`);
+      if (response.extraction && response.extraction.suggested) {
+        const { kcal, protein_g, carbs_g, fat_g } = response.extraction.suggested;
+        setFoodName('已分析食物');
+        setCalories(String(kcal || 0));
+        setProteinG(String(protein_g || 0));
+        setCarbsG(String(carbs_g || 0));
+        setFatG(String(fat_g || 0));
+        toast.success('食物分析完成');
       }
-
-      // Step 3: Extract nutrition from photo
-      const extractRes = await extractFromPhotoMutation.mutateAsync({
-        objectPath: uploadUrlRes.objectPath,
-        grams_g: parseFloat(portionGrams) || 100,
-      });
-
-      // Step 4: Auto-fill nutrition from AI response
-      if (extractRes.extraction?.suggested) {
-        setNewItem(prev => ({
-          ...prev,
-          name: extractRes.extraction?.items?.[0]?.name || '已分析食物',
-          calories: extractRes.extraction?.suggested.kcal?.toString() || '',
-          proteinG: extractRes.extraction?.suggested.protein_g?.toFixed(1) || '',
-          carbsG: extractRes.extraction?.suggested.carbs_g?.toFixed(1) || '',
-          fatG: extractRes.extraction?.suggested.fat_g?.toFixed(1) || '',
-        }));
-        toast.success('已分析食物');
-      }
-    } catch (error: any) {
-      console.error('Photo analysis error:', error);
-      toast.error(`分析失敗: ${error.message}`);
+    } catch (error) {
+      toast.error('分析失敗，請重試');
     } finally {
       setIsAnalyzing(false);
     }
-  }, [photoFile, portionGrams, createUploadUrlMutation, extractFromPhotoMutation]);
+  };
 
-  const handleAddFood = () => {
-    if (!newItem.name || !newItem.calories) {
+  // Add food item
+  const handleAddFood = async () => {
+    if (!foodName || !calories) {
       toast.error('請填寫食物名稱和熱量');
       return;
     }
-    addMutation.mutate({
-      date,
-      mealType: newItem.mealType as any,
-      name: newItem.name,
-      calories: newItem.calories,
-      proteinG: newItem.proteinG || null,
-      carbsG: newItem.carbsG || null,
-      fatG: newItem.fatG || null,
-    });
+
+    try {
+      await addItemMutation.mutateAsync({
+        date,
+        mealType: mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
+        name: foodName,
+        calories: calories || '0',
+        proteinG: proteinG || '0',
+        carbsG: carbsG || '0',
+        fatG: fatG || '0',
+      });
+
+      // Check if exceeded goal
+      const newTotal = totals.kcal + (parseInt(calories || '0') || 0);
+      if (newTotal > dailyCalorieGoal) {
+        toast.warning(`超過目標 ${newTotal - dailyCalorieGoal} kcal`);
+      } else if (newTotal < dailyCalorieGoal * 0.8) {
+        toast.info(`還差 ${Math.round(dailyCalorieGoal - newTotal)} kcal`);
+      }
+
+      // Reset form
+      setFoodName('');
+      setPortionGrams('100');
+      setCalories('');
+      setProteinG('');
+      setCarbsG('');
+      setFatG('');
+      setPhotoFile(null);
+      setPhotoPreview('');
+      setShowModal(false);
+      setActiveTab('manual');
+    } catch (error) {
+      toast.error('新增失敗');
+    }
   };
 
-  const calendarDays = getCalendarDays();
-  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-  const monthYear = calendarDate.toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' });
+  // Delete food item
+  const handleDeleteItem = async (id: string | number) => {
+    try {
+      const idStr = typeof id === 'string' ? id : String(id);
+      await deleteItemMutation.mutateAsync({ id: idStr as any });
+      toast.success('已刪除');
+    } catch (error) {
+      toast.error('刪除失敗');
+    }
+  };
+
+  const calendarDates = getCalendarDates();
+  const last7DaysData = getLast7Days();
+  const percentage = Math.round((totals.kcal / dailyCalorieGoal) * 100);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">飲食記錄</h1>
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6">
-                <Plus className="w-5 h-5 mr-2" />
-                今日記錄
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>新增食物</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                {/* Tabs */}
-                <div className="flex gap-2 border-b border-gray-200">
-                  <button
-                    onClick={() => setActiveTab('manual')}
-                    className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                      activeTab === 'manual'
-                        ? 'border-emerald-500 text-emerald-600'
-                        : 'border-transparent text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    手動輸入
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('photo')}
-                    className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-                      activeTab === 'photo'
-                        ? 'border-emerald-500 text-emerald-600'
-                        : 'border-transparent text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    影相
-                  </button>
-                </div>
-
-                {activeTab === 'manual' && (
-                  <div className="space-y-4">
-                    {/* Meal Type */}
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">用餐類型</label>
-                      <select
-                        value={newItem.mealType}
-                        onChange={(e) => setNewItem({ ...newItem, mealType: e.target.value as any })}
-                        className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="breakfast">早餐</option>
-                        <option value="lunch">午餐</option>
-                        <option value="dinner">晚餐</option>
-                        <option value="snack">零食</option>
-                      </select>
-                    </div>
-
-                    {/* Food Name with Search */}
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">食物名稱</label>
-                      <Input
-                        placeholder="例如: 雞蛋、米飯"
-                        value={newItem.name}
-                        onChange={(e) => {
-                          setNewItem({ ...newItem, name: e.target.value });
-                          setSearchQuery(e.target.value);
-                        }}
-                        className="mt-1"
-                      />
-                      {searchData && searchQuery && searchQuery.length >= 2 && (
-                        <div className="mt-2 border border-gray-200 rounded-lg max-h-48 overflow-y-auto bg-white">
-                          {isSearching && (
-                            <div className="px-3 py-2 text-sm text-gray-600">搜尋中...</div>
-                          )}
-                          {!isSearching && searchData.length === 0 && (
-                            <div className="px-3 py-2 text-sm text-gray-600">未找到結果</div>
-                          )}
-                          {searchData.map((food: any) => (
-                            <button
-                              key={`${food.source}-${food.id}`}
-                              onClick={() => handleSelectFood(food)}
-                              className="w-full text-left px-3 py-2 hover:bg-emerald-50 border-b last:border-b-0 transition-colors"
-                            >
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <div className="font-medium text-sm">{food.displayName}</div>
-                                  <div className="text-xs text-gray-600">{food.badge}</div>
-                                </div>
-                                <div className="text-xs text-emerald-600 font-medium">{food.kcal_per_100g} kcal/100g</div>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Portion Grams */}
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">份量 (克)</label>
-                      <Input
-                        type="number"
-                        placeholder="100"
-                        value={portionGrams}
-                        onChange={(e) => handlePortionChange(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'photo' && (
-                  <div className="space-y-4">
-                    {/* Meal Type */}
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">用餐類型</label>
-                      <select
-                        value={newItem.mealType}
-                        onChange={(e) => setNewItem({ ...newItem, mealType: e.target.value as any })}
-                        className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="breakfast">早餐</option>
-                        <option value="lunch">午餐</option>
-                        <option value="dinner">晚餐</option>
-                        <option value="snack">零食</option>
-                      </select>
-                    </div>
-
-                    {/* Photo Upload */}
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">上傳食物照片</label>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoSelect}
-                        className="hidden"
-                      />
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full mt-1 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-emerald-400 transition-colors flex items-center justify-center gap-2 text-gray-600 hover:text-emerald-600"
-                      >
-                        <Upload className="w-5 h-5" />
-                        <span>{photoFile ? '更換照片' : '選擇照片'}</span>
-                      </button>
-                    </div>
-
-                    {/* Photo Preview */}
-                    {photoPreview && (
-                      <div className="relative">
-                        <img
-                          src={photoPreview}
-                          alt="Preview"
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                        <button
-                          onClick={() => {
-                            setPhotoFile(null);
-                            setPhotoPreview(null);
-                          }}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Portion Grams */}
-                    <div>
-                      <label className="text-sm font-medium text-gray-700">份量 (克)</label>
-                      <Input
-                        type="number"
-                        placeholder="100"
-                        value={portionGrams}
-                        onChange={(e) => setPortionGrams(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    {/* Analyze Button */}
-                    <Button
-                      onClick={handleAnalyzePhoto}
-                      disabled={isAnalyzing || !photoFile}
-                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                    >
-                      {isAnalyzing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          分析中...
-                        </>
-                      ) : (
-                        '開始分析'
-                      )}
-                    </Button>
-                  </div>
-                )}
-
-                {/* Calories */}
-                <div>
-                  <label className="text-sm font-medium text-gray-700">熱量 (kcal)</label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={newItem.calories}
-                    onChange={(e) => setNewItem({ ...newItem, calories: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-
-                {/* Macros */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div>
-                    <label className="text-xs font-medium text-gray-700">蛋白質 (g)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={newItem.proteinG}
-                      onChange={(e) => setNewItem({ ...newItem, proteinG: e.target.value })}
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-700">碳水 (g)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={newItem.carbsG}
-                      onChange={(e) => setNewItem({ ...newItem, carbsG: e.target.value })}
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-gray-700">脂肪 (g)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={newItem.fatG}
-                      onChange={(e) => setNewItem({ ...newItem, fatG: e.target.value })}
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleAddFood}
-                  disabled={addMutation.isPending}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                >
-                  {addMutation.isPending ? '新增中...' : '新增'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+      <div className="sticky top-0 z-10 bg-white border-b">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-bold">飲食記錄</h1>
+          <Button
+            onClick={() => setShowModal(true)}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6 py-2 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            今日記錄
+          </Button>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Calendar Card */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">日期選擇</h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1))}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="text-sm font-medium text-gray-700 min-w-32 text-center">{monthYear}</span>
-                <button
-                  onClick={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1))}
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {/* Weekday Headers */}
-            <div className="grid grid-cols-7 gap-2 mb-4">
-              {weekDays.map((day) => (
-                <div key={day} className="text-center text-sm font-semibold text-gray-600 py-2">
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-2">
-              {calendarDays.map((day, idx) => {
-                if (day === null) {
-                  return <div key={`empty-${idx}`} className="aspect-square" />;
-                }
-
-                const dateStr = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isSelected = date === dateStr;
-                const isToday = dateStr === new Date().toISOString().split('T')[0];
-                const status = getCalendarStatus(dateStr);
-
-                let bgColor = 'bg-gray-100 text-gray-900 hover:bg-gray-200';
-                let dotColor = 'bg-gray-300'; // empty
-                
-                if (status === 'achieved') {
-                  dotColor = 'bg-emerald-500'; // green - under goal
-                } else if (status === 'exceeded') {
-                  dotColor = 'bg-red-500'; // red - exceeded goal
-                }
-
-                if (isSelected) {
-                  bgColor = 'bg-emerald-500 text-white ring-2 ring-emerald-300';
-                } else if (isToday) {
-                  bgColor = 'bg-emerald-100 text-emerald-700';
-                }
-
-                return (
+        <Card className="rounded-2xl">
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-2">
+                {calendarDates.map((dateObj) => (
                   <button
-                    key={day}
-                    onClick={() => setDate(dateStr)}
-                    className={`aspect-square rounded-lg flex flex-col items-center justify-center font-medium text-sm cursor-pointer transition-colors relative ${
-                      bgColor
+                    key={dateObj.dateStr}
+                    onClick={() => setDate(dateObj.dateStr)}
+                    className={`aspect-square rounded-full flex items-center justify-center font-semibold text-sm relative transition-all ${
+                      dateObj.dateStr === date
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    <span>{day}</span>
-                    <div className={`w-1.5 h-1.5 rounded-full mt-1 ${dotColor}`} />
-                  </button>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Records */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>最近記錄</CardTitle>
-              {getLast7Days().some(d => d.kcal > 0) && (
-                <button
-                  onClick={copyYesterdaysMeals}
-                  className="text-xs px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full hover:bg-emerald-200 transition-colors"
-                >
-                  複製昨天
-                </button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
-              </div>
-            ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {/* 7-Day History */}
-                {getLast7Days().map((day) => {
-                  const isToday = day.dateStr === date;
-                  const percentage = Math.round((day.kcal / dailyCalorieGoal) * 100);
-                  const dayNum = day.date.getDate();
-                  const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'][day.date.getDay()];
-                  const isCurrentDate = day.dateStr === new Date().toISOString().split('T')[0];
-                  
-                  return (
-                    <button
-                      key={day.dateStr}
-                      onClick={() => setDate(day.dateStr)}
-                      className={`w-full text-left p-3 rounded-lg transition-colors ${
-                        isToday ? 'bg-emerald-50 border-2 border-emerald-300' : 'bg-gray-50 hover:bg-gray-100'
+                    {dateObj.day}
+                    {/* Status dot */}
+                    <div
+                      className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${
+                        dateObj.status === 'achieved'
+                          ? 'bg-emerald-500'
+                          : dateObj.status === 'exceeded'
+                          ? 'bg-red-500'
+                          : 'bg-gray-300'
                       }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {/* Date Badge */}
-                        <div className={`w-12 h-12 rounded-full flex flex-col items-center justify-center font-semibold text-sm flex-shrink-0 ${
-                          day.kcal === 0 ? 'bg-gray-200 text-gray-600' :
-                          day.kcal >= dailyCalorieGoal ? 'bg-red-100 text-red-700' :
-                          'bg-emerald-100 text-emerald-700'
-                        }`}>
-                          <span>{dayNum}</span>
-                          <span className="text-xs">週{dayOfWeek}</span>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1">
-                          <div className="text-sm text-gray-600 mb-1">{day.dateStr}</div>
-                          {/* Progress Bar */}
-                          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden mb-1">
-                            <div
-                              className={`h-full transition-all ${
-                                day.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
-                              }`}
-                              style={{
-                                width: `${Math.min((day.kcal / dailyCalorieGoal) * 100, 100)}%`,
-                              }}
-                            />
-                          </div>
-                          <div className="text-xs text-gray-600">
-                            目標 {dailyCalorieGoal} kcal · {percentage}%
-                          </div>
-                        </div>
-
-                        {/* Kcal Display */}
-                        <div className="text-right flex-shrink-0">
-                          <div className={`text-lg font-bold ${
-                            day.kcal === 0 ? 'text-gray-400' :
-                            day.kcal >= dailyCalorieGoal ? 'text-red-600' :
-                            'text-emerald-600'
-                          }`}>
-                            {Math.round(day.kcal)} kcal
-                          </div>
-                          <ChevronRightIcon className="w-4 h-4 text-gray-400 mt-1" />
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                    />
+                  </button>
+                ))}
               </div>
-            )}
+
+              {/* Legend */}
+              <div className="flex items-center justify-center gap-6 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-xs text-gray-600">達標</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500" />
+                  <span className="text-xs text-gray-600">超標</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-gray-300" />
+                  <span className="text-xs text-gray-600">未記錄</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Recent Records Section */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold">最近記錄</h2>
+
+          {/* Today's Summary */}
+          <Card className="rounded-2xl border-2 border-emerald-200 bg-emerald-50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                {/* Date Badge */}
+                <div className="w-14 h-14 rounded-full bg-emerald-500 text-white flex flex-col items-center justify-center font-bold flex-shrink-0">
+                  <span className="text-lg">{new Date(date).getDate()}</span>
+                  <span className="text-xs">今日</span>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm text-gray-600 mb-2">{String(date)}</div>
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden mb-1">
+                    <div
+                      className={`h-full transition-all ${
+                        totals.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
+                      }`}
+                      style={{
+                        width: `${Math.min((totals.kcal / dailyCalorieGoal) * 100, 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    目標 {dailyCalorieGoal} kcal · {percentage}%
+                  </div>
+                </div>
+
+                {/* Kcal Display */}
+                    <div className="text-right flex-shrink-0">
+                      <div
+                        className={`text-lg font-bold ${
+                          totals.kcal >= dailyCalorieGoal ? 'text-red-600' : 'text-emerald-600'
+                        }`}
+                      >
+                        {String(Math.round(totals.kcal))} kcal
+                      </div>
+                    </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Food Items for Today */}
+          {items.length > 0 && (
+            <Card className="rounded-2xl">
+              <CardContent className="p-4 space-y-2">
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{item.name}</div>
+                      <div className="text-xs text-gray-500">{item.mealType}</div>
+                    </div>
+                    <div className="text-right mr-2">
+                      <div className="font-semibold text-sm">{String(item.calories)} kcal</div>
+                      <div className="text-xs text-gray-500">P:{String(item.proteinG || 0)}g C:{String(item.carbsG || 0)}g F:{String(item.fatG || 0)}g</div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteItem(String(item.id))}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Last 7 Days */}
+          <div className="space-y-2">
+            {last7DaysData.slice(0, -1).map((day) => {
+              const dayNum = day.date.getDate();
+              const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'][day.date.getDay()];
+              const dayPercentage = Math.round((day.kcal / dailyCalorieGoal) * 100);
+
+              return (
+                <button
+                  key={day.dateStr}
+                  onClick={() => setDate(day.dateStr)}
+                  className="w-full text-left p-4 rounded-2xl bg-white hover:bg-gray-50 transition-colors border border-gray-200"
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Date Badge */}
+                    <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-700 flex flex-col items-center justify-center font-bold flex-shrink-0">
+                      <span className="text-lg">{dayNum}</span>
+                      <span className="text-xs">週{dayOfWeek}</span>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-gray-600 mb-2">{String(day.dateStr)}</div>
+                      {/* Progress Bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-full transition-all ${
+                            day.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
+                          }`}
+                          style={{
+                            width: `${Math.min((day.kcal / dailyCalorieGoal) * 100, 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1">
+                        目標 {dailyCalorieGoal} kcal · {dayPercentage}%
+                      </div>
+                    </div>
+
+                    {/* Kcal Display */}
+                    <div className="text-right flex-shrink-0">
+                      <div
+                        className={`text-lg font-bold ${
+                          day.kcal >= dailyCalorieGoal ? 'text-red-600' : 'text-emerald-600'
+                        }`}
+                      >
+                        {String(Math.round(day.kcal))} kcal
+                      </div>
+                      <ChevronRightIcon className="w-4 h-4 text-gray-400 mt-1 ml-auto" />
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Fitasty Banner */}
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-white rounded-lg flex-shrink-0" />
+            <div>
+              <h3 className="font-bold text-lg">Fitasty 產品庫</h3>
+              <p className="text-sm opacity-90">記錄餐點時可快速加入 Fitasty 產品，自動填入營養資訊</p>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Add Food Modal */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>新增飲食</DialogTitle>
+          </DialogHeader>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="manual">手動輸入</TabsTrigger>
+              <TabsTrigger value="photo">影相</TabsTrigger>
+            </TabsList>
+
+            {/* Manual Input Tab */}
+            <TabsContent value="manual" className="space-y-4 mt-4">
+              {/* Meal Type */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">餐次</label>
+                <Select value={mealType} onValueChange={(value) => setMealType(value as 'breakfast' | 'lunch' | 'dinner' | 'snack')}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakfast">早餐</SelectItem>
+                    <SelectItem value="lunch">午餐</SelectItem>
+                    <SelectItem value="dinner">晚餐</SelectItem>
+                    <SelectItem value="snack">零食</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Food Name Search */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">食物名稱 *</label>
+                <div className="relative">
+                  <Input
+                    placeholder="搜尋食物 (支援中文/英文)"
+                    value={foodName}
+                    onChange={(e) => {
+                      setFoodName(e.target.value);
+                      handleSearch(e.target.value);
+                    }}
+                    onFocus={() => foodName.length >= 2 && setShowSearchResults(true)}
+                  />
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {searchResults.map((result, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSelectFood(result)}
+                          className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
+                        >
+                          <div className="font-medium">{result.name}</div>
+                          <div className="text-xs text-gray-500">{result.kcal} kcal · {result.source}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Portion */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">份量 (克) *</label>
+                <Input
+                  type="number"
+                  placeholder="100"
+                  value={portionGrams}
+                  onChange={(e) => handlePortionChange(e.target.value)}
+                />
+              </div>
+
+              {/* Nutrition Info */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-gray-600 mb-1 block">熱量 (kcal)</label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={calories}
+                    onChange={(e) => setCalories(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-600 mb-1 block">蛋白質 (g)</label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={proteinG}
+                    onChange={(e) => setProteinG(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-600 mb-1 block">碳水 (g)</label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={carbsG}
+                    onChange={(e) => setCarbsG(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-600 mb-1 block">脂肪 (g)</label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={fatG}
+                    onChange={(e) => setFatG(e.target.value)}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Photo Tab */}
+            <TabsContent value="photo" className="space-y-4 mt-4">
+              {/* Meal Type */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">餐次</label>
+                <Select value={mealType} onValueChange={(value) => setMealType(value as 'breakfast' | 'lunch' | 'dinner' | 'snack')}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakfast">早餐</SelectItem>
+                    <SelectItem value="lunch">午餐</SelectItem>
+                    <SelectItem value="dinner">晚餐</SelectItem>
+                    <SelectItem value="snack">零食</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Photo Upload */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">上傳照片</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-emerald-500 transition-colors cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoSelect}
+                    className="hidden"
+                    id="photo-input"
+                  />
+                  <label htmlFor="photo-input" className="cursor-pointer block">
+                    {photoPreview ? (
+                      <img src={photoPreview} alt="preview" className="w-full h-40 object-cover rounded" />
+                    ) : (
+                      <div className="text-gray-400">
+                        <div className="text-3xl mb-2">📷</div>
+                        <div className="text-sm">點擊上傳或拖放照片</div>
+                      </div>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              {/* Analyze Button */}
+              {photoPreview && (
+                <Button
+                  onClick={handleAnalyzePhoto}
+                  disabled={isAnalyzing}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600"
+                >
+                  {isAnalyzing ? '分析中...' : '分析食物'}
+                </Button>
+              )}
+
+              {/* Nutrition Info (after analysis) */}
+              {(calories || proteinG || carbsG || fatG) && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">熱量 (kcal)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={calories}
+                      onChange={(e) => setCalories(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">蛋白質 (g)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={proteinG}
+                      onChange={(e) => setProteinG(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">碳水 (g)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={carbsG}
+                      onChange={(e) => setCarbsG(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">脂肪 (g)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={fatG}
+                      onChange={(e) => setFatG(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          {/* Add Button */}
+          <Button
+            onClick={handleAddFood}
+            disabled={addItemMutation.isPending}
+            className="w-full bg-emerald-500 hover:bg-emerald-600 mt-6"
+          >
+            {addItemMutation.isPending ? '新增中...' : '新增'}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
