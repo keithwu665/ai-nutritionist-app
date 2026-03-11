@@ -194,7 +194,10 @@ export default function Dashboard() {
           <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">目標進度</h3>
-              <button className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80">
+              <button 
+              onClick={() => setLocation('/body')}
+              className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
+            >
                 詳情 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -232,7 +235,10 @@ export default function Dashboard() {
           <CardContent className="pt-5 pb-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">體重趨勢（7日）</h3>
-              <button className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80">
+              <button 
+                onClick={() => setLocation('/body')}
+                className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
+              >
                 查看更多 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -259,7 +265,10 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">今日運動</h3>
-            <button className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+            <button 
+              onClick={() => setLocation('/exercise')}
+              className="p-1.5 hover:bg-muted rounded-lg transition-colors"
+            >
               <Plus className="h-5 w-5 text-primary" />
             </button>
           </div>
