@@ -65,12 +65,12 @@ export default function ExerciseLog() {
   });
   const [manualOverride, setManualOverride] = useState(false);
 
-  // Get exercises for current date
-  const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date });
+  // Get exercises for selected date
+  const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date }, { staleTime: 0 });
   
   // Get exercises for last 7 days for weekly summary
   const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  const { data: last7DaysExercises = [] } = trpc.exercises.list.useQuery({ date: startDate });
+  const { data: last7DaysExercises = [] } = trpc.exercises.list.useQuery({ date: startDate }, { staleTime: 0 });
   
   const utils = trpc.useUtils();
 
@@ -136,7 +136,10 @@ export default function ExerciseLog() {
   const createMutation = trpc.exercises.create.useMutation({
     onSuccess: () => {
       toast.success('已新增');
-      utils.exercises.list.invalidate({ date });
+      // Invalidate the query for the date that was actually saved
+      utils.exercises.list.invalidate({ date: newExercise.date });
+      // Update the UI to show the selected date so user sees the newly added exercise
+      setDate(newExercise.date);
       setIsAddOpen(false);
       setNewExercise({
         type: 'running',
@@ -158,6 +161,7 @@ export default function ExerciseLog() {
   const deleteMutation = trpc.exercises.delete.useMutation({
     onSuccess: () => {
       toast.success('已刪除');
+      // Invalidate the query for the currently selected date
       utils.exercises.list.invalidate({ date });
     },
     onError: () => toast.error('刪除失敗'),
