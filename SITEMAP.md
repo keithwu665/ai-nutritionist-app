@@ -63,44 +63,71 @@ All protected routes are wrapped in `AppLayout` component which provides:
 - **Base Route:** `/food`
 - **Component:** `FoodLog.tsx`
 - **Access:** Protected
-- **Description:** Daily food tracking interface
+- **Description:** Daily food tracking interface with calendar and recent records
 
-##### 4.1 Food Log - Today
+##### 4.1 Food Log - Calendar View
 - **Route:** `/food`
-- **Default Date:** Current date
 - **Features:**
-  - Meal type tabs (breakfast, lunch, dinner, snack)
-  - Food item list with calories and macros
-  - Daily totals summary
-  - Add food button
-  - Copy yesterday button
-  - Nutrition report section
+  - Calendar grid (7×5) showing all dates in month
+  - Status indicators (dots):
+    - Green (達標): Daily intake 90-110% of goal
+    - Red (超標): Daily intake >110% of goal
+    - Grey (未記錄): No food logged
+  - Legend row showing status meanings
+  - Click date to view/edit that day's log
 
-##### 4.2 Food Log - Specific Date
-- **Route:** `/food/:date` (format: YYYY-MM-DD)
-- **Example:** `/food/2026-03-05`
-- **Features:** Same as 4.1 but for specified date
-- **Date Navigation:** Arrow buttons to browse dates
-
-##### 4.3 Nutrition Report (Modal/Section)
-- **Trigger:** Nutrition Report section in Food Log
+##### 4.2 Food Log - Recent Records
+- **Route:** `/food` (same page, scrollable section)
 - **Features:**
-  - 7-day or 30-day report selection
-  - Section checkboxes (macro summary, food details, body metrics)
-  - PDF download button
-  - Loading state during generation
+  - 7-day scrollable history
+  - Each record card shows:
+    - Circular date badge (left) with day number
+    - Date label with weekday
+    - Calorie amount (right, color-coded)
+    - Progress bar showing intake vs. goal
+    - Goal percentage display
+    - Chevron (>) for detail view
+  - "複製昨天" button to copy yesterday's meals
+  - Fitasty Product Banner below records
 
-##### 4.4 Add Food Modal
-- **Trigger:** "Add Food" button in Food Log
-- **Type:** Modal overlay (not separate route)
+##### 4.3 Add Food Modal
+- **Trigger:** "+ 今日記錄" button in header
+- **Type:** Modal overlay
+- **Tabs:**
+  - **Manual Input (手動輸入):**
+    - Food database search (Chinese + English)
+    - Search results dropdown with source badges (Fitasty/USDA)
+    - Portion grams input
+    - Nutrition auto-fill (kcal, protein, carbs, fat)
+    - Real-time macro recalculation on portion change
+    - Save button
+  - **Photo Recognition (影相):**
+    - File upload input
+    - Image preview
+    - AI food analysis (Vision LLM)
+    - Auto-filled nutrition data
+    - Portion grams adjustment
+    - Save button
+
+##### 4.4 Fitasty Product Banner
+- **Location:** Below recent records
 - **Features:**
-  - Fitasty product search with autocomplete
-  - Manual entry fields (name, calories, macros)
-  - Portion size adjustment
-  - Meal type selector
-  - Save button
+  - Product images
+  - Title (Fitasty 產品庫)
+  - Description text
+  - Link to Fitasty products
 
 **Status:** ✅ Implemented
+
+---
+
+#### **4.5 Food Logging Functions**
+- **searchUnified:** Search food database (USDA + Fitasty)
+- **addItem:** Save food entry to daily log
+- **deleteItem:** Remove food entry
+- **getItems:** Fetch daily food log with totals
+- **createUploadUrl:** Generate Supabase upload URL for photos
+- **extractFromPhoto:** AI analysis of food photos using Vision LLM
 
 ---
 
@@ -199,25 +226,52 @@ All protected routes are wrapped in `AppLayout` component which provides:
 - **Route:** `/exercise`
 - **Component:** `ExerciseLog.tsx`
 - **Access:** Protected
-- **Description:** Physical activity tracking
+- **Description:** Physical activity tracking with weekly summary
 
-##### 6.1 Exercise Log - Main View
+##### 6.1 Weekly Summary Card
+- **Location:** Top of page
 - **Features:**
-  - Date navigation (< date >)
-  - Daily exercise summary (total duration, calories burned)
-  - Exercise list with type, duration, intensity, calories
-  - Delete button per exercise
-  - Add exercise button
+  - Dark blue gradient background
+  - Title (本週運動)
+  - Statistics:
+    - Total sessions this week
+    - Total calories burned
+    - Average duration
+  - Bar chart showing 7-day activity
 
-##### 6.2 Add Exercise Modal
-- **Trigger:** "Add Exercise" button
+##### 6.2 Toggle Tabs
+- **Options:**
+  - 運動記錄 (Exercise Records) - Active by default
+  - AI 建議 (AI Suggestions) - Placeholder for future
+
+##### 6.3 Exercise Records View
+- **Features:**
+  - Exercise cards in scrollable list
+  - Each card displays:
+    - Exercise icon (emoji)
+    - Exercise name
+    - Intensity badge (color-coded)
+    - Date (YYYY-MM-DD)
+    - Duration & heart rate (XX 分鐘 · HR: XXX bpm)
+    - Calorie burn (🔥 XXX kcal)
+    - Delete button (×)
+
+##### 6.4 Add Exercise Modal
+- **Trigger:** "+ 新增運動" button in header
 - **Type:** Modal overlay
 - **Features:**
   - Exercise type dropdown (running, cycling, swimming, gym, yoga, walking, custom)
+  - Intensity selector (light, moderate, vigorous)
   - Duration input (minutes)
-  - Intensity selector (low, moderate, high)
-  - Auto-calculated calories based on MET values
+  - Heart rate input (optional)
+  - Estimated calorie burn display (auto-calculated)
   - Save button
+
+##### 6.5 Exercise Logging Functions
+- **addExercise:** Log new exercise entry
+- **deleteExercise:** Remove exercise entry
+- **getExercises:** Fetch weekly exercise log
+- **calculateCalorieBurn:** Auto-calculate based on type/duration/intensity/heart rate
 
 **Status:** ✅ Implemented
 
@@ -229,40 +283,52 @@ All protected routes are wrapped in `AppLayout` component which provides:
 - **Access:** Protected
 - **Description:** User profile and preferences management
 
-##### 7.1 Profile Section
+##### 7.1 Profile Summary Card (Green Gradient)
 - **Features:**
+  - User avatar with initials
   - User name display
-  - Gender selector (male, female)
-  - Age input
-  - Height input (cm)
-  - Weight input (kg)
-  - Edit button
+  - Email address
+  - Health goals display
 
-##### 7.2 Fitness Goal Section
+##### 7.2 Statistics Cards
 - **Features:**
-  - Goal selector (lose weight, maintain, gain muscle)
-  - Activity level selector (sedentary, light, moderate, high)
-  - Save button
+  - Consecutive logging days
+  - Daily calorie goal
+  - Protein goal (grams)
 
-##### 7.3 Metabolic Data Display
+##### 7.3 Personal Information Section
 - **Features:**
-  - BMR (Basal Metabolic Rate) display
-  - TDEE (Total Daily Energy Expenditure) display
-  - Daily calorie target display
-  - Explanation text
+  - Edit Profile (name, gender, age, height, weight)
+  - Goal Settings (goal type, daily calorie, activity level)
+  - InBody/Boditrax Integration (CSV import, API connection)
 
-##### 7.4 Preferences Section
+##### 7.4 Notification Settings
 - **Features:**
-  - Theme toggle (light/dark mode)
-  - Notifications toggle
-  - Language selector (if multilingual)
+  - Daily Reminder toggle (每日提醒)
+  - Meal Time Reminder toggle (飲食提醒)
+  - Reminder time customization
 
-##### 7.5 Account Section
+##### 7.5 Privacy & Security Section
 - **Features:**
-  - Logout button
-  - Delete account button (future)
-  - Privacy policy link
-  - Terms of service link
+  - Sharing Permissions (manage coach/friend access)
+  - Data Export (download CSV/JSON)
+
+##### 7.6 Support Section
+- **Features:**
+  - FAQ (常見問題)
+  - Rate Fitasty (評分 Fitasty)
+
+##### 7.7 Dangerous Operations
+- **Features:**
+  - Logout button (登出帳戶)
+  - Delete Account button (刪除帳戶)
+
+##### 7.8 Fitasty Footer
+- **Features:**
+  - Fitasty branding
+  - Version number
+  - Copyright notice
+  - Links to privacy policy, terms, contact
 
 **Status:** ✅ Implemented
 
