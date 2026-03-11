@@ -136,10 +136,8 @@ export default function ExerciseLog() {
   const createMutation = trpc.exercises.create.useMutation({
     onSuccess: () => {
       toast.success('已新增');
-      // Invalidate the query for the date that was actually saved
-      utils.exercises.list.invalidate({ date: newExercise.date });
-      // Update the UI to show the selected date so user sees the newly added exercise
-      setDate(newExercise.date);
+      // Invalidate the query for the currently selected date to refresh the list
+      utils.exercises.list.invalidate({ date });
       setIsAddOpen(false);
       setNewExercise({
         type: 'running',
