@@ -56,6 +56,7 @@ export default function ExerciseLog() {
   const [activeTab, setActiveTab] = useState<'records' | 'suggestions'>('records');
   const [newExercise, setNewExercise] = useState({
     type: 'running',
+    date: today,
     durationMinutes: '',
     caloriesBurned: '',
     intensity: 'moderate' as 'low' | 'moderate' | 'high',
@@ -139,6 +140,7 @@ export default function ExerciseLog() {
       setIsAddOpen(false);
       setNewExercise({
         type: 'running',
+        date: today,
         durationMinutes: '',
         caloriesBurned: '',
         intensity: 'moderate',
@@ -189,7 +191,7 @@ export default function ExerciseLog() {
       return;
     }
     createMutation.mutate({
-      date,
+      date: newExercise.date,
       type: newExercise.type,
       durationMinutes: parseInt(newExercise.durationMinutes),
       caloriesBurned: newExercise.caloriesBurned,
@@ -224,6 +226,16 @@ export default function ExerciseLog() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">日期</label>
+                <Input
+                  type="date"
+                  value={newExercise.date}
+                  onChange={(e) => setNewExercise({ ...newExercise, date: e.target.value })}
+                  max={today}
+                />
               </div>
 
               <div className="space-y-2">
