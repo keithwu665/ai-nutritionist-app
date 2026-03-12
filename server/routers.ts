@@ -100,8 +100,12 @@ export const appRouter = router({
         note: z.string().nullable().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { id, ...data } = input;
-        return db.updateBodyMetric(id, ctx.user.id, data);
+        try {
+          return db.deleteFoodLogItem(input.id, ctx.user.id);
+        } catch (error) {
+          console.error('[FoodLogs] deleteItem error:', error instanceof Error ? error.message : String(error));
+          throw error;
+        }
       }),
 
     delete: protectedProcedure
@@ -161,13 +165,35 @@ export const appRouter = router({
         fatG: z.string().nullable().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { date, ...itemData } = input;
-        const log = await db.getOrCreateFoodLog(ctx.user.id, date);
-        return db.createFoodLogItem({
-          foodLogId: log.id,
-          userId: ctx.user.id,
-          ...itemData,
-        });
+        try {
+          const { date, ...itemData } = input;
+          const log = await db.getOrCreateFoodLog(ctx.user.id, date);
+          
+          // Convert string values to numbers with proper validation
+          const caloriesNum = parseFloat(itemData.calories || '0') || 0;
+          const proteinNum = itemData.proteinG ? (parseFloat(itemData.proteinG) || 0) : null;
+          const carbsNum = itemData.carbsG ? (parseFloat(itemData.carbsG) || 0) : null;
+          const fatNum = itemData.fatG ? (parseFloat(itemData.fatG) || 0) : null;
+          
+          // Validate that calories is not NaN
+          if (isNaN(caloriesNum)) {
+            throw new Error(`Invalid calories value: ${itemData.calories}`);
+          }
+          
+          return db.createFoodLogItem({
+            foodLogId: log.id,
+            userId: ctx.user.id,
+            mealType: itemData.mealType,
+            name: itemData.name,
+            calories: String(caloriesNum),
+            proteinG: proteinNum !== null ? String(proteinNum) : null,
+            carbsG: carbsNum !== null ? String(carbsNum) : null,
+            fatG: fatNum !== null ? String(fatNum) : null,
+          } as any);
+        } catch (error) {
+          console.error('[FoodLogs] addItem error:', error instanceof Error ? error.message : String(error));
+          throw error;
+        }
       }),
 
     updateItem: protectedProcedure
@@ -181,8 +207,42 @@ export const appRouter = router({
         fatG: z.string().nullable().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { id, ...data } = input;
-        return db.updateFoodLogItem(id, ctx.user.id, data);
+        try {
+          const { id, ...data } = input;
+          
+          // Convert string values to numbers with proper validation
+          const convertedData: any = { ...data };
+          if (data.calories !== undefined) {
+            const caloriesNum = parseFloat(data.calories) || 0;
+            if (isNaN(caloriesNum)) {
+              throw new Error(`Invalid calories value: ${data.calories}`);
+            }
+            convertedData.calories = String(caloriesNum);
+          }
+          if (data.proteinG !== undefined && data.proteinG !== null) {
+            const proteinNum = parseFloat(data.proteinG) || 0;
+            convertedData.proteinG = String(proteinNum);
+          } else if (data.proteinG === null) {
+            convertedData.proteinG = null;
+          }
+          if (data.carbsG !== undefined && data.carbsG !== null) {
+            const carbsNum = parseFloat(data.carbsG) || 0;
+            convertedData.carbsG = String(carbsNum);
+          } else if (data.carbsG === null) {
+            convertedData.carbsG = null;
+          }
+          if (data.fatG !== undefined && data.fatG !== null) {
+            const fatNum = parseFloat(data.fatG) || 0;
+            convertedData.fatG = String(fatNum);
+          } else if (data.fatG === null) {
+            convertedData.fatG = null;
+          }
+          
+          return db.updateFoodLogItem(id, ctx.user.id, convertedData);
+        } catch (error) {
+          console.error('[FoodLogs] updateItem error:', error instanceof Error ? error.message : String(error));
+          throw error;
+        }
       }),
 
     deleteItem: protectedProcedure
@@ -194,31 +254,36 @@ export const appRouter = router({
     copyYesterday: protectedProcedure
       .input(z.object({ date: z.string() }))
       .mutation(async ({ ctx, input }) => {
-        const yesterday = new Date(input.date);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        try {
+          const yesterday = new Date(input.date);
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-        const yesterdayItems = await db.getFoodLogItems(ctx.user.id, yesterdayStr);
-        if (yesterdayItems.length === 0) {
-          return { copied: 0 };
-        }
+          const yesterdayItems = await db.getFoodLogItems(ctx.user.id, yesterdayStr);
+          if (yesterdayItems.length === 0) {
+            return { copied: 0 };
+          }
 
-        const todayLog = await db.getOrCreateFoodLog(ctx.user.id, input.date);
-        let copied = 0;
-        for (const item of yesterdayItems) {
-          await db.createFoodLogItem({
-            foodLogId: todayLog.id,
-            userId: ctx.user.id,
-            mealType: item.mealType,
-            name: item.name,
-            calories: item.calories,
-            proteinG: item.proteinG,
-            carbsG: item.carbsG,
-            fatG: item.fatG,
-          });
-          copied++;
+          const todayLog = await db.getOrCreateFoodLog(ctx.user.id, input.date);
+          let copied = 0;
+          for (const item of yesterdayItems) {
+            await db.createFoodLogItem({
+              foodLogId: todayLog.id,
+              userId: ctx.user.id,
+              mealType: item.mealType,
+              name: item.name,
+              calories: item.calories,
+              proteinG: item.proteinG,
+              carbsG: item.carbsG,
+              fatG: item.fatG,
+            });
+            copied++;
+          }
+          return { copied };
+        } catch (error) {
+          console.error('[FoodLogs] copyYesterday error:', error instanceof Error ? error.message : String(error));
+          throw error;
         }
-        return { copied };
       }),
 
     generateReport: protectedProcedure
@@ -419,8 +484,12 @@ export const appRouter = router({
         note: z.string().nullable().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { id, ...data } = input;
-        return db.updateExercise(id, ctx.user.id, data);
+        try {
+          return db.deleteFoodLogItem(input.id, ctx.user.id);
+        } catch (error) {
+          console.error('[FoodLogs] deleteItem error:', error instanceof Error ? error.message : String(error));
+          throw error;
+        }
       }),
 
     delete: protectedProcedure
