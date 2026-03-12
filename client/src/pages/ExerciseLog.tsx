@@ -69,8 +69,9 @@ export default function ExerciseLog() {
   const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date }, { staleTime: 0 });
   
   // Get exercises for last 7 days for weekly summary
+  const endDate = today;
   const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  const { data: last7DaysExercises = [] } = trpc.exercises.list.useQuery({ date: startDate }, { staleTime: 0 });
+  const { data: last7DaysExercises = [] } = trpc.exercises.listForRange.useQuery({ startDate, endDate }, { staleTime: 0 });
   
   const utils = trpc.useUtils();
 
