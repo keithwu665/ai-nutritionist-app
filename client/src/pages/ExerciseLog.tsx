@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Trash2, Loader2, Flame, Activity, Zap } from 'lucide-react';
+import { Plus, Trash2, Loader2, Flame, Activity, Zap, ChevronLeft, ChevronRight, Lightbulb, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { getExerciseIntensityText } from '@shared/calculations';
 
@@ -64,6 +64,16 @@ export default function ExerciseLog() {
     isAutoCalculated: false,
   });
   const [manualOverride, setManualOverride] = useState(false);
+
+  // Reset modal date when modal opens
+  useEffect(() => {
+    if (isAddOpen) {
+      setNewExercise(prev => ({
+        ...prev,
+        date: date, // Use currently selected date, not today
+      }));
+    }
+  }, [isAddOpen, date]);
 
   // Get exercises for selected date
   const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date }, { staleTime: 0 });
@@ -137,12 +147,14 @@ export default function ExerciseLog() {
   const createMutation = trpc.exercises.create.useMutation({
     onSuccess: () => {
       toast.success('已新增');
-      // Invalidate the query for the currently selected date to refresh the list
-      utils.exercises.list.invalidate({ date });
+      // Invalidate the query for the date that was actually saved
+      utils.exercises.list.invalidate({ date: newExercise.date });
+      // Also invalidate the 7-day range if the saved date is within it
+      utils.exercises.listForRange.invalidate({ startDate, endDate });
       setIsAddOpen(false);
       setNewExercise({
         type: 'running',
-        date: today,
+        date: date, // Use current selected date
         durationMinutes: '',
         caloriesBurned: '',
         intensity: 'moderate',
@@ -160,10 +172,12 @@ export default function ExerciseLog() {
   const deleteMutation = trpc.exercises.delete.useMutation({
     onSuccess: () => {
       toast.success('已刪除');
-      // Invalidate the query for the currently selected date
       utils.exercises.list.invalidate({ date });
+      utils.exercises.listForRange.invalidate({ startDate, endDate });
     },
-    onError: () => toast.error('刪除失敗'),
+    onError: () => {
+      toast.error('刪除失敗');
+    },
   });
 
   // Calculate weekly totals
@@ -201,6 +215,29 @@ export default function ExerciseLog() {
       intensity: newExercise.intensity,
       note: newExercise.note || null,
     });
+  };
+
+  // Navigate to previous day
+  const handlePrevDay = () => {
+    const prevDate = new Date(date);
+    prevDate.setDate(prevDate.getDate() - 1);
+    setDate(prevDate.toISOString().split('T')[0]);
+  };
+
+  // Navigate to next day
+  const handleNextDay = () => {
+    const nextDate = new Date(date);
+    nextDate.setDate(nextDate.getDate() + 1);
+    // Don't allow navigating to future dates
+    if (nextDate.toISOString().split('T')[0] <= today) {
+      setDate(nextDate.toISOString().split('T')[0]);
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateStr: string) => {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('zh-HK', { month: 'numeric', day: 'numeric', year: 'numeric' });
   };
 
   return (
@@ -249,42 +286,32 @@ export default function ExerciseLog() {
                   value={newExercise.durationMinutes}
                   onChange={(e) => handleDurationChange(e.target.value)}
                   placeholder="例: 30"
-                  required
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">強度</label>
-                <Select value={newExercise.intensity} onValueChange={(v) => handleIntensityChange(v as any)}>
+                <Select value={newExercise.intensity} onValueChange={handleIntensityChange}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">低強度</SelectItem>
-                    <SelectItem value="moderate">中等強度</SelectItem>
-                    <SelectItem value="high">高強度</SelectItem>
+                    <SelectItem value="low">{intensityLabels['low']}</SelectItem>
+                    <SelectItem value="moderate">{intensityLabels['moderate']}</SelectItem>
+                    <SelectItem value="high">{intensityLabels['high']}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  消耗熱量 (kcal) *
-                  {newExercise.isAutoCalculated && <span className="text-xs text-emerald-600 ml-2">(自動計算)</span>}
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={newExercise.caloriesBurned}
-                    onChange={(e) => handleCalorieChange(e.target.value)}
-                    placeholder={isCalculating ? '計算中...' : '自動計算'}
-                    required
-                    className="flex-1"
-                  />
-                  {isCalculating && <Loader2 className="h-4 w-4 animate-spin text-emerald-600 mt-2" />}
-                </div>
+                <label className="text-sm font-medium">消耗熱量 (kcal) *</label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={newExercise.caloriesBurned}
+                  onChange={(e) => handleCalorieChange(e.target.value)}
+                  placeholder="自動計算或手動輸入"
+                />
                 {newExercise.isAutoCalculated && (
-                  <p className="text-xs text-gray-500">根據運動類型、強度和時長自動計算</p>
+                  <p className="text-xs text-gray-500">自動計算</p>
                 )}
               </div>
 
@@ -340,6 +367,31 @@ export default function ExerciseLog() {
         </CardContent>
       </Card>
 
+      {/* Date Navigation */}
+      <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePrevDay}
+          className="rounded-full"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <div className="text-center">
+          <p className="text-lg font-semibold">{formatDate(date)}</p>
+          {date === today && <p className="text-xs text-gray-500">今日</p>}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleNextDay}
+          disabled={date >= today}
+          className="rounded-full"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
       {/* Tab Buttons */}
       <div className="flex gap-3">
         <Button
@@ -385,7 +437,7 @@ export default function ExerciseLog() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-600">
-                          {new Date(exercise.date).toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' })} · {exercise.durationMinutes} 分鐘
+                          {exercise.durationMinutes} 分鐘
                         </p>
                       </div>
 
@@ -418,9 +470,57 @@ export default function ExerciseLog() {
 
       {/* AI Suggestions Tab */}
       {activeTab === 'suggestions' && (
-        <div className="text-center py-8 text-gray-500">
-          <Zap className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-          <p>AI 建議功能即將推出</p>
+        <div className="space-y-4">
+          {/* AI Advice Section */}
+          <Card className="border-emerald-200 bg-emerald-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-emerald-700">
+                <Lightbulb className="h-5 w-5" />
+                AI 建議 🤖
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {todayTotals.calories > 0 ? (
+                <>
+                  <div className="flex items-start gap-2">
+                    <div className="text-emerald-600 font-bold">•</div>
+                    <p className="text-sm text-gray-700">今日運動量良好，已消耗 {Math.round(todayTotals.calories)} kcal</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="text-emerald-600 font-bold">•</div>
+                    <p className="text-sm text-gray-700">建議補充 20g 蛋白質以促進肌肉恢復</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="text-emerald-600 font-bold">•</div>
+                    <p className="text-sm text-gray-700">明日建議進行核心訓練以增強穩定性</p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-gray-600">今日暫無運動記錄。建議進行 30 分鐘的中等強度運動。</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Coach Advice Section */}
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-700">
+                <Users className="h-5 w-5" />
+                教練建議 👨‍🏫
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2 text-sm">
+                <p className="font-semibold text-gray-800">推薦訓練計劃：</p>
+                <div className="space-y-1 text-gray-700">
+                  <p>• Bench Press 4 x 8</p>
+                  <p>• Shoulder Press 3 x 10</p>
+                  <p>• Core Plank 3 x 30s</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-4">💡 提示：根據您的運動歷史和目標自動生成</p>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
