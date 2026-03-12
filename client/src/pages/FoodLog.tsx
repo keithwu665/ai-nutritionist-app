@@ -37,7 +37,6 @@ export default function FoodLog() {
   const { data: items = [] } = trpc.foodLogs.getItems.useQuery({ date });
   const { data: userAuth } = trpc.auth.me.useQuery();
   const { data: userProfile } = trpc.profile.get.useQuery();
-  const { data: last7Days = [] } = trpc.foodLogs.getItemsForRange.useQuery({ startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] });
 
   // Mutations
   const addItemMutation = trpc.foodLogs.addItem.useMutation();
@@ -49,7 +48,53 @@ export default function FoodLog() {
   // Calculate daily calorie goal - use default for now
   const dailyCalorieGoal = 1642;
 
-  // Calculate totals
+  // Get current month for calendar
+  const currentDate = new Date(date);
+  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString().split('T')[0];
+  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
+  
+  const { data: monthData = [] } = trpc.foodLogs.getItemsForRange.useQuery({ startDate: monthStart, endDate: monthEnd });
+  const { data: last7Days = [] } = trpc.foodLogs.getItemsForRange.useQuery({ startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: new Date().toISOString().split('T')[0] });
+
+
+  // Aggregate raw food items into daily totals
+  const aggregateDailyTotals = useMemo(() => {
+    const dailyMap = new Map<string, { date: string; kcal: number }>();
+    
+    // Aggregate monthData (all items for the month)
+    monthData.forEach((item: any) => {
+      const dateStr = item.date;
+      const kcal = typeof item.calories === 'number' ? item.calories : parseInt(item.calories || '0') || 0;
+      
+      if (!dailyMap.has(dateStr)) {
+        dailyMap.set(dateStr, { date: dateStr, kcal: 0 });
+      }
+      const existing = dailyMap.get(dateStr)!;
+      existing.kcal += kcal;
+    });
+    
+    return Array.from(dailyMap.values());
+  }, [monthData]);
+  
+  // Aggregate last 7 days data
+  const aggregateLast7Days = useMemo(() => {
+    const dailyMap = new Map<string, { date: string; kcal: number }>();
+    
+    last7Days.forEach((item: any) => {
+      const dateStr = item.date;
+      const kcal = typeof item.calories === 'number' ? item.calories : parseInt(item.calories || '0') || 0;
+      
+      if (!dailyMap.has(dateStr)) {
+        dailyMap.set(dateStr, { date: dateStr, kcal: 0 });
+      }
+      const existing = dailyMap.get(dateStr)!;
+      existing.kcal += kcal;
+    });
+    
+    return Array.from(dailyMap.values());
+  }, [last7Days]);
+
+  // Calculate totals for today
   const totals = useMemo(() => {
     return items.reduce(
       (acc, item) => ({
@@ -69,7 +114,7 @@ export default function FoodLog() {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
-      const dayData = last7Days.find((x: any) => x.date === dateStr) || { date: dateStr, kcal: 0 };
+      const dayData = aggregateLast7Days.find((x: any) => x.date === dateStr) || { date: dateStr, kcal: 0 };
       days.push({ ...dayData, dateStr, date: d });
     }
     return days;
@@ -85,10 +130,12 @@ export default function FoodLog() {
     for (let i = 1; i <= lastDay.getDate(); i++) {
       const d = new Date(parseInt(year), parseInt(month) - 1, i);
       const dateStr = d.toISOString().split('T')[0];
-      const dayData = last7Days.find((x: any) => x.date === dateStr);
-      let status = 'empty'; // grey
+      const dayData = aggregateDailyTotals.find((x: any) => x.date === dateStr);
+      let status = 'empty'; // grey - 未記錄
       if (dayData && dayData.kcal > 0) {
-        status = dayData.kcal >= dailyCalorieGoal ? 'exceeded' : 'achieved'; // red or green
+        // 達標: 0 < kcal <= target (green)
+        // 超標: kcal > target (red)
+        status = dayData.kcal > dailyCalorieGoal ? 'exceeded' : 'achieved';
       }
       dates.push({ day: i, dateStr, status });
     }
@@ -188,6 +235,8 @@ export default function FoodLog() {
     }
 
     try {
+      const utils = trpc.useUtils();
+      
       await addItemMutation.mutateAsync({
         date,
         mealType: mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
@@ -197,6 +246,10 @@ export default function FoodLog() {
         carbsG: carbsG || '0',
         fatG: fatG || '0',
       });
+
+      // Invalidate queries to refresh calendar and history
+      await utils.foodLogs.getItems.invalidate({ date });
+      await utils.foodLogs.getItemsForRange.invalidate();
 
       // Check if exceeded goal
       const newTotal = totals.kcal + (parseInt(calories || '0') || 0);
@@ -225,8 +278,15 @@ export default function FoodLog() {
   // Delete food item
   const handleDeleteItem = async (id: string | number) => {
     try {
+      const utils = trpc.useUtils();
       const idStr = typeof id === 'string' ? id : String(id);
+      
       await deleteItemMutation.mutateAsync({ id: idStr as any });
+      
+      // Invalidate queries to refresh calendar and history
+      await utils.foodLogs.getItems.invalidate({ date });
+      await utils.foodLogs.getItemsForRange.invalidate();
+      
       toast.success('已刪除');
     } catch (error) {
       toast.error('刪除失敗');
