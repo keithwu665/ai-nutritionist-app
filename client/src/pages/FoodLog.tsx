@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ChevronRightIcon, Plus, X } from 'lucide-react';
-// Calculation functions
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 
 export default function FoodLog() {
   const { user } = useAuth() || {};
@@ -145,25 +145,51 @@ export default function FoodLog() {
     return dates;
   };
 
-  // Search food
-  const handleSearch = async (query: string) => {
+  // Debounce search query
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Use tRPC query for food search with enabled flag
+  const { data: searchData, isLoading: isSearching } = trpc.foodLogs.searchUnified.useQuery(
+    { query: searchQuery, locale: 'en' },
+    { enabled: searchQuery.length >= 2 }
+  );
+
+  // Update search results when data changes
+  useEffect(() => {
+    if (searchQuery.length >= 2) {
+      setShowSearchResults(true);
+      if (searchData) {
+        setSearchResults(searchData || []);
+      }
+    }
+  }, [searchData, searchQuery]);
+
+  // Handle search with debounce
+  const handleSearch = useCallback((query: string) => {
+    setFoodName(query);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
     if (query.length < 2) {
       setSearchResults([]);
       setShowSearchResults(false);
+      setSearchQuery('');
       return;
     }
-
-    try {
-      // Use tRPC client to fetch search results
-      const results = await fetch(`/api/trpc/foodLogs.searchUnified?input=${JSON.stringify({ query })}`)
-        .then(r => r.json())
-        .then(data => data.result?.data || []);
-      setSearchResults(results);
-      setShowSearchResults(true);
-    } catch (error) {
-      toast.error('搜尋失敗');
-    }
-  };
+    
+    // Show loading state immediately
+    setShowSearchResults(true);
+    setSearchResults([]);
+    
+    // Debounce the search query update (300ms)
+    searchTimeoutRef.current = setTimeout(() => {
+      setSearchQuery(query);
+    }, 300);
+  }, []);
 
   // Select food from search
   const handleSelectFood = (food: any) => {
@@ -203,15 +229,41 @@ export default function FoodLog() {
 
   // Analyze photo
   const handleAnalyzePhoto = async () => {
-    if (!photoPreview) {
+    if (!photoFile) {
       toast.error('請選擇照片');
       return;
     }
 
     setIsAnalyzing(true);
     try {
+      // Step 1: Upload image to Supabase Storage
+      console.log('Step 1: Uploading image to Supabase...');
+      const uploadResponse = await photoUploadMutation.mutateAsync({
+        fileName: photoFile.name || `photo-${Date.now()}.jpg`,
+      });
+      
+      if (!uploadResponse.uploadUrl) {
+        throw new Error('Failed to get upload URL');
+      }
+
+      // Step 2: Upload file to the signed URL
+      console.log('Step 2: Uploading to signed URL...');
+      const uploadResult = await fetch(uploadResponse.uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': photoFile.type || 'image/jpeg',
+        },
+        body: photoFile,
+      });
+
+      if (!uploadResult.ok) {
+        throw new Error(`Upload failed: ${uploadResult.statusText}`);
+      }
+
+      // Step 3: Analyze the uploaded image
+      console.log('Step 3: Analyzing image...');
       const response = await photoAnalysisMutation.mutateAsync({
-        objectPath: photoPreview,
+        objectPath: uploadResponse.objectPath,
       });
 
       if (response.extraction && response.extraction.suggested) {
@@ -224,7 +276,9 @@ export default function FoodLog() {
         toast.success('食物分析完成');
       }
     } catch (error) {
-      toast.error('分析失敗，請重試');
+      const errorMessage = error instanceof Error ? error.message : '分析失敗，請重試';
+      console.error('Photo analysis error:', error);
+      toast.error(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }
@@ -545,24 +599,27 @@ export default function FoodLog() {
                   <Input
                     placeholder="搜尋食物 (支援中文/英文)"
                     value={foodName}
-                    onChange={(e) => {
-                      setFoodName(e.target.value);
-                      handleSearch(e.target.value);
-                    }}
+                    onChange={(e) => handleSearch(e.target.value)}
                     onFocus={() => foodName.length >= 2 && setShowSearchResults(true)}
                   />
-                  {showSearchResults && searchResults.length > 0 && (
+                  {showSearchResults && (searchResults.length > 0 || isSearching) && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                      {searchResults.map((result, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSelectFood(result)}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
-                        >
-                          <div className="font-medium">{result.name}</div>
-                          <div className="text-xs text-gray-500">{result.kcal} kcal · {result.source}</div>
-                        </button>
-                      ))}
+                      {isSearching ? (
+                        <div className="px-4 py-3 text-center text-sm text-gray-500">搜尋中...</div>
+                      ) : searchResults.length > 0 ? (
+                        searchResults.map((result, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSelectFood(result)}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
+                          >
+                            <div className="font-medium">{result.displayName || result.name}</div>
+                            <div className="text-xs text-gray-500">{result.kcal_per_100g || result.kcal || 0} kcal · {result.badge || result.source || 'USDA'}</div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-center text-sm text-gray-500">未找到相關食物</div>
+                      )}
                     </div>
                   )}
                 </div>
