@@ -1,0 +1,13 @@
+{
+  "query": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'food_log_items';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'food_log_items';",
+  "rows": [
+    {
+      "TABLE_NAME": "food_log_items"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\nfood_log_items\n",
+  "stderr": "",
+  "execution_time_ms": 1586
+}

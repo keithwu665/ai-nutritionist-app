@@ -43,6 +43,9 @@ export default function FoodLog() {
   const deleteItemMutation = trpc.foodLogs.deleteItem.useMutation();
   const photoUploadMutation = trpc.foodPhoto.createUploadUrl.useMutation();
   const photoAnalysisMutation = trpc.foodPhoto.extractFromPhoto.useMutation();
+  
+  // Utils hook - must be called at top level, not inside handlers
+  const utils = trpc.useUtils();
 
   // Calculate daily calorie goal
   // Calculate daily calorie goal - use default for now
@@ -235,7 +238,6 @@ export default function FoodLog() {
     }
 
     try {
-      const utils = trpc.useUtils();
       
       await addItemMutation.mutateAsync({
         date,
@@ -278,7 +280,6 @@ export default function FoodLog() {
   // Delete food item
   const handleDeleteItem = async (id: string | number) => {
     try {
-      const utils = trpc.useUtils();
       const idStr = typeof id === 'string' ? id : String(id);
       
       await deleteItemMutation.mutateAsync({ id: idStr as any });
