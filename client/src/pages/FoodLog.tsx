@@ -341,14 +341,7 @@ export default function FoodLog() {
       await utils.foodLogs.getItems.invalidate({ date });
       await utils.foodLogs.getItemsForRange.invalidate();
 
-      // Check if exceeded goal
-      const newTotal = totals.kcal + (parseInt(calories || '0') || 0);
-      if (newTotal > dailyCalorieGoal) {
-        toast.warning(`超過目標 ${newTotal - dailyCalorieGoal} kcal`);
-      } else if (newTotal < dailyCalorieGoal * 0.8) {
-        toast.info(`還差 ${Math.round(dailyCalorieGoal - newTotal)} kcal`);
-      }
-
+      // Show success toast only
       toast.success('食物已新增');
 
       // Reset form
@@ -516,6 +509,12 @@ export default function FoodLog() {
                   </div>
                   <div className="text-xs text-gray-600">
                     目標 {dailyCalorieGoal} kcal · {percentage}%
+                  </div>
+                  {/* Calorie Difference Message */}
+                  <div className="text-xs text-gray-500 mt-1">
+                    {totals.kcal > dailyCalorieGoal
+                      ? `超過目標 ${Math.round(totals.kcal - dailyCalorieGoal)} kcal`
+                      : `還差 ${Math.round(dailyCalorieGoal - totals.kcal)} kcal`}
                   </div>
                 </div>
 

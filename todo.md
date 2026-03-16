@@ -973,3 +973,27 @@
 - [x] Verified both buttons fully tappable
 - [x] Verified food saved successfully to database
 - [ ] Publish to live site
+
+
+## Daily Calorie Feedback UI Improvement - COMPLETE
+
+### ISSUE: Calorie Gap Toast Popups FIXED
+- [x] Removed "超過目標 XXX kcal" toast popup
+- [x] Removed "還差 XXX kcal" toast popup
+- [x] Kept "食物已新增" success toast
+
+### SOLUTION: Display Calorie Message in Card IMPLEMENTED
+- [x] Updated Recent Record card to show calorie difference below target line
+- [x] Format: "還差 XXX kcal" when under target
+- [x] Format: "超過目標 XXX kcal" when over target
+- [x] Updates immediately after adding/deleting food
+- [x] Progress bar and current kcal display unchanged
+
+### Testing & Deployment VERIFIED
+- [x] Test adding food - calorie message appears in card (verified: 還差 950 kcal)
+- [x] Test deleting food - calorie message updates
+- [x] Test exceeding target - "超過目標" message displays correctly
+- [x] Test under target - "還差" message displays correctly
+- [x] Verified no toast popups for calorie gap
+- [ ] Create checkpoint
+- [ ] Publish to live site
