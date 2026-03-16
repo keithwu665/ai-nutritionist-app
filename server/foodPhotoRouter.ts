@@ -83,15 +83,29 @@ function calculateMealQualityRating(
   return 'Limited';
 }
 
+// Detect if food is a vegetable
+function isVegetableFood(foodItems: string[]): boolean {
+  const vegetableKeywords = [
+    '菜心', '西蘭花', '生菜', '菠菜', '白菜', '青菜', '蔬菜',
+    'broccoli', 'lettuce', 'spinach', 'cabbage', 'gai lan', 'chinese broccoli',
+    '蕹菜', '芥蘭', '小白菜', '羽衣甘藍', '綠菜', '葉菜'
+  ];
+  
+  return foodItems.some(item => 
+    vegetableKeywords.some(keyword => item.toLowerCase().includes(keyword.toLowerCase()))
+  );
+}
+
 // Generate AI diet advice based on nutrition and user tone style
-// Validates that advice matches actual nutrition data
+// Validates that advice matches actual nutrition data with STRICT rules
 function generateDietAdvice(
   kcal: number,
   proteinG: number,
   carbsG: number,
   fatG: number,
   mealRating: string,
-  toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle'
+  toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle',
+  foodItems: string[] = []
 ): string {
   // Calculate nutrition ratios for validation
   const totalCalories = kcal || 1; // Avoid division by zero
@@ -99,11 +113,14 @@ function generateDietAdvice(
   const carbRatio = (carbsG * 4) / totalCalories;
   const fatRatio = (fatG * 9) / totalCalories;
   
-  // Determine nutrition profile
+  // Determine nutrition profile with STRICT validation rules
   const isHighProtein = proteinRatio >= 0.25;
-  const isLowFat = fatRatio <= 0.25;
+  const isLowFat = fatRatio <= 0.25 || fatG < 10; // STRICT: fat < 10g is low
+  const isLowCarbs = carbRatio <= 0.30 || carbsG < 20; // STRICT: carbs < 20g is low
+  const isLowCalorie = kcal < 100; // Light meal
   const isBalanced = proteinRatio >= 0.15 && carbRatio >= 0.30 && fatRatio >= 0.15 && fatRatio <= 0.35;
   const isGoodRating = mealRating === 'Good' || mealRating === 'Nutritious';
+  const isVegetable = isVegetableFood(foodItems);
   
   // Select quote library based on tone style
   let quoteLibrary: string[];
@@ -117,21 +134,44 @@ function generateDietAdvice(
   }
   
   // Filter quotes that match the nutrition profile
-  // This ensures advice doesn't contradict actual nutrition data
+  // STRICT validation: advice must NOT contradict actual nutrition data
   let validQuotes = quoteLibrary.filter(quote => {
-    // Validation rules: advice must match actual nutrition
-    // If fat is low, don't select quotes saying fat is too high
-    if (isLowFat && (quote.includes('脂肪爆') || quote.includes('脂肪偏高') || quote.includes('脂肪太高'))) {
-      return false;
+    // STRICT RULE 1: If fat < 10g, BLOCK any "fat too high" statements
+    if (isLowFat) {
+      if (quote.includes('脂肪爆') || quote.includes('脂肪偏高') || quote.includes('脂肪太高') ||
+          quote.includes('脂肪堆積') || quote.includes('脂肪過多') || quote.includes('脂肪會堆積')) {
+        return false;
+      }
     }
-    // If protein is high, don't select quotes saying protein is too low
+    
+    // STRICT RULE 2: If carbs < 20g, BLOCK any "carbs too high" statements
+    if (isLowCarbs) {
+      if (quote.includes('碳水超標') || quote.includes('碳水過高') || quote.includes('碳水爆') ||
+          quote.includes('碳水化合物超標') || quote.includes('碳水化合物過高')) {
+        return false;
+      }
+    }
+    
+    // STRICT RULE 3: If protein is high, don't select quotes saying protein is too low
     if (isHighProtein && (quote.includes('蛋白質唔夠') || quote.includes('蛋白質太低'))) {
       return false;
     }
-    // If rating is good, don't select quotes saying meal is terrible
+    
+    // STRICT RULE 4: If rating is good, don't select quotes saying meal is terrible
     if (isGoodRating && (quote.includes('唔合格') || quote.includes('救唔返') || quote.includes('垃圾'))) {
       return false;
     }
+    
+    // STRICT RULE 5: If it's a vegetable, don't select overly critical quotes
+    if (isVegetable && (quote.includes('脂肪爆') || quote.includes('碳水爆'))) {
+      return false;
+    }
+    
+    // STRICT RULE 6: If it's low-calorie, don't select quotes about excess
+    if (isLowCalorie && (quote.includes('爆') || quote.includes('超標') || quote.includes('過高'))) {
+      return false;
+    }
+    
     return true;
   });
   
@@ -480,13 +520,15 @@ Rules:
           
           // ISSUE 1 FIX: Use aggregated nutrition values for advice generation
           // This ensures advice matches the final calculated nutrition, not raw extraction
+          // Pass foodItems for vegetable detection and better advice matching
           const advice = generateDietAdvice(
             aggregatedKcal,
             aggregatedProtein,
             aggregatedCarbs,
             aggregatedFat,
             rating,
-            toneStyle
+            toneStyle,
+            foodItems
           );
 
           return {

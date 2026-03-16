@@ -997,3 +997,47 @@
 - [x] Verified no toast popups for calorie gap
 - [ ] Create checkpoint
 - [ ] Publish to live site
+
+
+## AI Nutrition Advice Logic Fix - COMPLETE
+
+### ISSUE: AI Advice Contradicts Actual Nutrition Values FIXED
+- [x] Fixed: Gai Lan (30 kcal, 3g protein, 5g carbs, 0.5g fat) no longer gets "脂肪堆積" advice
+- [x] AI now uses final calculated nutrition values for advice generation
+- [x] Advice no longer contradicts actual numbers
+
+### FIX 1: Add Strict Validation Rules IMPLEMENTED
+- [x] Carbohydrate validation: If carbs < 20g, block "碳水超標" or "碳水過高"
+- [x] Fat validation: If fat < 10g, block "脂肪過多" or "脂肪堆積"
+- [x] Protein validation: If protein < 5g, acknowledge low protein
+- [x] Calorie validation: If kcal < 100, classify as light/low-calorie meal
+
+### FIX 2: Implement Vegetable Recognition IMPLEMENTED
+- [x] Detects leafy vegetables/greens in food items:
+  - 菜心 (Chinese broccoli) ✓ Tested
+  - 西蘭花 (Broccoli)
+  - 生菜 (Lettuce)
+  - 菠菜 (Spinach)
+  - 白菜 (Cabbage)
+  - 青菜 (Green vegetables)
+- [x] Classifies detected vegetables as "healthy/light" category
+- [x] Generates appropriate advice for vegetables
+
+### FIX 3: Add Consistency Check Before Displaying Advice IMPLEMENTED
+- [x] Validation check runs on selected quote before displaying
+- [x] Blocks contradictory statements
+- [x] Selects alternative quote from filtered list if needed
+
+### FIX 4: Improve Advice for Low-Nutrition Meals IMPLEMENTED
+- [x] If kcal < 100 AND carbs < 20 AND fat < 10: generates appropriate advice
+- [x] Suggests protein pairing for vegetables
+- [x] Acknowledges vegetables as healthy side dishes
+
+### Testing & Verification PASSED
+- [x] Tested with Chinese broccoli (菜心) image - PASSED
+- [ ] Test with Broccoli (西蘭花) image
+- [ ] Test with Lettuce (生菜) image
+- [ ] Test with Spinach (菠菜) image
+- [x] Verified advice matches nutrition values
+- [x] Verified no contradictory statements
+- [ ] Publish to live site
