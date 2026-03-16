@@ -599,12 +599,12 @@ export default function FoodLog() {
 
       {/* Add Food Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-md rounded-2xl">
+        <DialogContent className="max-w-md rounded-2xl max-h-[95vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>新增飲食</DialogTitle>
           </DialogHeader>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1 overflow-hidden">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="manual">手動輸入</TabsTrigger>
               <TabsTrigger value="photo">影相</TabsTrigger>
@@ -714,7 +714,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4 max-h-[90vh] overflow-y-auto pr-2 pb-[120px]">
+            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[160px]">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>

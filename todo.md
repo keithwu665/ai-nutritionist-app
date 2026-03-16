@@ -810,3 +810,13 @@
 - [x] Test scrolling on mobile and verify 新增 button accessibility
 - [x] Test AI advice tone with different food items
 - [ ] Create checkpoint and publish to live site
+
+
+## CRITICAL FIX: Food Analysis Modal Scrolling on Mobile
+- [x] Fix modal container structure to enable proper scrolling
+- [x] Set max-height: 90vh with overflow-y: auto on scrollable container
+- [x] Add padding-bottom: 160px to ensure 新增 button is reachable
+- [x] Verify scrolling works on mobile viewport (390px width)
+- [x] Test complete flow: upload → analyze → scroll → save
+- [x] Ensure 新增 button is not hidden by bottom navigation
+- [ ] Publish to live site and verify on mobile
