@@ -373,21 +373,23 @@ export default function FoodLog() {
     }
   };
 
-  // BUG 3 FIX: Cancel photo analysis - completely clear all analysis state
+  // ISSUE 1 FIX: Cancel photo analysis - completely clear ALL state including photo
   const handleCancelAnalysis = () => {
-    console.log('[FoodLog] Canceling photo analysis');
+    console.log('[FoodLog] Canceling photo analysis - clearing all state');
     // Reset photo analysis state
     setPhotoAnalysisComplete(false);
     setPhotoFoodName('');
     setPhotoFoodItems([]);
     setPhotoMealRating('');
     setPhotoAiAdvice('');
-    // BUG 3 FIX: Also clear nutrition fields
+    // Clear nutrition fields
     setCalories('');
     setProteinG('');
     setCarbsG('');
     setFatG('');
-    // Keep the photo file and preview so user can re-analyze if needed
+    // ISSUE 1 FIX: Also clear the photo file and preview completely
+    setPhotoFile(null);
+    setPhotoPreview('');
     toast.info('已取消分析');
   };
 
@@ -743,7 +745,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[200px]">
+            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[280px]">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>
@@ -913,8 +915,8 @@ export default function FoodLog() {
             </TabsContent>
           </Tabs>
 
-          {/* BUG 1 FIX: Sticky action buttons with safe-area support */}
-          <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-4 flex gap-3 safe-area-inset-bottom">
+          {/* ISSUE 2 FIX: Sticky action buttons with proper safe-area and padding support */}
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-4 flex gap-3" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
             {photoAnalysisComplete && (
               <Button
                 onClick={handleCancelAnalysis}
