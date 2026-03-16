@@ -877,31 +877,7 @@ export default function FoodLog() {
                 </div>
               )}
 
-              {/* Meal Quality Rating (after analysis) */}
-              {photoAnalysisComplete && photoMealRating && (
-                <div>
-                  <label className="text-sm font-medium mb-2 block">營養評級</label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex gap-2 text-xs font-medium">
-                      <span className={photoMealRating === 'Limited' ? 'text-red-600' : 'text-gray-400'}>Limited</span>
-                      <span className={photoMealRating === 'Fair' ? 'text-yellow-600' : 'text-gray-400'}>Fair</span>
-                      <span className={photoMealRating === 'Good' ? 'text-blue-600' : 'text-gray-400'}>Good</span>
-                      <span className={photoMealRating === 'Nutritious' ? 'text-emerald-600' : 'text-gray-400'}>Nutritious</span>
-                    </div>
-                    <div className="text-lg font-semibold">●</div>
-                  </div>
-                </div>
-              )}
-
-              {/* AI Diet Advice (after analysis) */}
-              {photoAnalysisComplete && photoAiAdvice && (
-                <div>
-                  <label className="text-sm font-medium mb-2 block">AI 飲食建議</label>
-                  <div className="bg-emerald-50 border border-emerald-200 rounded p-3 text-sm text-emerald-900">
-                    {photoAiAdvice}
-                  </div>
-                </div>
-              )}
+              {/* Removed duplicate Meal Quality Rating and AI Diet Advice - kept only in green result card above */}
             </TabsContent>
           </Tabs>
 

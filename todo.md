@@ -785,3 +785,15 @@
 - [x] Test scrolling on mobile to reach 新增 button
 - [x] Verify rating scale clarity and usability
 - [ ] Create checkpoint and publish to live site
+
+
+## Food Analysis Result Flow - Duplicate Removal & Save Functionality
+- [x] ISSUE 1: Remove duplicate 營養評級 from form section (keep only in green result card)
+- [x] ISSUE 1: Remove duplicate AI 飲食建議 from form section (keep only in green result card)
+- [x] ISSUE 2: Fix handleAddFood to properly save analyzed food to database
+- [x] ISSUE 2: Ensure analyzed food values populate the form fields correctly
+- [x] ISSUE 2: Verify saved food appears in Food Log list immediately
+- [x] ISSUE 2: Verify daily kcal total updates correctly after save
+- [x] ISSUE 3: Maintain scrollable modal behavior (max-height: 80vh, overflow-y: auto)
+- [x] Test complete flow: analyze → save → verify in food log
+- [ ] Create checkpoint and publish to live site
