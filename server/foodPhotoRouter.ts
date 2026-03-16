@@ -291,6 +291,8 @@ Return ONLY valid JSON matching this schema:
 }
 
 Rules:
+- IMPORTANT: Detect and list ALL visible food items in the image, not just one
+- If multiple foods are visible (e.g., rice, meat, soup, vegetables), list them all
 - Never hallucinate brand names
 - Return null if unsure about a value
 - Always include confidence levels
@@ -403,10 +405,13 @@ Rules:
           
           console.log(`[extractFromPhoto] SUCCESS debugId=${debugId}, kcal=${extraction.suggested.kcal}`);
 
-          // Extract primary food name
-          const foodName = extraction.items && extraction.items.length > 0 
-            ? extraction.items[0].name 
-            : '未識別食物';
+          // Extract all food items (not just the first one)
+          const foodItems = extraction.items && extraction.items.length > 0 
+            ? extraction.items.map((item: any) => item.name)
+            : ['未識別食物'];
+          
+          // Primary food name for backward compatibility
+          const foodName = foodItems[0];
 
           // Calculate meal quality rating
           const rating = calculateMealQualityRating(
@@ -432,6 +437,7 @@ Rules:
             success: true,
             extraction,
             foodName,
+            foodItems,
             mealQualityRating: rating,
             aiAdvice: advice,
           };

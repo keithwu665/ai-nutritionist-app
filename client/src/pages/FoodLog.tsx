@@ -35,6 +35,7 @@ export default function FoodLog() {
   const [photoFoodName, setPhotoFoodName] = useState('');
   const [photoMealRating, setPhotoMealRating] = useState('');
   const [photoAiAdvice, setPhotoAiAdvice] = useState('');
+  const [photoFoodItems, setPhotoFoodItems] = useState<string[]>([]);
   const [photoAnalysisComplete, setPhotoAnalysisComplete] = useState(false);
 
   // Queries
@@ -299,6 +300,7 @@ export default function FoodLog() {
         setCarbsG(String(carbs_g || 0));
         setFatG(String(fat_g || 0));
         setPhotoFoodName(response.foodName || '已分析食物');
+        setPhotoFoodItems(response.foodItems || [response.foodName || '已分析食物']);
         setPhotoMealRating(response.mealQualityRating || '');
         setPhotoAiAdvice(response.aiAdvice || '');
         setPhotoAnalysisComplete(true);
@@ -762,6 +764,45 @@ export default function FoodLog() {
                 >
                   {isAnalyzing ? '分析中...' : '分析食物'}
                 </Button>
+              )}
+
+              {/* Analysis Result Card - Prominent Display */}
+              {photoAnalysisComplete && (
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-300 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-emerald-900">✓ 分析完成</h3>
+                    <span className={`text-xs font-medium px-2 py-1 rounded ${
+                      photoMealRating === 'Nutritious' ? 'bg-emerald-200 text-emerald-900' :
+                      photoMealRating === 'Good' ? 'bg-blue-200 text-blue-900' :
+                      photoMealRating === 'Fair' ? 'bg-yellow-200 text-yellow-900' :
+                      'bg-red-200 text-red-900'
+                    }`}>
+                      {photoMealRating}
+                    </span>
+                  </div>
+                  
+                  {/* Food Items */}
+                  {photoFoodItems.length > 0 && (
+                    <div>
+                      <p className="text-xs text-emerald-700 font-medium mb-2">食物項目</p>
+                      <div className="flex flex-wrap gap-2">
+                        {photoFoodItems.map((item, idx) => (
+                          <span key={idx} className="bg-white text-emerald-700 px-2 py-1 rounded text-sm border border-emerald-200">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* AI Advice */}
+                  {photoAiAdvice && (
+                    <div className="bg-white rounded p-3 border border-emerald-200">
+                      <p className="text-xs text-emerald-600 font-medium mb-1">💡 AI 飲食建議</p>
+                      <p className="text-sm text-emerald-900">{photoAiAdvice}</p>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Food Name (after analysis) */}

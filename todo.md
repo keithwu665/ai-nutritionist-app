@@ -760,3 +760,16 @@
 - [x] ISSUE 5: Test all three tone styles (gentle, coach, HK style)
 - [ ] Create checkpoint with all fixes
 - [ ] Publish to live site: ainutriapp-btnutczq.manus.space
+
+
+## Food Photo Analysis - UX & Consistency Improvements
+- [x] ISSUE 1: Show AI advice in prominent popup/result card (not far below)
+- [x] ISSUE 2: Detect and display multiple food items in analysis results
+- [x] ISSUE 3: Make analysis results more consistent (reduce randomness)
+- [x] Update AI analysis to return structured result with foodItems array
+- [x] Implement result popup/card component to display immediately after analysis
+- [x] Add lower temperature/deterministic settings for analysis
+- [x] Test multiple food detection with sample images
+- [x] Test result consistency (same image gives similar results)
+- [x] Verify all three issues fixed and working on mobile
+- [ ] Create checkpoint and publish to live site
