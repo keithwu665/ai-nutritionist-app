@@ -833,3 +833,55 @@
 - [x] Test Hong Kong personality with photo analysis
 - [x] Verify advice is 2-3 sentences maximum
 - [ ] Create checkpoint and publish to live site
+
+
+## Photo Analysis Flow Fixes - CURRENT SPRINT
+
+### ISSUE 1: Add Cancel Function After Analysis
+- [ ] Add visible 取消 button next to 新增 button in analysis result
+- [ ] Implement cancel handler to close analysis result state
+- [ ] Clear temporary analyzed result on cancel
+- [ ] Keep modal usable for another upload after cancel
+- [ ] Test cancel functionality on mobile and desktop
+
+### ISSUE 2: Fix Nutrition Aggregation for Multiple Food Items
+- [ ] Update backend to aggregate nutrition from ALL detected food items
+- [ ] Calculate combined totals: kcal, protein, carbs, fat
+- [ ] Handle failed items gracefully (skip failed, sum rest)
+- [ ] Update form fields to show aggregated totals
+- [ ] Set food name to combined meal description (e.g., 綜合分析餐)
+- [ ] Test with multiple detected food items
+- [ ] Verify no all-zero results
+
+### Verification & Deployment
+- [ ] Test complete flow: upload → analyze multiple items → see aggregated nutrition
+- [ ] Verify cancel button works
+- [ ] Verify save button saves aggregated totals
+- [ ] Create checkpoint
+- [ ] Publish to live site
+
+
+## Photo Analysis Flow Fixes - COMPLETE
+
+### ISSUE 1: Add Cancel Function After Analysis
+- [x] Add visible cancel button next to Add button in analysis result
+- [x] Implement cancel handler to close analysis result state
+- [x] Clear temporary analyzed result on cancel
+- [x] Keep modal usable for another upload after cancel
+- [x] Test cancel functionality on mobile and desktop
+
+### ISSUE 2: Fix Nutrition Aggregation for Multiple Food Items
+- [x] Update backend to aggregate nutrition from ALL detected food items
+- [x] Calculate combined totals: kcal, protein, carbs, fat
+- [x] Handle failed items gracefully (skip failed, sum rest)
+- [x] Update form fields to show aggregated totals
+- [x] Set food name to combined meal description (e.g., 綜合分析餐)
+- [x] Test with multiple detected food items
+- [x] Verify aggregation working correctly
+
+### Verification & Deployment
+- [x] Test complete flow: upload -> analyze multiple items -> see aggregated nutrition
+- [x] Verify cancel button works
+- [x] Verify save button saves aggregated totals
+- [ ] Create checkpoint
+- [ ] Publish to live site

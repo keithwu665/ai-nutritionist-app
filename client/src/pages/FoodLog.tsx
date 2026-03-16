@@ -362,6 +362,19 @@ export default function FoodLog() {
     }
   };
 
+  // ISSUE 1 FIX: Cancel photo analysis without saving
+  const handleCancelAnalysis = () => {
+    console.log('[FoodLog] Canceling photo analysis');
+    // Reset photo analysis state
+    setPhotoAnalysisComplete(false);
+    setPhotoFoodName('');
+    setPhotoFoodItems([]);
+    setPhotoMealRating('');
+    setPhotoAiAdvice('');
+    // Keep the photo file and preview so user can re-analyze if needed
+    toast.info('已取消分析');
+  };
+
   // Delete food item
   const handleDeleteItem = async (id: string | number) => {
     try {
@@ -822,7 +835,7 @@ export default function FoodLog() {
                 </div>
               )}
 
-              {/* Food Name (after analysis) */}
+              {/* Food Name (after analysis) - ISSUE 2 FIX: Show combined meal name */}
               {photoAnalysisComplete && photoFoodName && (
                 <div>
                   <label className="text-sm font-medium mb-2 block">食物名稱</label>
@@ -832,6 +845,9 @@ export default function FoodLog() {
                     value={photoFoodName}
                     onChange={(e) => setPhotoFoodName(e.target.value)}
                   />
+                  {photoFoodItems.length > 1 && (
+                    <p className="text-xs text-gray-500 mt-1">檢測到 {photoFoodItems.length} 項食物項目</p>
+                  )}
                 </div>
               )}
 
@@ -881,14 +897,25 @@ export default function FoodLog() {
             </TabsContent>
           </Tabs>
 
-          {/* Add Button */}
-          <Button
-            onClick={handleAddFood}
-            disabled={addItemMutation.isPending}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 mt-6"
-          >
-            {addItemMutation.isPending ? '新增中...' : '新增'}
-          </Button>
+          {/* ISSUE 1 FIX: Add Cancel and Add buttons */}
+          <div className="flex gap-3 mt-6">
+            {photoAnalysisComplete && (
+              <Button
+                onClick={handleCancelAnalysis}
+                variant="outline"
+                className="flex-1"
+              >
+                取消
+              </Button>
+            )}
+            <Button
+              onClick={handleAddFood}
+              disabled={addItemMutation.isPending}
+              className={`${photoAnalysisComplete ? 'flex-1' : 'w-full'} bg-emerald-500 hover:bg-emerald-600`}
+            >
+              {addItemMutation.isPending ? '新增中...' : '新增'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
