@@ -361,7 +361,10 @@
 - [x] Verified multipart/FormData request is sent
 
 ## CRITICAL: Progress Photo Upload + AI Goal Photo - FINAL FIX - COMPLETE
-- [x] Fixed photoId extraction from Drizzle insert result (insertId property)
+- [x] Fixed photoId extraction from Dr...[content truncated]
+
+## Current Issues
+- [x] Fix food record delete functionality - returns "刪除失敗" error when attempting to delete recordsnsertId property)
 - [x] Fixed modal overlap: Upload and AI modals now mutually exclusive
 - [x] Added loading indicator with spinner to AI generation modal
 - [x] Added time estimate display (30-60 seconds)

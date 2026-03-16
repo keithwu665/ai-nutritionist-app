@@ -355,9 +355,14 @@ export default function FoodLog() {
   // Delete food item
   const handleDeleteItem = async (id: string | number) => {
     try {
-      const idStr = typeof id === 'string' ? id : String(id);
+      const idNum = typeof id === 'number' ? id : parseInt(id, 10);
       
-      await deleteItemMutation.mutateAsync({ id: idStr as any });
+      if (isNaN(idNum)) {
+        toast.error('無效的食物 ID');
+        return;
+      }
+      
+      await deleteItemMutation.mutateAsync({ id: idNum });
       
       // Invalidate queries to refresh calendar and history
       await utils.foodLogs.getItems.invalidate({ date });
