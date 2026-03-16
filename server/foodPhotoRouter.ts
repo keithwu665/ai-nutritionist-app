@@ -13,6 +13,7 @@ import { initializeSupabaseAdmin, ensureFoodPhotosBucket } from './utils/supabas
 import { createLocalUploadUrl, downloadLocalFile, isLocalStoragePath, saveLocalFile } from './utils/localStorageFallback';
 import { gentleQuotes, coachQuotes, hongkongQuotes } from './coachQuotes';
 import { getRandomDialogue } from './personalityDialogueLibrary';
+import { generateNutritionAdvice, NutritionValues } from './nutritionAdviceEngine';
 
 // Vision LLM extraction response schema
 const AIExtractionSchema = z.object({
@@ -41,47 +42,17 @@ const AIExtractionSchema = z.object({
 
 type AIExtraction = z.infer<typeof AIExtractionSchema>;
 
-// Calculate meal quality rating based on macro ratios
+// DEPRECATED: Use Nutrition Advice Engine instead
+// This function delegates to the unified engine for backwards compatibility
 function calculateMealQualityRating(
   kcal: number,
   proteinG: number,
   carbsG: number,
   fatG: number
 ): 'Limited' | 'Fair' | 'Good' | 'Nutritious' {
-  if (kcal === 0) return 'Limited';
-  
-  let score = 0;
-
-  // 1. Protein Score
-  const proteinRatio = (proteinG * 4) / kcal;
-  if (proteinRatio >= 0.25) score += 2;
-  else if (proteinRatio >= 0.15) score += 1;
-  else if (proteinRatio < 0.10) score -= 1;
-
-  // 2. Carb Score
-  const carbRatio = (carbsG * 4) / kcal;
-  if (carbRatio >= 0.35 && carbRatio <= 0.55) score += 1;
-  else if (carbRatio > 0.65) score -= 1;
-
-  // 3. Fat Score
-  const fatRatio = (fatG * 9) / kcal;
-  if (fatRatio >= 0.20 && fatRatio <= 0.35) score += 1;
-  else if (fatRatio > 0.45) score -= 1;
-
-  // 4. Calorie Score
-  if (kcal >= 300 && kcal <= 700) score += 1;
-  else if (kcal > 900) score -= 1;
-
-  // 5. Macro Balance Bonus
-  if (proteinRatio >= 0.2 && carbRatio <= 0.55 && fatRatio <= 0.35) {
-    score += 1;
-  }
-
-  // Final rating
-  if (score >= 4) return 'Nutritious';
-  if (score >= 2) return 'Good';
-  if (score >= 1) return 'Fair';
-  return 'Limited';
+  const values: NutritionValues = { kcal, protein: proteinG, carbs: carbsG, fat: fatG };
+  const result = generateNutritionAdvice(values, 'gentle');
+  return result.rating;
 }
 
 // Detect if food is a vegetable
@@ -482,35 +453,26 @@ Rules:
             ? `綜合分析餐 (${foodItems.join(' + ')})`
             : foodItems[0];
 
-          // Calculate meal quality rating using aggregated nutrition
-          const rating = calculateMealQualityRating(
-            aggregatedKcal,
-            aggregatedProtein,
-            aggregatedCarbs,
-            aggregatedFat
-          );
-
-          // Generate AI diet advice with user tone style
+          // Use the unified Nutrition Advice Engine
           const userProfile = await db.getUserProfile(userId);
-          // Map database tone style to function parameter
-          let toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle';
           const dbTone = userProfile?.aiToneStyle || 'gentle';
-          if (dbTone === 'coach') toneStyle = 'coach';
-          else if (dbTone === 'hk_style') toneStyle = 'hongkong';
-          else toneStyle = 'gentle';
           
-          // ISSUE 1 FIX: Use aggregated nutrition values for advice generation
-          // This ensures advice matches the final calculated nutrition, not raw extraction
-          // Pass foodItems for vegetable detection and better advice matching
-          const advice = generateDietAdvice(
-            aggregatedKcal,
-            aggregatedProtein,
-            aggregatedCarbs,
-            aggregatedFat,
-            rating,
-            toneStyle,
-            foodItems
-          );
+          let personalityType: 'gentle' | 'coach' | 'hongkong' = 'gentle';
+          if (dbTone === 'coach') personalityType = 'coach';
+          else if (dbTone === 'hk_style') personalityType = 'hongkong';
+          
+          const nutritionValues: NutritionValues = {
+            kcal: aggregatedKcal,
+            protein: aggregatedProtein,
+            carbs: aggregatedCarbs,
+            fat: aggregatedFat,
+            foodItems,
+            foodCategory: isVegetableFood(foodItems) ? 'vegetables' : 'general'
+          };
+          
+          const adviceResult = generateNutritionAdvice(nutritionValues, personalityType);
+          const rating = adviceResult.rating;
+          const advice = adviceResult.personalityAdvice;
 
           return {
             success: true,
