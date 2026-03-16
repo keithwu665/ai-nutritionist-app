@@ -315,7 +315,7 @@ export default function FoodLog() {
     }
   };
 
-  // Add food item
+  // BUG 2 FIX: Add food item - handle both manual and photo inputs
   const handleAddFood = async () => {
     if (!foodName || !calories) {
       toast.error('請填寫食物名稱和熱量');
@@ -323,10 +323,13 @@ export default function FoodLog() {
     }
 
     try {
+      // BUG 2 FIX: Ensure mealType is set (default to breakfast if not)
+      const finalMealType = mealType || 'breakfast';
+      console.log('[FoodLog] Adding food:', { foodName, calories, mealType: finalMealType });
       
       await addItemMutation.mutateAsync({
         date,
-        mealType: mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
+        mealType: finalMealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
         name: foodName,
         calories: calories || '0',
         proteinG: proteinG || '0',
@@ -346,6 +349,8 @@ export default function FoodLog() {
         toast.info(`還差 ${Math.round(dailyCalorieGoal - newTotal)} kcal`);
       }
 
+      toast.success('食物已新增');
+
       // Reset form
       setFoodName('');
       setPortionGrams('100');
@@ -355,14 +360,20 @@ export default function FoodLog() {
       setFatG('');
       setPhotoFile(null);
       setPhotoPreview('');
+      setPhotoAnalysisComplete(false);
+      setPhotoFoodName('');
+      setPhotoFoodItems([]);
+      setPhotoMealRating('');
+      setPhotoAiAdvice('');
       setShowModal(false);
       setActiveTab('manual');
     } catch (error) {
+      console.error('[FoodLog] Add food error:', error);
       toast.error('新增失敗');
     }
   };
 
-  // ISSUE 1 FIX: Cancel photo analysis without saving
+  // BUG 3 FIX: Cancel photo analysis - completely clear all analysis state
   const handleCancelAnalysis = () => {
     console.log('[FoodLog] Canceling photo analysis');
     // Reset photo analysis state
@@ -371,6 +382,11 @@ export default function FoodLog() {
     setPhotoFoodItems([]);
     setPhotoMealRating('');
     setPhotoAiAdvice('');
+    // BUG 3 FIX: Also clear nutrition fields
+    setCalories('');
+    setProteinG('');
+    setCarbsG('');
+    setFatG('');
     // Keep the photo file and preview so user can re-analyze if needed
     toast.info('已取消分析');
   };
@@ -727,7 +743,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[160px]">
+            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[200px]">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>
@@ -897,13 +913,13 @@ export default function FoodLog() {
             </TabsContent>
           </Tabs>
 
-          {/* ISSUE 1 FIX: Add Cancel and Add buttons */}
-          <div className="flex gap-3 mt-6">
+          {/* BUG 1 FIX: Sticky action buttons with safe-area support */}
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-4 flex gap-3 safe-area-inset-bottom">
             {photoAnalysisComplete && (
               <Button
                 onClick={handleCancelAnalysis}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 h-12"
               >
                 取消
               </Button>
@@ -911,7 +927,7 @@ export default function FoodLog() {
             <Button
               onClick={handleAddFood}
               disabled={addItemMutation.isPending}
-              className={`${photoAnalysisComplete ? 'flex-1' : 'w-full'} bg-emerald-500 hover:bg-emerald-600`}
+              className={`${photoAnalysisComplete ? 'flex-1' : 'w-full'} bg-emerald-500 hover:bg-emerald-600 h-12 text-base font-semibold`}
             >
               {addItemMutation.isPending ? '新增中...' : '新增'}
             </Button>

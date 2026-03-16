@@ -885,3 +885,37 @@
 - [x] Verify save button saves aggregated totals
 - [ ] Create checkpoint
 - [ ] Publish to live site
+
+
+## Photo Analysis Flow - Critical Bug Fixes - COMPLETE
+
+### BUG 1: Buttons Unreachable on Mobile ✅ FIXED
+- [x] Changed to sticky bottom positioning with safe-area support
+- [x] Added proper padding and border for visibility
+- [x] Increased button height to h-12 for better touch targets
+- [x] Buttons now always visible and accessible on mobile
+- [x] Tested on preview environment
+
+### BUG 2: 新增 Button Does Not Save Food ✅ FIXED
+- [x] Fixed by ensuring mealType defaults to 'breakfast' if not set
+- [x] Added success toast confirmation "食物已新增"
+- [x] Food record now properly persists to database
+- [x] Food record appears in Food Log immediately
+- [x] Daily calories update correctly after save
+- [x] Tested with aggregated nutrition values
+
+### BUG 3: 取消 Button Does Not Clear Analysis ✅ FIXED
+- [x] Clear detected food items array
+- [x] Clear AI advice text
+- [x] Clear meal rating
+- [x] Clear all nutrition fields (kcal, protein, carbs, fat)
+- [x] Return to initial upload state
+- [x] Photo remains for re-analysis
+- [x] Tested on preview environment
+
+### Verification & Deployment ✅ COMPLETE
+- [x] Test complete flow: upload → analyze → cancel → upload again
+- [x] Test complete flow: upload → analyze → save → verify in log
+- [x] Verified on preview browser
+- [ ] Create checkpoint
+- [ ] Publish to live site
