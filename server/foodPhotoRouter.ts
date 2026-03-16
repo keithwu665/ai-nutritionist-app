@@ -39,6 +39,86 @@ const AIExtractionSchema = z.object({
 
 type AIExtraction = z.infer<typeof AIExtractionSchema>;
 
+// Calculate meal quality rating based on macro ratios
+function calculateMealQualityRating(
+  kcal: number,
+  proteinG: number,
+  carbsG: number,
+  fatG: number
+): 'Limited' | 'Fair' | 'Good' | 'Nutritious' {
+  if (kcal === 0) return 'Limited';
+  
+  let score = 0;
+
+  // 1. Protein Score
+  const proteinRatio = (proteinG * 4) / kcal;
+  if (proteinRatio >= 0.25) score += 2;
+  else if (proteinRatio >= 0.15) score += 1;
+  else if (proteinRatio < 0.10) score -= 1;
+
+  // 2. Carb Score
+  const carbRatio = (carbsG * 4) / kcal;
+  if (carbRatio >= 0.35 && carbRatio <= 0.55) score += 1;
+  else if (carbRatio > 0.65) score -= 1;
+
+  // 3. Fat Score
+  const fatRatio = (fatG * 9) / kcal;
+  if (fatRatio >= 0.20 && fatRatio <= 0.35) score += 1;
+  else if (fatRatio > 0.45) score -= 1;
+
+  // 4. Calorie Score
+  if (kcal >= 300 && kcal <= 700) score += 1;
+  else if (kcal > 900) score -= 1;
+
+  // 5. Macro Balance Bonus
+  if (proteinRatio >= 0.2 && carbRatio <= 0.55 && fatRatio <= 0.35) {
+    score += 1;
+  }
+
+  // Final rating
+  if (score >= 4) return 'Nutritious';
+  if (score >= 2) return 'Good';
+  if (score >= 1) return 'Fair';
+  return 'Limited';
+}
+
+// Generate AI diet advice based on nutrition and user tone style
+async function generateDietAdvice(
+  kcal: number,
+  proteinG: number,
+  carbsG: number,
+  fatG: number,
+  mealRating: string,
+  toneStyle: 'gentle' | 'coach' | 'hk_style' = 'gentle'
+): Promise<string> {
+  const tonePrompts = {
+    gentle: 'You are a supportive and encouraging nutritionist. Provide gentle, positive feedback about the meal with constructive suggestions. Keep it 1-2 sentences.',
+    coach: 'You are a strict fitness coach with a blunt, direct style. Provide motivational but firm feedback about the meal. Keep it 1-2 sentences and be direct.',
+    hk_style: 'You are a casual Hong Kong friend giving sarcastic but caring advice in Cantonese style. Use expressions like "嘩", "爆燈", "收一收", "有排都未見到影". Keep it 1-2 sentences and avoid offensive language.'
+  };
+
+  const systemPrompt = tonePrompts[toneStyle];
+  const userPrompt = `Analyze this meal and provide brief diet advice:\nCalories: ${kcal} kcal\nProtein: ${proteinG}g\nCarbs: ${carbsG}g\nFat: ${fatG}g\nMeal Quality: ${mealRating}\n\nProvide 1-2 sentences of advice.`;
+
+  try {
+    const response = await invokeLLM({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]
+    });
+    
+    const content = response.choices?.[0]?.message?.content;
+    if (typeof content === 'string') {
+      return content.trim();
+    }
+    return 'Unable to generate advice at this time.';
+  } catch (error) {
+    console.error('[generateDietAdvice] Error:', error);
+    return 'Unable to generate advice at this time.';
+  }
+}
+
 export const foodPhotoRouter = router({
   // Create signed upload URL for food photo
   createUploadUrl: protectedProcedure
@@ -323,9 +403,36 @@ Rules:
           
           console.log(`[extractFromPhoto] SUCCESS debugId=${debugId}, kcal=${extraction.suggested.kcal}`);
 
+          // Extract primary food name
+          const foodName = extraction.items && extraction.items.length > 0 
+            ? extraction.items[0].name 
+            : '未識別食物';
+
+          // Calculate meal quality rating
+          const rating = calculateMealQualityRating(
+            extraction.suggested.kcal || 0,
+            extraction.suggested.protein_g || 0,
+            extraction.suggested.carbs_g || 0,
+            extraction.suggested.fat_g || 0
+          );
+
+          // Generate AI diet advice with user tone style
+          const toneStyle = (ctx.user?.settings?.ai_tone_style || 'gentle') as 'gentle' | 'coach' | 'hk_style';
+          const advice = await generateDietAdvice(
+            extraction.suggested.kcal || 0,
+            extraction.suggested.protein_g || 0,
+            extraction.suggested.carbs_g || 0,
+            extraction.suggested.fat_g || 0,
+            rating,
+            toneStyle
+          );
+
           return {
             success: true,
             extraction,
+            foodName,
+            mealQualityRating: rating,
+            aiAdvice: advice,
           };
         } catch (parseError) {
           const message = parseError instanceof Error ? parseError.message : 'Unknown parse error';

@@ -732,3 +732,12 @@
 - [ ] Fix AI Goal Photo generation (backend request, provider config, model compatibility)
 - [ ] Add comprehensive error handling and logging for both features
 - [ ] Test both features end-to-end and verify functionality
+
+
+## Photo Analysis Enhancement Features
+
+- [ ] Feature 1: Extract and display detected food name from AI analysis
+- [ ] Feature 2: Implement meal quality rating calculation (Limited/Fair/Good/Nutritious)
+- [ ] Feature 3: Generate AI diet advice based on nutrition and user tone style
+- [ ] Feature 4: Support three tone styles (gentle, coach, hk_style)
+- [ ] Feature 5: Integrate all features into photo analysis modal without UI redesign

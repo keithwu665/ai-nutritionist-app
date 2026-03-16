@@ -32,6 +32,10 @@ export default function FoodLog() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [photoFoodName, setPhotoFoodName] = useState('');
+  const [photoMealRating, setPhotoMealRating] = useState('');
+  const [photoAiAdvice, setPhotoAiAdvice] = useState('');
+  const [photoAnalysisComplete, setPhotoAnalysisComplete] = useState(false);
 
   // Queries
   const { data: items = [] } = trpc.foodLogs.getItems.useQuery({ date });
@@ -289,11 +293,15 @@ export default function FoodLog() {
 
       if (response.extraction && response.extraction.suggested) {
         const { kcal, protein_g, carbs_g, fat_g } = response.extraction.suggested;
-        setFoodName('已分析食物');
+        setFoodName(response.foodName || '已分析食物');
         setCalories(String(kcal || 0));
         setProteinG(String(protein_g || 0));
         setCarbsG(String(carbs_g || 0));
         setFatG(String(fat_g || 0));
+        setPhotoFoodName(response.foodName || '已分析食物');
+        setPhotoMealRating(response.mealQualityRating || '');
+        setPhotoAiAdvice(response.aiAdvice || '');
+        setPhotoAnalysisComplete(true);
         toast.success('食物分析完成');
       }
     } catch (error) {
@@ -756,6 +764,19 @@ export default function FoodLog() {
                 </Button>
               )}
 
+              {/* Food Name (after analysis) */}
+              {photoAnalysisComplete && photoFoodName && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">食物名稱</label>
+                  <Input
+                    type="text"
+                    placeholder="食物名稱"
+                    value={photoFoodName}
+                    onChange={(e) => setPhotoFoodName(e.target.value)}
+                  />
+                </div>
+              )}
+
               {/* Nutrition Info (after analysis) */}
               {(calories || proteinG || carbsG || fatG) && (
                 <div className="grid grid-cols-2 gap-3">
@@ -794,6 +815,32 @@ export default function FoodLog() {
                       value={fatG}
                       onChange={(e) => setFatG(e.target.value)}
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Meal Quality Rating (after analysis) */}
+              {photoAnalysisComplete && photoMealRating && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">營養評級</label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex gap-2 text-xs font-medium">
+                      <span className={photoMealRating === 'Limited' ? 'text-red-600' : 'text-gray-400'}>Limited</span>
+                      <span className={photoMealRating === 'Fair' ? 'text-yellow-600' : 'text-gray-400'}>Fair</span>
+                      <span className={photoMealRating === 'Good' ? 'text-blue-600' : 'text-gray-400'}>Good</span>
+                      <span className={photoMealRating === 'Nutritious' ? 'text-emerald-600' : 'text-gray-400'}>Nutritious</span>
+                    </div>
+                    <div className="text-lg font-semibold">●</div>
+                  </div>
+                </div>
+              )}
+
+              {/* AI Diet Advice (after analysis) */}
+              {photoAnalysisComplete && photoAiAdvice && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">AI 飲食建議</label>
+                  <div className="bg-emerald-50 border border-emerald-200 rounded p-3 text-sm text-emerald-900">
+                    {photoAiAdvice}
                   </div>
                 </div>
               )}
