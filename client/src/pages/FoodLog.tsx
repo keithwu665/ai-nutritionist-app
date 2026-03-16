@@ -714,7 +714,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4 max-h-[80vh] overflow-y-auto pr-2">
+            <TabsContent value="photo" className="space-y-4 mt-4 max-h-[90vh] overflow-y-auto pr-2 pb-[120px]">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>

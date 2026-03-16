@@ -797,3 +797,16 @@
 - [x] ISSUE 3: Maintain scrollable modal behavior (max-height: 80vh, overflow-y: auto)
 - [x] Test complete flow: analyze → save → verify in food log
 - [ ] Create checkpoint and publish to live site
+
+
+## Food Analysis Modal & AI Tone - Mobile UX & Language Fixes
+- [x] ISSUE 1: Fix modal scrolling - use max-height: 90vh, overflow-y: auto
+- [x] ISSUE 1: Add bottom padding (120px) to prevent content hiding under navigation
+- [x] ISSUE 2: Fix bottom navigation overlap - adjust container height
+- [x] ISSUE 2: Ensure 新增 button is always visible and accessible
+- [x] ISSUE 3: Update AI advice to Hong Kong Cantonese conversational tone
+- [x] ISSUE 3: Keep AI advice to 2-3 sentences only (not too long)
+- [x] ISSUE 3: Make advice sound like a real coach (slightly sarcastic/direct)
+- [x] Test scrolling on mobile and verify 新增 button accessibility
+- [x] Test AI advice tone with different food items
+- [ ] Create checkpoint and publish to live site

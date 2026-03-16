@@ -92,13 +92,13 @@ async function generateDietAdvice(
   toneStyle: 'gentle' | 'coach' | 'hk_style' = 'gentle'
 ): Promise<string> {
   const tonePrompts = {
-    gentle: '你是一位支持和鼓勵的營養師。用溫柔、正面的方式給予膳食建議。保持1-2句話。',
-    coach: '你是一位嚴厲的健身教練，風格直接。提供動力十足但堅定的膳食反饋。保持1-2句話，要直接。',
-    hk_style: '你是一位香港朋友，用諷刺但關心的方式給予建議。使用香港用語如「嘩」、「爆燈」、「收一收」、「有排都未見到影」。保持1-2句話，避免冒犯性語言。'
+    gentle: '你是一位支持和鼓勵的營養師。用溫柔、正面的方式給予膳食建議。保持2-3句話。',
+    coach: '你是一位嚴厲的健身教練，風格直接。提供動力十足但堅定的膳食反饋。保持2-3句話，要直接、有力。',
+    hk_style: '你是一位香港教練，用香港Cantonese對話風格給予建議。風格要像真人教練，稍微帶點諷刺但關心。使用香港用語如「脂肪爆咗」、「碳水比例唔太平衡」、「如果想減脂」、「記得加返啲蔬菜」。保持2-3句話，自然流暢，避免冒犯性語言。'
   };
 
   const systemPrompt = tonePrompts[toneStyle];
-  const userPrompt = `分析這餐飯並提供簡短的膳食建議:\n熱量: ${kcal} kcal\n蛋白質: ${proteinG}g\n碳水化合物: ${carbsG}g\n脂肪: ${fatG}g\n餐飯質量: ${mealRating}\n\n請提供1-2句話的建議。`;
+  const userPrompt = `分析這餐飯並提供簡短的膳食建議:\n熱量: ${kcal} kcal\n蛋白質: ${proteinG}g\n碳水化合物: ${carbsG}g\n脂肪: ${fatG}g\n餐飯質量: ${mealRating}\n\n請提供2-3句話的建議。`;
 
   try {
     const response = await invokeLLM({
