@@ -820,3 +820,16 @@
 - [x] Test complete flow: upload → analyze → scroll → save
 - [x] Ensure 新增 button is not hidden by bottom navigation
 - [ ] Publish to live site and verify on mobile
+
+
+## AI Coach Personalities System - Implementation
+- [x] Create quote library for 溫柔營養師 (100 supportive/encouraging quotes)
+- [x] Create quote library for 魔鬼教練 (100 strict/motivational quotes)
+- [x] Create quote library for 香港粗口教練 (100 sarcastic/funny Hong Kong quotes)
+- [x] Update foodPhotoRouter to randomly select from quote libraries
+- [x] Update Settings page labels: 溫柔營養師, 魔鬼教練, 香港粗口教練（粗口警告）
+- [x] Test gentle personality with photo analysis
+- [x] Test coach personality with photo analysis
+- [x] Test Hong Kong personality with photo analysis
+- [x] Verify advice is 2-3 sentences maximum
+- [ ] Create checkpoint and publish to live site

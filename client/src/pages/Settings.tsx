@@ -252,19 +252,19 @@ export default function Settings() {
           <CardContent className="p-4">
             <div className="space-y-3">
               <label className="block">
-                <p className="font-medium mb-2">AI 建議語氣</p>
+                <p className="font-medium mb-2">AI 教練人格</p>
                 <Select value={formData.aiToneStyle} onValueChange={(value) => setFormData({ ...formData, aiToneStyle: value as 'gentle' | 'coach' | 'hk_style' })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gentle">溫柔體貼教導</SelectItem>
-                    <SelectItem value="coach">嚴厲魔鬼教練</SelectItem>
-                    <SelectItem value="hk_style">香港地道模式（粗口警告）</SelectItem>
+                    <SelectItem value="gentle">溫柔營養師</SelectItem>
+                    <SelectItem value="coach">魔鬼教練</SelectItem>
+                    <SelectItem value="hk_style">香港粗口教練（粗口警告）</SelectItem>
                   </SelectContent>
                 </Select>
               </label>
-              <p className="text-xs text-gray-500">選擇 AI 給予飲食建議時的語氣風格</p>
+              <p className="text-xs text-gray-500">選擇你喜歡的 AI 教練人格風格</p>
               <Button
                 onClick={handleSave}
                 disabled={updateMutation.isPending || createMutation.isPending}

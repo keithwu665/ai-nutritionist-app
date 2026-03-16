@@ -11,6 +11,7 @@ import * as db from './db';
 import { TRPCError } from '@trpc/server';
 import { initializeSupabaseAdmin, ensureFoodPhotosBucket } from './utils/supabaseClient';
 import { createLocalUploadUrl, downloadLocalFile, isLocalStoragePath, saveLocalFile } from './utils/localStorageFallback';
+import { gentleQuotes, coachQuotes, hongkongQuotes } from './coachQuotes';
 
 // Vision LLM extraction response schema
 const AIExtractionSchema = z.object({
@@ -83,40 +84,29 @@ function calculateMealQualityRating(
 }
 
 // Generate AI diet advice based on nutrition and user tone style
-async function generateDietAdvice(
+// Uses predefined quote libraries for consistent, entertaining advice
+function generateDietAdvice(
   kcal: number,
   proteinG: number,
   carbsG: number,
   fatG: number,
   mealRating: string,
-  toneStyle: 'gentle' | 'coach' | 'hk_style' = 'gentle'
-): Promise<string> {
-  const tonePrompts = {
-    gentle: '你是一位支持和鼓勵的營養師。用溫柔、正面的方式給予膳食建議。保持2-3句話。',
-    coach: '你是一位嚴厲的健身教練，風格直接。提供動力十足但堅定的膳食反饋。保持2-3句話，要直接、有力。',
-    hk_style: '你是一位香港教練，用香港Cantonese對話風格給予建議。風格要像真人教練，稍微帶點諷刺但關心。使用香港用語如「脂肪爆咗」、「碳水比例唔太平衡」、「如果想減脂」、「記得加返啲蔬菜」。保持2-3句話，自然流暢，避免冒犯性語言。'
-  };
-
-  const systemPrompt = tonePrompts[toneStyle];
-  const userPrompt = `分析這餐飯並提供簡短的膳食建議:\n熱量: ${kcal} kcal\n蛋白質: ${proteinG}g\n碳水化合物: ${carbsG}g\n脂肪: ${fatG}g\n餐飯質量: ${mealRating}\n\n請提供2-3句話的建議。`;
-
-  try {
-    const response = await invokeLLM({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ]
-    });
-    
-    const content = response.choices?.[0]?.message?.content;
-    if (typeof content === 'string') {
-      return content.trim();
-    }
-    return 'Unable to generate advice at this time.';
-  } catch (error) {
-    console.error('[generateDietAdvice] Error:', error);
-    return 'Unable to generate advice at this time.';
+  toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle'
+): string {
+  // Select quote library based on tone style
+  let quoteLibrary: string[];
+  
+  if (toneStyle === 'coach') {
+    quoteLibrary = coachQuotes;
+  } else if (toneStyle === 'hongkong') {
+    quoteLibrary = hongkongQuotes;
+  } else {
+    quoteLibrary = gentleQuotes;
   }
+  
+  // Randomly select a quote from the library
+  const randomIndex = Math.floor(Math.random() * quoteLibrary.length);
+  return quoteLibrary[randomIndex];
 }
 
 export const foodPhotoRouter = router({
@@ -423,8 +413,14 @@ Rules:
 
           // Generate AI diet advice with user tone style
           const userProfile = await db.getUserProfile(userId);
-          const toneStyle = (userProfile?.aiToneStyle || 'gentle') as 'gentle' | 'coach' | 'hk_style';
-          const advice = await generateDietAdvice(
+          // Map database tone style to function parameter
+          let toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle';
+          const dbTone = userProfile?.aiToneStyle || 'gentle';
+          if (dbTone === 'coach') toneStyle = 'coach';
+          else if (dbTone === 'hk_style') toneStyle = 'hongkong';
+          else toneStyle = 'gentle';
+          
+          const advice = generateDietAdvice(
             extraction.suggested.kcal || 0,
             extraction.suggested.protein_g || 0,
             extraction.suggested.carbs_g || 0,
