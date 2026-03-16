@@ -10,6 +10,7 @@ import { eq, and } from 'drizzle-orm';
 import * as db from './db';
 import { TRPCError } from '@trpc/server';
 import { initializeSupabaseAdmin, ensureFoodPhotosBucket } from './utils/supabaseClient';
+import { createLocalUploadUrl, downloadLocalFile, isLocalStoragePath, saveLocalFile } from './utils/localStorageFallback';
 
 // Vision LLM extraction response schema
 const AIExtractionSchema = z.object({
@@ -52,50 +53,47 @@ export const foodPhotoRouter = router({
       const bucketName = 'food-photos';
 
       try {
-        // Initialize Supabase client with validation and connectivity checks
-        const supabase = await initializeSupabaseAdmin(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
-        
-        // Ensure food-photos bucket exists
-        await ensureFoodPhotosBucket(supabase);
-        
-        console.log(`[createUploadUrl] Creating signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
-        
-        // Use official Supabase SDK to create signed upload URL
-        console.log('[createUploadUrl] Calling createSignedUploadUrl...');
-        const { data, error } = await supabase
-          .storage
-          .from(bucketName)
-          .createSignedUploadUrl(filePath);
-        
-        if (error) {
-          console.error(`[createUploadUrl] ERROR creating signed URL:`, {
-            errorName: (error as any).name,
-            errorMessage: error.message,
-            errorStatus: (error as any).status || (error as any).statusCode,
-          });
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: `Failed to generate upload URL: ${error.message}`,
-            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
-          });
+        // Try Supabase first
+        try {
+          const supabase = await initializeSupabaseAdmin(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
+          await ensureFoodPhotosBucket(supabase);
+          
+          console.log(`[createUploadUrl] Creating signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
+          
+          const { data, error } = await supabase
+            .storage
+            .from(bucketName)
+            .createSignedUploadUrl(filePath);
+          
+          if (error) {
+            console.error(`[createUploadUrl] ERROR creating signed URL:`, {
+              errorName: (error as any).name,
+              errorMessage: error.message,
+              errorStatus: (error as any).status || (error as any).statusCode,
+            });
+            throw new Error(`Failed to generate upload URL: ${error.message}`);
+          }
+          
+          if (!data?.signedUrl) {
+            console.error('[createUploadUrl] No signed URL in response');
+            throw new Error('No signed URL returned from Supabase');
+          }
+          
+          console.log('[createUploadUrl] Successfully created Supabase upload URL');
+          return { signedUrl: data.signedUrl, path: filePath };
+        } catch (supabaseError: any) {
+          console.warn('[createUploadUrl] Supabase failed, falling back to local storage:', supabaseError.message);
+          
+          // Fallback to local storage
+          const { uploadUrl, objectPath } = await createLocalUploadUrl(`${uuid}.jpg`);
+          console.log('[createUploadUrl] Using local storage fallback:', { uploadUrl, objectPath });
+          
+          return {
+            uploadUrl: uploadUrl,
+            objectPath: objectPath,
+            bucket: bucketName,
+          };
         }
-        
-        if (!data?.signedUrl) {
-          console.error('[createUploadUrl] No signed URL in response');
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'No signed URL returned from Supabase',
-            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
-          });
-        }
-        
-        console.log(`[createUploadUrl] SUCCESS: Generated signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
-        
-        return {
-          uploadUrl: data.signedUrl,
-          objectPath: filePath,
-          bucket: bucketName,
-        };
         } catch (err: any) {
           console.error(`[createUploadUrl] EXCEPTION:`, {
             message: err.message,
@@ -161,18 +159,25 @@ export const foodPhotoRouter = router({
           imageBuffer = Buffer.from(await data.arrayBuffer());
           console.log(`[extractFromPhoto] Downloaded image size: ${imageBuffer.length} bytes`);
 
-        } catch (storageError) {
-          const message = storageError instanceof Error ? storageError.message : 'Unknown storage error';
-          console.error(`[extractFromPhoto] Storage layer error: ${message}`);
+        } catch (supabaseError: any) {
+          // Fallback to local storage
+          console.warn(`[extractFromPhoto] Supabase failed, trying local storage fallback: ${supabaseError.message}`);
           
-          // If it's already a TRPCError from initializeSupabaseAdmin, re-throw it
-          if (storageError instanceof TRPCError) throw storageError;
-          
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: `Storage download failed: ${message}`,
-            cause: { debugId, code: 'STORAGE_DOWNLOAD_FAILED' },
-          });
+          if (isLocalStoragePath(input.objectPath)) {
+            imageBuffer = await downloadLocalFile(input.objectPath);
+            console.log(`[extractFromPhoto] Downloaded from local storage, size: ${imageBuffer.length} bytes`);
+          } else {
+            const message = supabaseError instanceof Error ? supabaseError.message : 'Unknown storage error';
+            console.error(`[extractFromPhoto] Storage layer error: ${message}`);
+            
+            if (supabaseError instanceof TRPCError) throw supabaseError;
+            
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: `Storage download failed: ${message}`,
+              cause: { debugId, code: 'STORAGE_DOWNLOAD_FAILED' },
+            });
+          }
         }
 
         // Phase 2: Call Vision LLM
@@ -347,6 +352,36 @@ Rules:
           code: 'INTERNAL_SERVER_ERROR',
           message: `Photo analysis failed: ${message}`,
           cause: { debugId, code: 'UNKNOWN_ERROR' },
+        });
+      }
+    }),
+
+  // Upload photo data directly (for local storage fallback)
+  uploadPhotoData: protectedProcedure
+    .input(z.object({
+      objectPath: z.string(),
+      fileData: z.string(), // base64 encoded
+    }))
+    .mutation(async ({ input, ctx }: any) => {
+      try {
+        if (!isLocalStoragePath(input.objectPath)) {
+          throw new Error('uploadPhotoData only supports local storage paths');
+        }
+        
+        // Decode base64 to buffer
+        const buffer = Buffer.from(input.fileData, 'base64');
+        console.log(`[uploadPhotoData] Saving ${buffer.length} bytes to ${input.objectPath}`);
+        
+        // Save to local storage
+        await saveLocalFile(input.objectPath, buffer);
+        
+        return { success: true, path: input.objectPath, size: buffer.length };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`[uploadPhotoData] ERROR: ${message}`);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to save photo data: ${message}`,
         });
       }
     }),

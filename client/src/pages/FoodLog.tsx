@@ -42,6 +42,7 @@ export default function FoodLog() {
   const addItemMutation = trpc.foodLogs.addItem.useMutation();
   const deleteItemMutation = trpc.foodLogs.deleteItem.useMutation();
   const photoUploadMutation = trpc.foodPhoto.createUploadUrl.useMutation();
+  const photoUploadDataMutation = trpc.foodPhoto.uploadPhotoData.useMutation();
   const photoAnalysisMutation = trpc.foodPhoto.extractFromPhoto.useMutation();
   
   // Utils hook - must be called at top level, not inside handlers
@@ -246,18 +247,38 @@ export default function FoodLog() {
         throw new Error('Failed to get upload URL');
       }
 
-      // Step 2: Upload file to the signed URL
-      console.log('Step 2: Uploading to signed URL...');
-      const uploadResult = await fetch(uploadResponse.uploadUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': photoFile.type || 'image/jpeg',
-        },
-        body: photoFile,
-      });
+      // Step 2: Upload file to the signed URL (skip for local storage paths)
+      const isLocalStorage = uploadResponse.uploadUrl.startsWith('file://');
+      if (!isLocalStorage) {
+        console.log('Step 2: Uploading to Supabase signed URL...');
+        const uploadResult = await fetch(uploadResponse.uploadUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': photoFile.type || 'image/jpeg',
+          },
+          body: photoFile,
+        });
 
-      if (!uploadResult.ok) {
-        throw new Error(`Upload failed: ${uploadResult.statusText}`);
+        if (!uploadResult.ok) {
+          throw new Error(`Upload failed: ${uploadResult.statusText}`);
+        }
+      } else {
+        console.log('Step 2: Using local storage fallback (uploading file data directly)...');
+        // For local storage, send file data directly to backend
+        const fileData = await photoFile.arrayBuffer();
+        // Convert ArrayBuffer to base64 using browser API
+        const uint8Array = new Uint8Array(fileData);
+        let binaryString = '';
+        for (let i = 0; i < uint8Array.length; i++) {
+          binaryString += String.fromCharCode(uint8Array[i]);
+        }
+        const base64Data = btoa(binaryString);
+        
+        // Call uploadPhotoData to save file to local storage
+        await photoUploadDataMutation.mutateAsync({
+          objectPath: uploadResponse.objectPath,
+          fileData: base64Data,
+        });
       }
 
       // Step 3: Analyze the uploaded image
