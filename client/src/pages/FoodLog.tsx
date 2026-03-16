@@ -745,7 +745,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[280px]">
+            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[320px]">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>
@@ -916,7 +916,7 @@ export default function FoodLog() {
           </Tabs>
 
           {/* ISSUE 2 FIX: Sticky action buttons with proper safe-area and padding support */}
-          <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-4 flex gap-3" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3 z-50" style={{ paddingBottom: 'max(2rem, calc(1rem + env(safe-area-inset-bottom)))' }}>
             {photoAnalysisComplete && (
               <Button
                 onClick={handleCancelAnalysis}

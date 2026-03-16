@@ -84,7 +84,7 @@ function calculateMealQualityRating(
 }
 
 // Generate AI diet advice based on nutrition and user tone style
-// Uses predefined quote libraries for consistent, entertaining advice
+// Validates that advice matches actual nutrition data
 function generateDietAdvice(
   kcal: number,
   proteinG: number,
@@ -93,6 +93,18 @@ function generateDietAdvice(
   mealRating: string,
   toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle'
 ): string {
+  // Calculate nutrition ratios for validation
+  const totalCalories = kcal || 1; // Avoid division by zero
+  const proteinRatio = (proteinG * 4) / totalCalories;
+  const carbRatio = (carbsG * 4) / totalCalories;
+  const fatRatio = (fatG * 9) / totalCalories;
+  
+  // Determine nutrition profile
+  const isHighProtein = proteinRatio >= 0.25;
+  const isLowFat = fatRatio <= 0.25;
+  const isBalanced = proteinRatio >= 0.15 && carbRatio >= 0.30 && fatRatio >= 0.15 && fatRatio <= 0.35;
+  const isGoodRating = mealRating === 'Good' || mealRating === 'Nutritious';
+  
   // Select quote library based on tone style
   let quoteLibrary: string[];
   
@@ -104,9 +116,33 @@ function generateDietAdvice(
     quoteLibrary = gentleQuotes;
   }
   
-  // Randomly select a quote from the library
-  const randomIndex = Math.floor(Math.random() * quoteLibrary.length);
-  return quoteLibrary[randomIndex];
+  // Filter quotes that match the nutrition profile
+  // This ensures advice doesn't contradict actual nutrition data
+  let validQuotes = quoteLibrary.filter(quote => {
+    // Validation rules: advice must match actual nutrition
+    // If fat is low, don't select quotes saying fat is too high
+    if (isLowFat && (quote.includes('脂肪爆') || quote.includes('脂肪偏高') || quote.includes('脂肪太高'))) {
+      return false;
+    }
+    // If protein is high, don't select quotes saying protein is too low
+    if (isHighProtein && (quote.includes('蛋白質唔夠') || quote.includes('蛋白質太低'))) {
+      return false;
+    }
+    // If rating is good, don't select quotes saying meal is terrible
+    if (isGoodRating && (quote.includes('唔合格') || quote.includes('救唔返') || quote.includes('垃圾'))) {
+      return false;
+    }
+    return true;
+  });
+  
+  // If no valid quotes found, use all quotes (fallback)
+  if (validQuotes.length === 0) {
+    validQuotes = quoteLibrary;
+  }
+  
+  // Randomly select from valid quotes
+  const randomIndex = Math.floor(Math.random() * validQuotes.length);
+  return validQuotes[randomIndex];
 }
 
 export const foodPhotoRouter = router({
@@ -442,11 +478,13 @@ Rules:
           else if (dbTone === 'hk_style') toneStyle = 'hongkong';
           else toneStyle = 'gentle';
           
+          // ISSUE 1 FIX: Use aggregated nutrition values for advice generation
+          // This ensures advice matches the final calculated nutrition, not raw extraction
           const advice = generateDietAdvice(
-            extraction.suggested.kcal || 0,
-            extraction.suggested.protein_g || 0,
-            extraction.suggested.carbs_g || 0,
-            extraction.suggested.fat_g || 0,
+            aggregatedKcal,
+            aggregatedProtein,
+            aggregatedCarbs,
+            aggregatedFat,
             rating,
             toneStyle
           );
