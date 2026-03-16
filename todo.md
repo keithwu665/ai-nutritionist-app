@@ -773,3 +773,15 @@
 - [x] Test result consistency (same image gives similar results)
 - [x] Verify all three issues fixed and working on mobile
 - [ ] Create checkpoint and publish to live site
+
+
+## Food Analysis Result UI - Scrollability & Rating Display Fixes
+- [x] ISSUE 1: Make result modal vertically scrollable (max-height: 80vh, overflow-y: auto)
+- [x] ISSUE 2: Replace unclear rating badge with clear visual rating scale
+- [x] Create nutrition rating scale component (Limited → Fair → Good → Nutritious)
+- [x] Add color indicators: Limited=red, Fair=orange, Good=green, Nutritious=dark-green
+- [x] Add position marker showing current rating on the scale
+- [x] Update result card layout with improved rating display at top
+- [x] Test scrolling on mobile to reach 新增 button
+- [x] Verify rating scale clarity and usability
+- [ ] Create checkpoint and publish to live site

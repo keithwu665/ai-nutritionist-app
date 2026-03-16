@@ -714,7 +714,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4">
+            <TabsContent value="photo" className="space-y-4 mt-4 max-h-[80vh] overflow-y-auto pr-2">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>
@@ -769,16 +769,33 @@ export default function FoodLog() {
               {/* Analysis Result Card - Prominent Display */}
               {photoAnalysisComplete && (
                 <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-300 rounded-lg p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-emerald-900">✓ 分析完成</h3>
-                    <span className={`text-xs font-medium px-2 py-1 rounded ${
-                      photoMealRating === 'Nutritious' ? 'bg-emerald-200 text-emerald-900' :
-                      photoMealRating === 'Good' ? 'bg-blue-200 text-blue-900' :
-                      photoMealRating === 'Fair' ? 'bg-yellow-200 text-yellow-900' :
-                      'bg-red-200 text-red-900'
-                    }`}>
-                      {photoMealRating}
-                    </span>
+                  <h3 className="font-semibold text-emerald-900">✓ 分析完成</h3>
+                  
+                  {/* Nutrition Rating Scale */}
+                  <div>
+                    <p className="text-xs text-emerald-700 font-medium mb-2">營養評級</p>
+                    <div className="flex items-center justify-between gap-1 text-xs font-medium">
+                      <div className={`flex-1 text-center py-1 px-2 rounded ${
+                        photoMealRating === 'Limited' ? 'bg-red-100 text-red-700 border-2 border-red-500' : 'bg-gray-100 text-gray-500 border border-gray-300'
+                      }`}>
+                        Limited
+                      </div>
+                      <div className={`flex-1 text-center py-1 px-2 rounded ${
+                        photoMealRating === 'Fair' ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500' : 'bg-gray-100 text-gray-500 border border-gray-300'
+                      }`}>
+                        Fair
+                      </div>
+                      <div className={`flex-1 text-center py-1 px-2 rounded ${
+                        photoMealRating === 'Good' ? 'bg-green-100 text-green-700 border-2 border-green-500' : 'bg-gray-100 text-gray-500 border border-gray-300'
+                      }`}>
+                        Good
+                      </div>
+                      <div className={`flex-1 text-center py-1 px-2 rounded ${
+                        photoMealRating === 'Nutritious' ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-600' : 'bg-gray-100 text-gray-500 border border-gray-300'
+                      }`}>
+                        Nutritious
+                      </div>
+                    </div>
                   </div>
                   
                   {/* Food Items */}
