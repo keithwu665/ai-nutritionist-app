@@ -1041,3 +1041,40 @@
 - [x] Verified advice matches nutrition values
 - [x] Verified no contradictory statements
 - [ ] Publish to live site
+
+
+## AI Diet Advice Rule Table System - COMPLETE
+
+### Phase 1: Implement Comprehensive Rule Table DONE
+- [x] CASE 1: High protein / clean meal (protein ≥15g, fat ≤8g, carbs ≤15g)
+- [x] CASE 2: High protein but high fat (protein ≥20g, fat ≥20g)
+- [x] CASE 3: High carbs meal (carbs ≥40g)
+- [x] CASE 4: High fat meal (fat ≥20g)
+- [x] CASE 5: High calorie meal (kcal ≥700)
+- [x] CASE 6: Very light meal (kcal ≤150, protein <8g)
+- [x] CASE 7: Vegetables / low calorie (kcal ≤120, fat ≤5g, carbs ≤15g)
+- [x] CASE 8: Balanced meal (protein 15-35g, fat 5-15g, carbs 15-40g)
+
+### Phase 2: Add Consistency Guardrails DONE
+- [x] If fat ≤5g: NEVER say fat is high or accumulation
+- [x] If carbs ≤10g: NEVER say carbs too high
+- [x] If protein ≥15g: MUST mention protein is good
+- [x] If kcal ≤150: NEVER say meal is heavy
+- [x] If rating=Good/Nutritious: advice must not sound negative
+
+### Phase 3: Update Advice Generation DONE
+- [x] Use final nutrition values as primary input
+- [x] Food name/category as secondary reference only
+- [x] Generate advice after nutrition analysis completes
+- [x] Apply rule table matching
+
+### Phase 4: Test with 4 Food Types VERIFIED
+- [x] Test 1: Salad chicken (165 kcal, 31g protein, 0g carbs, 3.6g fat) - CASE 1 advice generated correctly
+- [ ] Test 2: Chinese broccoli (expect light/healthy vegetable advice)
+- [ ] Test 3: Fried pork cutlet (expect high fat/calorie warning)
+- [ ] Test 4: Rice meal (expect carb comment)
+
+### Phase 5: Publish & Verify
+- [ ] Create checkpoint
+- [ ] Publish to live site
+- [ ] Verify AI advice matches nutrition values

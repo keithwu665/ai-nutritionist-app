@@ -96,8 +96,9 @@ function isVegetableFood(foodItems: string[]): boolean {
   );
 }
 
-// Generate AI diet advice based on nutrition and user tone style
-// Validates that advice matches actual nutrition data with STRICT rules
+// Generate AI diet advice based on FINAL nutrition values using rule table system
+// PRIMARY INPUT: final nutrition macros (kcal, protein, carbs, fat)
+// SECONDARY INPUT: food name/category (only for context)
 function generateDietAdvice(
   kcal: number,
   proteinG: number,
@@ -107,82 +108,150 @@ function generateDietAdvice(
   toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle',
   foodItems: string[] = []
 ): string {
-  // Calculate nutrition ratios for validation
-  const totalCalories = kcal || 1; // Avoid division by zero
-  const proteinRatio = (proteinG * 4) / totalCalories;
-  const carbRatio = (carbsG * 4) / totalCalories;
-  const fatRatio = (fatG * 9) / totalCalories;
+  // AI DIET ADVICE RULE TABLE - Match nutrition profile to advice case
   
-  // Determine nutrition profile with STRICT validation rules
-  const isHighProtein = proteinRatio >= 0.25;
-  const isLowFat = fatRatio <= 0.25 || fatG < 10; // STRICT: fat < 10g is low
-  const isLowCarbs = carbRatio <= 0.30 || carbsG < 20; // STRICT: carbs < 20g is low
-  const isLowCalorie = kcal < 100; // Light meal
-  const isBalanced = proteinRatio >= 0.15 && carbRatio >= 0.30 && fatRatio >= 0.15 && fatRatio <= 0.35;
-  const isGoodRating = mealRating === 'Good' || mealRating === 'Nutritious';
-  const isVegetable = isVegetableFood(foodItems);
-  
-  // Select quote library based on tone style
-  let quoteLibrary: string[];
-  
-  if (toneStyle === 'coach') {
-    quoteLibrary = coachQuotes;
-  } else if (toneStyle === 'hongkong') {
-    quoteLibrary = hongkongQuotes;
-  } else {
-    quoteLibrary = gentleQuotes;
+  // CASE 1: High protein / clean meal
+  // Condition: protein >= 15g AND fat <= 8g AND carbs <= 15g
+  if (proteinG >= 15 && fatG <= 8 && carbsG <= 15) {
+    const case1Advices = {
+      gentle: [
+        '蛋白質幾高，脂肪同碳水都唔多，整體算幾乾淨。如果用嚟補蛋白或者減脂都幾適合。',
+        '呢餐蛋白質充足，脂肪同碳水都控制得好，係個唔錯嘅選擇。',
+      ],
+      coach: [
+        '蛋白質夠，脂肪同碳水都低，呢個係好餐。堅持呢個比例，減脂會快啲。',
+      ],
+      hongkong: [
+        '靚啦，蛋白質夠，脂肪同碳水都唔多。呢個就係減脂餐嘅樣。',
+      ]
+    };
+    const adviceList = case1Advices[toneStyle] || case1Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
   }
   
-  // Filter quotes that match the nutrition profile
-  // STRICT validation: advice must NOT contradict actual nutrition data
-  let validQuotes = quoteLibrary.filter(quote => {
-    // STRICT RULE 1: If fat < 10g, BLOCK any "fat too high" statements
-    if (isLowFat) {
-      if (quote.includes('脂肪爆') || quote.includes('脂肪偏高') || quote.includes('脂肪太高') ||
-          quote.includes('脂肪堆積') || quote.includes('脂肪過多') || quote.includes('脂肪會堆積')) {
-        return false;
-      }
-    }
-    
-    // STRICT RULE 2: If carbs < 20g, BLOCK any "carbs too high" statements
-    if (isLowCarbs) {
-      if (quote.includes('碳水超標') || quote.includes('碳水過高') || quote.includes('碳水爆') ||
-          quote.includes('碳水化合物超標') || quote.includes('碳水化合物過高')) {
-        return false;
-      }
-    }
-    
-    // STRICT RULE 3: If protein is high, don't select quotes saying protein is too low
-    if (isHighProtein && (quote.includes('蛋白質唔夠') || quote.includes('蛋白質太低'))) {
-      return false;
-    }
-    
-    // STRICT RULE 4: If rating is good, don't select quotes saying meal is terrible
-    if (isGoodRating && (quote.includes('唔合格') || quote.includes('救唔返') || quote.includes('垃圾'))) {
-      return false;
-    }
-    
-    // STRICT RULE 5: If it's a vegetable, don't select overly critical quotes
-    if (isVegetable && (quote.includes('脂肪爆') || quote.includes('碳水爆'))) {
-      return false;
-    }
-    
-    // STRICT RULE 6: If it's low-calorie, don't select quotes about excess
-    if (isLowCalorie && (quote.includes('爆') || quote.includes('超標') || quote.includes('過高'))) {
-      return false;
-    }
-    
-    return true;
-  });
-  
-  // If no valid quotes found, use all quotes (fallback)
-  if (validQuotes.length === 0) {
-    validQuotes = quoteLibrary;
+  // CASE 2: High protein but high fat
+  // Condition: protein >= 20g AND fat >= 20g
+  if (proteinG >= 20 && fatG >= 20) {
+    const case2Advices = {
+      gentle: [
+        '蛋白質係幾好，不過脂肪都偏高，如果想控制熱量可以減少油脂來源。',
+      ],
+      coach: [
+        '蛋白質夠，但脂肪偏高。如果減脂，要控制份量或者選擇更低脂肪嘅蛋白質來源。',
+      ],
+      hongkong: [
+        '蛋白質唔錯，不過脂肪爆。想減脂就要少啲油。',
+      ]
+    };
+    const adviceList = case2Advices[toneStyle] || case2Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
   }
   
-  // Randomly select from valid quotes
-  const randomIndex = Math.floor(Math.random() * validQuotes.length);
-  return validQuotes[randomIndex];
+  // CASE 3: High carbs meal
+  // Condition: carbs >= 40g
+  if (carbsG >= 40) {
+    const case3Advices = {
+      gentle: [
+        '碳水比例偏高，如果今日活動量唔多可能會比較容易熱量過多。',
+      ],
+      coach: [
+        '碳水爆，如果唔係訓練日就要小心。下次減少碳水份量。',
+      ],
+      hongkong: [
+        '碳水爆晒喎。唔係訓練日就要少啲。',
+      ]
+    };
+    const adviceList = case3Advices[toneStyle] || case3Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
+  }
+  
+  // CASE 4: High fat meal
+  // Condition: fat >= 20g
+  if (fatG >= 20) {
+    const case4Advices = {
+      gentle: [
+        '脂肪含量偏高，如果長期食呢類餐單要留意總熱量。',
+      ],
+      coach: [
+        '脂肪偏高，如果減脂期間要控制份量。',
+      ],
+      hongkong: [
+        '脂肪偏高喎。減脂期間要少啲。',
+      ]
+    };
+    const adviceList = case4Advices[toneStyle] || case4Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
+  }
+  
+  // CASE 5: High calorie meal
+  // Condition: kcal >= 700
+  if (kcal >= 700) {
+    const case5Advices = {
+      gentle: [
+        '呢餐熱量幾高，如果目標係減脂可以注意份量或者分配到其他餐。',
+      ],
+      coach: [
+        '熱量爆，如果減脂就要控制份量。',
+      ],
+      hongkong: [
+        '熱量爆晒喎。減脂要少啲。',
+      ]
+    };
+    const adviceList = case5Advices[toneStyle] || case5Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
+  }
+  
+  // CASE 6: Very light meal
+  // Condition: kcal <= 150 AND protein < 8g
+  if (kcal <= 150 && proteinG < 8) {
+    const case6Advices = {
+      gentle: [
+        '呢餐比較輕，蛋白質略少，如果當正餐可以加返啲蛋白質。',
+      ],
+      coach: [
+        '太輕，蛋白質唔夠。如果係正餐要加蛋白質。',
+      ],
+      hongkong: [
+        '太輕喎，蛋白質唔夠。當正餐要加返啲。',
+      ]
+    };
+    const adviceList = case6Advices[toneStyle] || case6Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
+  }
+  
+  // CASE 7: Vegetables / low calorie foods
+  // Condition: kcal <= 120 AND fat <= 5g AND carbs <= 15g
+  if (kcal <= 120 && fatG <= 5 && carbsG <= 15) {
+    const case7Advices = {
+      gentle: [
+        '呢類蔬菜熱量低，纖維又多，作為配菜幾健康。如果做主餐可以加返蛋白質。',
+      ],
+      coach: [
+        '蔬菜好，熱量低脂肪低。當配菜可以，當正餐要加蛋白質。',
+      ],
+      hongkong: [
+        '蔬菜靚啦，熱量低脂肪低。當配菜好，當正餐要加蛋白質。',
+      ]
+    };
+    const adviceList = case7Advices[toneStyle] || case7Advices.gentle;
+    return adviceList[Math.floor(Math.random() * adviceList.length)];
+  }
+  
+  // CASE 8: Balanced meal (DEFAULT)
+  // Condition: protein 15-35g AND fat 5-15g AND carbs 15-40g
+  const case8Advices = {
+    gentle: [
+      '整體營養比例算幾均衡，蛋白質、脂肪同碳水都算合理。',
+    ],
+    coach: [
+      '營養比例均衡，好餐。保持呢個水平。',
+    ],
+    hongkong: [
+      '營養比例靚啦，蛋白質、脂肪同碳水都啱。好餐。',
+    ]
+  };
+  const adviceList = case8Advices[toneStyle] || case8Advices.gentle;
+  return adviceList[Math.floor(Math.random() * adviceList.length)];
 }
 
 export const foodPhotoRouter = router({
