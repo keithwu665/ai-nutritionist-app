@@ -1,0 +1,52 @@
+{
+  "query": "SELECT u.id, u.name, u.email, up.id as profile_id, up.aiToneStyle FROM users u LEFT JOIN user_profiles up ON u.id = up.userId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT u.id, u.name, u.email, up.id as profile_id, up.aiToneStyle FROM users u LEFT JOIN user_profiles up ON u.id = up.userId;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Keith Wu",
+      "email": "wukamon@gmail.com",
+      "profile_id": "NULL",
+      "aiToneStyle": "NULL"
+    },
+    {
+      "id": "6",
+      "name": "Yoyo Poon",
+      "email": "6ys44tpv5n@privaterelay.appleid.com",
+      "profile_id": "1",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "60001",
+      "name": "Hans Chan",
+      "email": "hanschan.au@gmail.com",
+      "profile_id": "60001",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "180014",
+      "name": "dlmleung",
+      "email": "dlmleung@hotmail.com",
+      "profile_id": "30001",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "330001",
+      "name": "Fitness TRIFIT",
+      "email": "trifitfitnesshk@gmail.com",
+      "profile_id": "30002",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "4620026",
+      "name": "Keith Wu",
+      "email": "wukamon.aus@gmail.com",
+      "profile_id": "NULL",
+      "aiToneStyle": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tprofile_id\taiToneStyle\n1\tKeith Wu\twukamon@gmail.com\tNULL\tNULL\n6\tYoyo Poon\t6ys44tpv5n@privaterelay.appleid.com\t1\tgentle\n60001\tHans Chan\thanschan.au@gmail.com\t60001\tgentle\n180014\tdlmleung\tdlmleung@hotmail.com\t30001\tgentle\n330001\tFitness TRIFIT\ttrifitfitnesshk@gmail.com\t30002\tgentle\n4620026\tKeith Wu\twukamon.aus@gmail.com\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1607
+}

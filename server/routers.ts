@@ -1,5 +1,5 @@
-import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
+import { COOKIE_NAME } from "../shared/const";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
@@ -39,11 +39,13 @@ export const appRouter = router({
         weightKg: z.string(),
         fitnessGoal: z.enum(["lose", "maintain", "gain"]),
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]),
+        aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.createUserProfile({
           userId: ctx.user.id,
           ...input,
+          aiToneStyle: input.aiToneStyle || 'gentle',
         });
       }),
 
@@ -55,6 +57,7 @@ export const appRouter = router({
         weightKg: z.string().optional(),
         fitnessGoal: z.enum(["lose", "maintain", "gain"]).optional(),
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]).optional(),
+        aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);

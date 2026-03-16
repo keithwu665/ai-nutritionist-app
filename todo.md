@@ -741,3 +741,22 @@
 - [ ] Feature 3: Generate AI diet advice based on nutrition and user tone style
 - [ ] Feature 4: Support three tone styles (gentle, coach, hk_style)
 - [ ] Feature 5: Integrate all features into photo analysis modal without UI redesign
+
+
+## Photo Analysis Experience Fixes (Current Sprint)
+
+- [ ] Add AI tone setting to Settings page (溫柔體貼教導 / 嚴厲魔鬼教練 / 香港地道模式)
+- [ ] Update backend to detect and return multiple food items from photo
+- [ ] Implement visible nutrition rating bar with color coding (red/orange/green)
+- [ ] Fix mobile scrolling in photo analysis modal
+- [ ] Update AI advice generation to use selected tone and Traditional Chinese
+- [ ] Display AI advice prominently in result card/popup after analysis
+
+## AI Tone Feature - Bug Fixes & Completion
+- [x] ISSUE 1: Fix profile creation - use UPSERT instead of UPDATE
+- [x] ISSUE 2: Add AI tone selector UI to Settings page
+- [x] ISSUE 3: Update AI advice generation to use Traditional Chinese
+- [x] ISSUE 4: Verify tone style is applied in photo analysis
+- [x] ISSUE 5: Test all three tone styles (gentle, coach, HK style)
+- [ ] Create checkpoint with all fixes
+- [ ] Publish to live site: ainutriapp-btnutczq.manus.space

@@ -143,6 +143,7 @@ export const userProfiles = mysqlTable("user_profiles", {
 	weightKg: varchar({ length: 10 }).notNull(),
 	fitnessGoal: mysqlEnum(['lose','maintain','gain']).notNull(),
 	activityLevel: mysqlEnum(['sedentary','light','moderate','high']).notNull(),
+	aiToneStyle: mysqlEnum(['gentle','coach','hk_style']).default('gentle').notNull(),
 	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });

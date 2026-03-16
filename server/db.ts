@@ -25,15 +25,24 @@ type InsertBodyPhoto = InferInsertModel<typeof bodyPhotos>;
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _dbInitialized = false;
 
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
+  if (!_dbInitialized) {
+    if (!process.env.DATABASE_URL) {
+      console.error('[Database] DATABASE_URL not set');
       _db = null;
+    } else {
+      try {
+        console.log('[Database] Initializing connection...');
+        _db = drizzle(process.env.DATABASE_URL);
+        console.log('[Database] Connection initialized successfully');
+      } catch (error) {
+        console.error('[Database] Failed to connect:', error);
+        _db = null;
+      }
     }
+    _dbInitialized = true;
   }
   return _db;
 }
@@ -133,8 +142,32 @@ export async function createUserProfile(data: InsertUserProfile) {
 export async function updateUserProfile(userId: number, data: Partial<InsertUserProfile>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
-  return getUserProfile(userId);
+  console.log('[updateUserProfile] Updating user', userId, 'with data:', data);
+  
+  // Check if profile exists
+  const existing = await getUserProfile(userId);
+  if (!existing) {
+    console.log('[updateUserProfile] Profile does not exist, creating new one');
+    // If profile doesn't exist, create it with the provided data
+    const createData: InsertUserProfile = {
+      userId,
+      gender: data.gender || 'male',
+      age: data.age || 25,
+      heightCm: data.heightCm || '170',
+      weightKg: data.weightKg || '70',
+      fitnessGoal: data.fitnessGoal || 'maintain',
+      activityLevel: data.activityLevel || 'moderate',
+      aiToneStyle: data.aiToneStyle || 'gentle',
+    };
+    await db.insert(userProfiles).values(createData);
+  } else {
+    // Profile exists, update it
+    await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+  }
+  
+  const updated = await getUserProfile(userId);
+  console.log('[updateUserProfile] Updated profile:', updated);
+  return updated;
 }
 
 // ============================================================================

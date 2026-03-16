@@ -92,13 +92,13 @@ async function generateDietAdvice(
   toneStyle: 'gentle' | 'coach' | 'hk_style' = 'gentle'
 ): Promise<string> {
   const tonePrompts = {
-    gentle: 'You are a supportive and encouraging nutritionist. Provide gentle, positive feedback about the meal with constructive suggestions. Keep it 1-2 sentences.',
-    coach: 'You are a strict fitness coach with a blunt, direct style. Provide motivational but firm feedback about the meal. Keep it 1-2 sentences and be direct.',
-    hk_style: 'You are a casual Hong Kong friend giving sarcastic but caring advice in Cantonese style. Use expressions like "嘩", "爆燈", "收一收", "有排都未見到影". Keep it 1-2 sentences and avoid offensive language.'
+    gentle: '你是一位支持和鼓勵的營養師。用溫柔、正面的方式給予膳食建議。保持1-2句話。',
+    coach: '你是一位嚴厲的健身教練，風格直接。提供動力十足但堅定的膳食反饋。保持1-2句話，要直接。',
+    hk_style: '你是一位香港朋友，用諷刺但關心的方式給予建議。使用香港用語如「嘩」、「爆燈」、「收一收」、「有排都未見到影」。保持1-2句話，避免冒犯性語言。'
   };
 
   const systemPrompt = tonePrompts[toneStyle];
-  const userPrompt = `Analyze this meal and provide brief diet advice:\nCalories: ${kcal} kcal\nProtein: ${proteinG}g\nCarbs: ${carbsG}g\nFat: ${fatG}g\nMeal Quality: ${mealRating}\n\nProvide 1-2 sentences of advice.`;
+  const userPrompt = `分析這餐飯並提供簡短的膳食建議:\n熱量: ${kcal} kcal\n蛋白質: ${proteinG}g\n碳水化合物: ${carbsG}g\n脂肪: ${fatG}g\n餐飯質量: ${mealRating}\n\n請提供1-2句話的建議。`;
 
   try {
     const response = await invokeLLM({
@@ -417,7 +417,8 @@ Rules:
           );
 
           // Generate AI diet advice with user tone style
-          const toneStyle = (ctx.user?.settings?.ai_tone_style || 'gentle') as 'gentle' | 'coach' | 'hk_style';
+          const userProfile = await db.getUserProfile(userId);
+          const toneStyle = (userProfile?.aiToneStyle || 'gentle') as 'gentle' | 'coach' | 'hk_style';
           const advice = await generateDietAdvice(
             extraction.suggested.kcal || 0,
             extraction.suggested.protein_g || 0,
