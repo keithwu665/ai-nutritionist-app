@@ -620,7 +620,18 @@ export default function FoodLog() {
         </div>
 
         {/* Fitasty Banner */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
+        <div 
+          onClick={() => {
+            setShowModal(true);
+            setActiveTab('manual');
+            // Focus search input after modal opens
+            setTimeout(() => {
+              const searchInput = document.querySelector('input[placeholder="搜尋食物"]') as HTMLInputElement;
+              if (searchInput) searchInput.focus();
+            }, 100);
+          }}
+          className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-200 active:scale-95"
+        >
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white rounded-lg flex-shrink-0" />
             <div>

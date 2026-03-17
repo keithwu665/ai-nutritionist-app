@@ -92,14 +92,16 @@ export const bodyPhotos = mysqlTable("body_photos", {
 		isActive: tinyint().default(1).notNull(),
 		createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-		// New fields for full specification
-		brand_name: varchar({ length: 255 }),
-		serving_unit: varchar({ length: 50 }),
-		fiber_g: decimal({ precision: 6, scale: 1 }),
-		sugar_g: decimal({ precision: 6, scale: 1 }),
-		sodium_mg: decimal({ precision: 8, scale: 1 }),
-		barcode: varchar({ length: 100 }),
 	});
+
+	// TODO: Add these fields after database migration:
+	// brand_name: varchar({ length: 255 }),
+	// serving_unit: varchar({ length: 50 }),
+	// fiber_g: decimal({ precision: 6, scale: 1 }),
+	// sugar_g: decimal({ precision: 6, scale: 1 }),
+	// sodium_mg: decimal({ precision: 8, scale: 1 }),
+	// barcode: varchar({ length: 100 }),
+
 
 	export const foodLogItems = mysqlTable("food_log_items", {
 		id: int().autoincrement().notNull(),
