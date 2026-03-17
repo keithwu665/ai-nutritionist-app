@@ -44,14 +44,14 @@ type AIExtraction = z.infer<typeof AIExtractionSchema>;
 
 // DEPRECATED: Use Nutrition Advice Engine instead
 // This function delegates to the unified engine for backwards compatibility
-function calculateMealQualityRating(
+async function calculateMealQualityRating(
   kcal: number,
   proteinG: number,
   carbsG: number,
   fatG: number
-): 'Limited' | 'Fair' | 'Good' | 'Nutritious' {
+): Promise<'Limited' | 'Fair' | 'Good' | 'Nutritious'> {
   const values: NutritionValues = { kcal, protein: proteinG, carbs: carbsG, fat: fatG };
-  const result = generateNutritionAdvice(values, 'gentle');
+  const result = await generateNutritionAdvice(values, 'gentle');
   return result.rating;
 }
 
@@ -470,7 +470,7 @@ Rules:
             foodCategory: isVegetableFood(foodItems) ? 'vegetables' : 'general'
           };
           
-          const adviceResult = generateNutritionAdvice(nutritionValues, personalityType);
+          const adviceResult = await generateNutritionAdvice(nutritionValues, personalityType);
           const rating = adviceResult.rating;
           const advice = adviceResult.personalityAdvice;
 
