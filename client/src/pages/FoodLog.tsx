@@ -846,19 +846,11 @@ export default function FoodLog() {
                     </div>
                   )}
                   
-                  {/* Nutrition Summary */}
-                  {photoNutritionSummary && (
-                    <div className="bg-white rounded p-3 border border-emerald-200">
-                      <p className="text-xs text-emerald-600 font-medium mb-2">營養重點</p>
-                      <p className="text-sm text-emerald-900 font-mono">{photoNutritionSummary}</p>
-                    </div>
-                  )}
-                  
-                  {/* AI Diet Advice */}
+                  {/* AI Diet Advice - Main Focus */}
                   {photoAiAdvice && (
-                    <div className="bg-white rounded p-3 border border-emerald-200">
-                      <p className="text-xs text-emerald-600 font-medium mb-2">💡 AI 飲食建議</p>
-                      <p className="text-sm text-emerald-900 leading-relaxed">{photoAiAdvice}</p>
+                    <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-300 shadow-sm">
+                      <p className="text-sm text-emerald-700 font-semibold mb-3">💡 AI 飲食建議</p>
+                      <p className="text-base text-emerald-900 leading-relaxed font-medium">{photoAiAdvice}</p>
                     </div>
                   )}
                 </div>
