@@ -80,27 +80,27 @@ export const bodyPhotos = mysqlTable("body_photos", {
 
 	export const fitastyProducts = mysqlTable("fitasty_products", {
 		id: int().autoincrement().notNull().primaryKey(),
-		name: varchar({ length: 255 }).notNull(), // Keep for backward compatibility
+		product_name_zh: varchar({ length: 255 }).notNull(),
+		product_name_en: varchar({ length: 255 }),
+		brand_name: varchar({ length: 255 }),
 		category: varchar({ length: 100 }).notNull(),
-		servingSize: varchar({ length: 100 }),
-		calories: decimal({ precision: 8, scale: 1 }).notNull(),
-		proteinG: decimal({ precision: 6, scale: 1 }),
-		carbsG: decimal({ precision: 6, scale: 1 }),
-		fatG: decimal({ precision: 6, scale: 1 }),
+		serving_size: int(), // numeric value (e.g., 100, 150)
+		serving_unit: varchar({ length: 50 }), // e.g., 'g', 'ml', 'piece'
+		calories: int().notNull(), // numeric only, no units
+		protein_g: int(), // numeric only, no units
+		carbs_g: int(), // numeric only, no units
+		fat_g: int(), // numeric only, no units
+		fiber_g: int(),
+		sugar_g: int(),
+		sodium_mg: int(),
+		barcode: varchar({ length: 100 }),
+		product_image_url: varchar({ length: 500 }),
 		description: text(),
-		imageUrl: varchar({ length: 500 }),
-		isActive: tinyint().default(1).notNull(),
+		is_active: tinyint().default(1).notNull(),
+		is_featured: tinyint().default(0).notNull(),
 		createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 	});
-
-	// TODO: Add these fields after database migration:
-	// brand_name: varchar({ length: 255 }),
-	// serving_unit: varchar({ length: 50 }),
-	// fiber_g: decimal({ precision: 6, scale: 1 }),
-	// sugar_g: decimal({ precision: 6, scale: 1 }),
-	// sodium_mg: decimal({ precision: 8, scale: 1 }),
-	// barcode: varchar({ length: 100 }),
 
 
 	export const foodLogItems = mysqlTable("food_log_items", {

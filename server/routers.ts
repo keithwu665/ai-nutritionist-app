@@ -927,7 +927,7 @@ export const appRouter = router({
         }
         return db.createFitastyProduct({
           ...input,
-          isActive: 1,
+          is_active: 1,
         } as any);
       }),
 
@@ -976,14 +976,14 @@ export const appRouter = router({
         if (!product) throw new Error("Product not found");
         const log = await db.getOrCreateFoodLog(ctx.user.id, input.date);
         const calories = Number(product.calories) * input.quantity;
-        const proteinG = product.proteinG ? Number(product.proteinG) * input.quantity : null;
-        const carbsG = product.carbsG ? Number(product.carbsG) * input.quantity : null;
-        const fatG = product.fatG ? Number(product.fatG) * input.quantity : null;
+        const proteinG = product.protein_g ? Number(product.protein_g) * input.quantity : null;
+        const carbsG = product.carbs_g ? Number(product.carbs_g) * input.quantity : null;
+        const fatG = product.fat_g ? Number(product.fat_g) * input.quantity : null;
         return db.createFoodLogItem({
           foodLogId: log.id,
           userId: ctx.user.id,
           mealType: input.mealType,
-          name: product.name,
+          name: product.product_name_zh || product.product_name_en || 'Unknown',
           calories: calories.toString(),
           proteinG: proteinG ? proteinG.toString() : null,
           carbsG: carbsG ? carbsG.toString() : null,
@@ -1030,15 +1030,15 @@ export const appRouter = router({
         // Only allow admin to create products
         const user = await db.getUserById(ctx.user.id);
         if (user?.role !== 'admin') throw new Error('Only admins can create Fitasty products');
-        // Convert numbers to strings for database
+        // Keep numbers as-is for new schema
         const dbData = {
           ...input,
-          calories: input.calories.toString(),
-          proteinG: input.proteinG ? input.proteinG.toString() : undefined,
-          carbsG: input.carbsG ? input.carbsG.toString() : undefined,
-          fatG: input.fatG ? input.fatG.toString() : undefined,
+          calories: input.calories,
+          protein_g: input.proteinG,
+          carbs_g: input.carbsG,
+          fat_g: input.fatG,
         };
-        return db.createFitastyProduct(dbData);
+        return db.createFitastyProduct(dbData as any);
       }),
 
     update: protectedProcedure
@@ -1059,15 +1059,15 @@ export const appRouter = router({
         const user = await db.getUserById(ctx.user.id);
         if (user?.role !== 'admin') throw new Error('Only admins can update Fitasty products');
         const { id, ...updateData } = input;
-        // Convert numbers to strings for database
+        // Keep numbers as-is for new schema
         const dbData = {
           ...updateData,
-          calories: updateData.calories ? updateData.calories.toString() : undefined,
-          proteinG: updateData.proteinG ? updateData.proteinG.toString() : undefined,
-          carbsG: updateData.carbsG ? updateData.carbsG.toString() : undefined,
-          fatG: updateData.fatG ? updateData.fatG.toString() : undefined,
+          calories: updateData.calories,
+          protein_g: updateData.proteinG,
+          carbs_g: updateData.carbsG,
+          fat_g: updateData.fatG,
         };
-        return db.updateFitastyProduct(id, dbData);
+        return db.updateFitastyProduct(id, dbData as any);
       }),
 
     delete: protectedProcedure

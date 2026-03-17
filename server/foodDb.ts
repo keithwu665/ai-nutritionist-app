@@ -90,10 +90,10 @@ export async function searchFitastyProducts(query: string) {
       .select()
       .from(fitastyProducts)
       .where(and(
-        eq(fitastyProducts.isActive, 1),
-        like(fitastyProducts.name, `%${query}%`)
+        eq(fitastyProducts.is_active, 1),
+        like(fitastyProducts.product_name_zh, `%${query}%`)
       ))
-      .orderBy(fitastyProducts.category, fitastyProducts.name)
+      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
       .limit(10);
     return result;
   } catch (error) {
