@@ -37,7 +37,7 @@ export async function searchUnifiedFood(
       product.proteinG ? Number(product.proteinG) : null,
       product.carbsG ? Number(product.carbsG) : null,
       product.fatG ? Number(product.fatG) : null,
-      product.net_weight_g ? Number(product.net_weight_g) : null
+      product.servingSize ? Number(product.servingSize) : 100 // Default to 100g if not specified
     );
 
     results.push({

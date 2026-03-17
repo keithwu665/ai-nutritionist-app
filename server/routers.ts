@@ -991,6 +991,94 @@ export const appRouter = router({
         });
       }),
   }),
+
+  // ========================================================================
+  // Fitasty Products
+  // ========================================================================
+  fitasty: router({
+    search: publicProcedure
+      .input(z.object({ query: z.string().min(1) }))
+      .query(async ({ input }) => {
+        return db.searchFitastyProducts(input.query);
+      }),
+
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getFitastyProductById(input.id);
+      }),
+
+    list: publicProcedure
+      .input(z.object({ limit: z.number().default(20), offset: z.number().default(0) }))
+      .query(async ({ input }) => {
+        return db.listFitastyProducts(input.limit, input.offset);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        category: z.string().min(1),
+        servingSize: z.string().optional(),
+        calories: z.number().positive(),
+        proteinG: z.number().nonnegative().optional(),
+        carbsG: z.number().nonnegative().optional(),
+        fatG: z.number().nonnegative().optional(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Only allow admin to create products
+        const user = await db.getUserById(ctx.user.id);
+        if (user?.role !== 'admin') throw new Error('Only admins can create Fitasty products');
+        // Convert numbers to strings for database
+        const dbData = {
+          ...input,
+          calories: input.calories.toString(),
+          proteinG: input.proteinG ? input.proteinG.toString() : undefined,
+          carbsG: input.carbsG ? input.carbsG.toString() : undefined,
+          fatG: input.fatG ? input.fatG.toString() : undefined,
+        };
+        return db.createFitastyProduct(dbData);
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        category: z.string().optional(),
+        servingSize: z.string().optional(),
+        calories: z.number().positive().optional(),
+        proteinG: z.number().nonnegative().optional(),
+        carbsG: z.number().nonnegative().optional(),
+        fatG: z.number().nonnegative().optional(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Only allow admin to update products
+        const user = await db.getUserById(ctx.user.id);
+        if (user?.role !== 'admin') throw new Error('Only admins can update Fitasty products');
+        const { id, ...updateData } = input;
+        // Convert numbers to strings for database
+        const dbData = {
+          ...updateData,
+          calories: updateData.calories ? updateData.calories.toString() : undefined,
+          proteinG: updateData.proteinG ? updateData.proteinG.toString() : undefined,
+          carbsG: updateData.carbsG ? updateData.carbsG.toString() : undefined,
+          fatG: updateData.fatG ? updateData.fatG.toString() : undefined,
+        };
+        return db.updateFitastyProduct(id, dbData);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // Only allow admin to delete products
+        const user = await db.getUserById(ctx.user.id);
+        if (user?.role !== 'admin') throw new Error('Only admins can delete Fitasty products');
+        return db.deleteFitastyProduct(input.id);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

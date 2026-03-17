@@ -78,23 +78,28 @@ export const bodyPhotos = mysqlTable("body_photos", {
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
-export const fitastyProducts = mysqlTable("fitasty_products", {
-	id: int().autoincrement().notNull(),
-	name: varchar({ length: 255 }).notNull(),
-	category: varchar({ length: 100 }).notNull(),
-	servingSize: varchar({ length: 100 }),
-	net_weight_g: decimal({ precision: 6, scale: 1 }), // Net weight in grams for per100g calculation
-	calories: decimal({ precision: 8, scale: 1 }).notNull(),
-	proteinG: decimal({ precision: 6, scale: 1 }),
-	carbsG: decimal({ precision: 6, scale: 1 }),
-	fatG: decimal({ precision: 6, scale: 1 }),
-	description: text(),
-	imageUrl: varchar({ length: 500 }),
-	isActive: tinyint().default(1).notNull(),
-	createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
-	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-	deletedAt: timestamp({ mode: 'string' }),
-});
+	export const fitastyProducts = mysqlTable("fitasty_products", {
+		id: int().autoincrement().notNull().primaryKey(),
+		name: varchar({ length: 255 }).notNull(), // Keep for backward compatibility
+		category: varchar({ length: 100 }).notNull(),
+		servingSize: varchar({ length: 100 }),
+		calories: decimal({ precision: 8, scale: 1 }).notNull(),
+		proteinG: decimal({ precision: 6, scale: 1 }),
+		carbsG: decimal({ precision: 6, scale: 1 }),
+		fatG: decimal({ precision: 6, scale: 1 }),
+		description: text(),
+		imageUrl: varchar({ length: 500 }),
+		isActive: tinyint().default(1).notNull(),
+		createdAt: timestamp({ mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+		// New fields for full specification
+		brand_name: varchar({ length: 255 }),
+		serving_unit: varchar({ length: 50 }),
+		fiber_g: decimal({ precision: 6, scale: 1 }),
+		sugar_g: decimal({ precision: 6, scale: 1 }),
+		sodium_mg: decimal({ precision: 8, scale: 1 }),
+		barcode: varchar({ length: 100 }),
+	});
 
 	export const foodLogItems = mysqlTable("food_log_items", {
 		id: int().autoincrement().notNull(),

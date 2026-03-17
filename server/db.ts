@@ -393,7 +393,8 @@ export async function updateFitastyProduct(id: number, data: Partial<InsertFitas
 export async function deleteFitastyProduct(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(fitastyProducts).set({ deletedAt: new Date().toISOString() }).where(eq(fitastyProducts.id, id));
+  // Mark as inactive instead of deleting
+  await db.update(fitastyProducts).set({ isActive: 0 }).where(eq(fitastyProducts.id, id));
   return true;
 }
 
@@ -426,6 +427,34 @@ export async function getFitastyProductById(id: number) {
     return result.length > 0 ? result[0] : null;
   } catch (error) {
     console.error('Error fetching Fitasty product by ID:', error);
+    return null;
+  }
+}
+
+export async function listFitastyProducts(limit: number = 20, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    const result = await db.select().from(fitastyProducts)
+      .where(eq(fitastyProducts.isActive, 1))
+      .orderBy(fitastyProducts.category, fitastyProducts.name)
+      .limit(limit)
+      .offset(offset);
+    return result;
+  } catch (error) {
+    console.error('Error listing Fitasty products:', error);
+    return [];
+  }
+}
+
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
     return null;
   }
 }
