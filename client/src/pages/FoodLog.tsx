@@ -15,7 +15,7 @@ export default function FoodLog() {
   const { user } = useAuth() || {};
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('manual');
+  const [activeTab, setActiveTab] = useState('photo');
 
   // Manual input form state
   const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
@@ -640,8 +640,8 @@ export default function FoodLog() {
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1 overflow-hidden">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="manual">手動輸入</TabsTrigger>
               <TabsTrigger value="photo">影相</TabsTrigger>
+              <TabsTrigger value="manual">手動輸入</TabsTrigger>
             </TabsList>
 
             {/* Manual Input Tab */}
