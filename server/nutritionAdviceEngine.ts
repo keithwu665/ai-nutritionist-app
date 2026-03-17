@@ -1,12 +1,10 @@
 /**
- * Complete Nutrition Advice Engine v3
- * HARD OVERRIDE LOGIC: Rules engine determines facts FIRST, AI MUST reference facts
+ * Complete Nutrition Advice Engine v4
+ * REAL ADVICE: Interprets macros and gives practical recommendations
  * 
- * Architecture:
- * 1. Generate structured nutrition facts (protein_status, fat_status, carbs_status, calorie_level)
- * 2. Generate neutral advice that EXPLICITLY mentions macros
- * 3. AI transforms tone while PRESERVING macro references
- * 4. Validation layer ensures advice mentions at least one macro and doesn't contradict facts
+ * Output Structure:
+ * 1. Nutrition Summary - Brief macro summary (蛋白質 22.9g ・ 脂肪 5g...)
+ * 2. AI Diet Advice - Real interpretation + practical recommendation (not just numbers)
  */
 
 import { invokeLLM } from './_core/llm';
@@ -33,8 +31,8 @@ export interface NutritionFacts {
 
 export interface AdviceResult {
   rating: NutritionRating;
-  neutralAdvice: string;
-  personalityAdvice: string;
+  nutritionSummary: string;
+  aiDietAdvice: string;
   facts: NutritionFacts;
 }
 
@@ -138,154 +136,86 @@ export function calculateNutritionRating(values: NutritionValues): NutritionRati
 }
 
 // ============================================
-// PART 3: NEUTRAL ADVICE GENERATION
-// CRITICAL: MUST explicitly mention at least one macro
+// PART 3: NUTRITION SUMMARY (MACRO NUMBERS)
 // ============================================
 
-export function generateNeutralAdvice(values: NutritionValues, facts: NutritionFacts): string {
+export function generateNutritionSummary(values: NutritionValues): string {
   const { kcal, protein, carbs, fat } = values;
-
-  // CASE 1: High protein / low fat / low carb (PROTEIN FOCUSED)
-  if (protein >= 15 && fat <= 8 && carbs <= 15) {
-    return `蛋白質${protein}g，幾高。脂肪${fat}g，好低。碳水${carbs}g，都唔高。整體算幾乾淨。`;
-  }
-
-  // CASE 2: High protein but high fat
-  if (protein >= 20 && fat >= 20) {
-    return `蛋白質${protein}g，有。脂肪${fat}g，偏高。要留意總熱量${kcal}kcal。`;
-  }
-
-  // CASE 3: High carbs
-  if (carbs >= 40) {
-    return `碳水${carbs}g，比例偏高。蛋白質${protein}g。如果活動量唔多要注意份量。`;
-  }
-
-  // CASE 4: High fat
-  if (fat >= 20) {
-    return `脂肪${fat}g，偏高。長期食要注意油脂攝取。蛋白質${protein}g。`;
-  }
-
-  // CASE 5: High calorie
-  if (kcal >= 700) {
-    return `呢餐熱量${kcal}kcal，幾高。蛋白質${protein}g，脂肪${fat}g。如果目標係減脂要留意。`;
-  }
-
-  // CASE 6: Light meal but low protein
-  if (kcal <= 150 && protein < 8) {
-    return `呢餐熱量${kcal}kcal，比較輕。蛋白質${protein}g，偏少。如果當正餐食會唔太夠。`;
-  }
-
-  // CASE 7: Healthy vegetables
-  if (kcal <= 120 && fat <= 5 && carbs <= 15) {
-    return `呢類蔬菜熱量${kcal}kcal，好低。脂肪${fat}g，碳水${carbs}g，都唔高。作為配菜幾健康。蛋白質${protein}g，如果當正餐食會偏少。`;
-  }
-
-  // CASE 8: Balanced meal
-  if (protein >= 15 && protein <= 35 && fat >= 5 && fat <= 15 && carbs >= 15 && carbs <= 40) {
-    return `整體比例算幾均衡。蛋白質${protein}g，脂肪${fat}g，碳水${carbs}g，都算合理。`;
-  }
-
-  // DEFAULT: Always mention at least one macro
-  return `呢餐營養：蛋白質${protein}g，脂肪${fat}g，碳水${carbs}g，熱量${kcal}kcal。`;
+  
+  // Format: 蛋白質 22.9g ・ 脂肪 5g ・ 碳水 0g ・ 187 kcal
+  return `蛋白質 ${protein.toFixed(1)}g ・ 脂肪 ${fat.toFixed(1)}g ・ 碳水 ${carbs.toFixed(1)}g ・ ${kcal.toFixed(0)} kcal`;
 }
 
 // ============================================
-// PART 4: VALIDATION LAYER - FACT CHECKING
+// PART 4: AI DIET ADVICE (REAL INTERPRETATION)
 // ============================================
 
-function validateAdviceAgainstFacts(advice: string, facts: NutritionFacts): boolean {
-  const advice_lower = advice.toLowerCase();
-
-  // RULE 1: Advice MUST mention at least one macro
-  const hasMacroReference = /蛋白質|脂肪|碳水|熱量|kcal|protein|fat|carbs|calories/i.test(advice);
-  if (!hasMacroReference) {
-    console.warn('[validateAdviceAgainstFacts] No macro reference found in advice');
-    return false;
-  }
-
-  // RULE 2: If protein is high/very_high, cannot say protein is insufficient
-  if ((facts.protein_status === 'high' || facts.protein_status === 'very_high') &&
-      (advice_lower.includes('蛋白質') && (advice_lower.includes('唔夠') || advice_lower.includes('不夠') || advice_lower.includes('不足') || advice_lower.includes('insufficient') || advice_lower.includes('偏少')))) {
-    console.warn('[validateAdviceAgainstFacts] Contradiction: high protein but advice says insufficient');
-    return false;
-  }
-
-  // RULE 3: If protein is very_low/low, cannot say protein is sufficient
-  if ((facts.protein_status === 'very_low' || facts.protein_status === 'low') &&
-      (advice_lower.includes('蛋白質') && (advice_lower.includes('充足') || advice_lower.includes('足夠') || advice_lower.includes('夠') || advice_lower.includes('高')))) {
-    console.warn('[validateAdviceAgainstFacts] Contradiction: low protein but advice says sufficient');
-    return false;
-  }
-
-  // RULE 4: If fat is low/very_low, cannot say fat is high
-  if ((facts.fat_status === 'low' || facts.fat_status === 'very_low') &&
-      (advice_lower.includes('脂肪') && (advice_lower.includes('高') || advice_lower.includes('多') || advice_lower.includes('excessive') || advice_lower.includes('偏高')))) {
-    console.warn('[validateAdviceAgainstFacts] Contradiction: low fat but advice says high');
-    return false;
-  }
-
-  // RULE 5: If fat is high/very_high, cannot say fat is low
-  if ((facts.fat_status === 'high' || facts.fat_status === 'very_high') &&
-      (advice_lower.includes('脂肪') && (advice_lower.includes('低') || advice_lower.includes('少')))) {
-    console.warn('[validateAdviceAgainstFacts] Contradiction: high fat but advice says low');
-    return false;
-  }
-
-  // RULE 6: If carbs is low/very_low, cannot say carbs are high
-  if ((facts.carbs_status === 'low' || facts.carbs_status === 'very_low') &&
-      (advice_lower.includes('碳水') && (advice_lower.includes('高') || advice_lower.includes('過高') || advice_lower.includes('爆')))) {
-    console.warn('[validateAdviceAgainstFacts] Contradiction: low carbs but advice says high');
-    return false;
-  }
-
-  // RULE 7: If carbs is high/very_high, cannot say carbs are low
-  if ((facts.carbs_status === 'high' || facts.carbs_status === 'very_high') &&
-      (advice_lower.includes('碳水') && (advice_lower.includes('低') || advice_lower.includes('少')))) {
-    console.warn('[validateAdviceAgainstFacts] Contradiction: high carbs but advice says low');
-    return false;
-  }
-
-  return true; // VALID - no contradictions and has macro reference
-}
-
-// ============================================
-// PART 5: AI-POWERED PERSONALITY TRANSFORMATION
-// ============================================
-
-async function transformToPersonalityWithAI(
-  neutralAdvice: string,
-  personality: PersonalityType,
+async function generateAIDietAdviceWithAI(
   facts: NutritionFacts,
   values: NutritionValues,
+  personality: PersonalityType,
   retryCount: number = 0
 ): Promise<string> {
   if (retryCount > 3) {
-    console.warn('[transformToPersonalityWithAI] Max retries reached, returning neutral advice');
-    return neutralAdvice;
+    console.warn('[generateAIDietAdviceWithAI] Max retries reached, using fallback');
+    return generateFallbackAdvice(facts, values, personality);
   }
 
   const personalityPrompts = {
-    gentle: `You are a gentle, supportive nutrition coach. Transform the following nutrition advice into a warm, encouraging message that celebrates the meal's positive aspects while gently suggesting improvements. Keep the tone supportive and motivating. CRITICAL: You MUST preserve all macro references (protein, fat, carbs, calories) from the original advice. Do not remove or generalize them.`,
-    coach: `You are a strict, no-nonsense fitness coach. Transform the following nutrition advice into a direct, demanding message that focuses on results and discipline. Be honest about what needs improvement, but acknowledge what's good. CRITICAL: You MUST preserve all macro references (protein, fat, carbs, calories) from the original advice. Do not remove or generalize them.`,
-    hongkong: `You are a Hong Kong-style coach with a sarcastic, humorous tone. Transform the following nutrition advice into a witty, entertaining message using casual Hong Kong Cantonese style. Be playful but honest about nutrition. CRITICAL: You MUST preserve all macro references (protein, fat, carbs, calories) from the original advice. Do not remove or generalize them.`,
+    gentle: `You are a gentle, supportive nutrition coach (溫柔營養師). Your role is to:
+1. Interpret the nutrition values and what they mean for the user
+2. Give practical recommendations based on the meal type
+3. Be encouraging and supportive
+4. Suggest improvements in a kind way
+
+IMPORTANT: Do NOT just repeat the macro numbers. Instead, interpret what they mean and give real advice.
+Example: Instead of "蛋白質22.9g，脂肪5g", say "呢份蛋白質幾好，脂肪又唔高，作為補蛋白或者控制熱量都幾適合。"
+
+Keep response under 60 words in Cantonese.`,
+
+    coach: `You are a strict, no-nonsense fitness coach (魔鬼教練). Your role is to:
+1. Assess the nutrition values and what they mean for fitness goals
+2. Give direct, demanding feedback
+3. Focus on results and discipline
+4. Acknowledge what's good but push for improvement
+
+IMPORTANT: Do NOT just repeat the macro numbers. Instead, interpret what they mean and give real advice.
+Example: Instead of "蛋白質22.9g，脂肪5g", say "蛋白質合格，脂肪控制得唔錯，呢餐先似樣。想練得好，就保持呢種乾淨食法。"
+
+Keep response under 60 words in Cantonese.`,
+
+    hongkong: `You are a Hong Kong-style sarcastic coach (香港寸嘴教練). Your role is to:
+1. Interpret the nutrition values with humor and wit
+2. Give honest feedback in a playful way
+3. Use casual Hong Kong Cantonese style
+4. Be entertaining but truthful
+
+IMPORTANT: Do NOT just repeat the macro numbers. Instead, interpret what they mean and give real advice.
+Example: Instead of "蛋白質22.9g，脂肪5g", say "呢餐終於有啲似樣，蛋白質夠，脂肪又唔爆。識食就繼續啦，唔好又轉頭食垃圾。"
+
+Keep response under 60 words in Cantonese.`,
   };
 
   const factsDescription = `
-NUTRITION FACTS (IMMUTABLE - DO NOT CONTRADICT):
-- Protein: ${facts.protein_status} (${values.protein}g)
-- Fat: ${facts.fat_status} (${values.fat}g)
-- Carbs: ${facts.carbs_status} (${values.carbs}g)
-- Calories: ${facts.calorie_level} (${values.kcal} kcal)
+NUTRITION ANALYSIS:
+- Protein: ${facts.protein_status} (${values.protein.toFixed(1)}g)
+- Fat: ${facts.fat_status} (${values.fat.toFixed(1)}g)
+- Carbs: ${facts.carbs_status} (${values.carbs.toFixed(1)}g)
+- Calories: ${facts.calorie_level} (${values.kcal.toFixed(0)} kcal)
 - Meal type: ${facts.meal_type}
 
-CRITICAL RULES:
-1. PRESERVE all macro references from the original advice
-2. If protein is "high" or "very_high", NEVER say protein is insufficient
-3. If protein is "very_low" or "low", NEVER say protein is sufficient
-4. If fat is "low" or "very_low", NEVER say fat is high
-5. If fat is "high" or "very_high", NEVER say fat is low
-6. You can only change the TONE and WORDING, never the FACTS
-7. The transformed advice MUST still mention specific macro values or statuses
+INTERPRETATION GUIDE:
+- Protein high/very_high: Good for muscle building, post-workout, satiety
+- Protein low/very_low: May need more protein, not ideal for muscle building
+- Fat low/very_low: Good for fat loss, light meal
+- Fat high/very_high: High calorie density, may hinder fat loss
+- Carbs low/very_low: Good for low-carb diet, may lack energy
+- Carbs high/very_high: Good for energy, may need activity to burn
+- Calories low: Light meal, snack
+- Calories high: Heavy meal, full meal
+
+YOUR TASK:
+Interpret these facts and give practical advice about whether this meal is suitable for fat loss, muscle building, light eating, post-workout, etc. Give real recommendations, not just numbers.
 `;
 
   try {
@@ -297,25 +227,59 @@ CRITICAL RULES:
         },
         {
           role: 'user',
-          content: `Transform this advice into ${personality} style (keep it under 60 words, preserve all macro references):\n\n"${neutralAdvice}"`,
+          content: `Based on the nutrition analysis above, give real diet advice in ${personality} style. Interpret what the macros mean and give practical recommendation. Do NOT just repeat the numbers.`,
         },
       ],
     });
 
     const content = response.choices[0]?.message?.content;
-    const transformedAdvice = (typeof content === 'string' ? content : neutralAdvice).trim();
+    const advice = (typeof content === 'string' ? content : '').trim();
 
-    // VALIDATION: Check if transformed advice contradicts facts
-    if (!validateAdviceAgainstFacts(transformedAdvice, facts)) {
-      console.warn(`[transformToPersonalityWithAI] Validation failed, regenerating (attempt ${retryCount + 1})`);
-      return transformToPersonalityWithAI(neutralAdvice, personality, facts, values, retryCount + 1);
+    // Validate that advice is not just macro numbers
+    if (advice.length === 0 || advice.match(/^\d+g.*\d+g.*\d+g.*kcal$/)) {
+      console.warn('[generateAIDietAdviceWithAI] Advice is just numbers, regenerating');
+      return generateAIDietAdviceWithAI(facts, values, personality, retryCount + 1);
     }
 
-    return transformedAdvice;
+    return advice;
   } catch (error) {
-    console.error('[transformToPersonalityWithAI] Error:', error);
-    return neutralAdvice;
+    console.error('[generateAIDietAdviceWithAI] Error:', error);
+    return generateFallbackAdvice(facts, values, personality);
   }
+}
+
+// ============================================
+// PART 5: FALLBACK ADVICE (IF AI FAILS)
+// ============================================
+
+function generateFallbackAdvice(facts: NutritionFacts, values: NutritionValues, personality: PersonalityType): string {
+  const { protein_status, fat_status, carbs_status, meal_type } = facts;
+
+  // Build advice based on facts
+  let baseAdvice = '';
+
+  if (meal_type === 'protein_focused') {
+    baseAdvice = '呢餐蛋白質幾好，脂肪又低，好適合補蛋白或者控制熱量。';
+  } else if (meal_type === 'carb_heavy') {
+    baseAdvice = '呢餐碳水比例偏高，適合運動前或者活動量大嘅日子。';
+  } else if (meal_type === 'fat_heavy') {
+    baseAdvice = '呢餐脂肪偏高，熱量密度大，如果減脂要留意份量。';
+  } else if (meal_type === 'light') {
+    baseAdvice = '呢餐比較輕，適合作為輕食或者點心。';
+  } else if (meal_type === 'heavy') {
+    baseAdvice = '呢餐熱量幾高，適合作為正餐或者活動量大嘅補充。';
+  } else {
+    baseAdvice = '呢餐營養比例算幾均衡。';
+  }
+
+  // Add personality-specific twist
+  if (personality === 'coach') {
+    return baseAdvice.replace('好適合', '適合').replace('幾好', '可以').replace('算幾', '算係');
+  } else if (personality === 'hongkong') {
+    return baseAdvice.replace('呢餐', '呢餐終於').replace('好', '幾').replace('。', '啦。');
+  }
+
+  return baseAdvice;
 }
 
 // ============================================
@@ -326,45 +290,22 @@ export async function generateNutritionAdvice(
   values: NutritionValues,
   personality: PersonalityType
 ): Promise<AdviceResult> {
-  // STEP 1: Generate structured nutrition facts (IMMUTABLE)
+  // STEP 1: Generate structured nutrition facts
   const facts = generateNutritionFacts(values);
 
   // STEP 2: Calculate rating
   const rating = calculateNutritionRating(values);
 
-  // STEP 3: Generate neutral advice (MUST mention macros)
-  const neutralAdvice = generateNeutralAdvice(values, facts);
+  // STEP 3: Generate nutrition summary (macro numbers)
+  const nutritionSummary = generateNutritionSummary(values);
 
-  // STEP 4: Validate neutral advice
-  if (!validateAdviceAgainstFacts(neutralAdvice, facts)) {
-    console.error('[generateNutritionAdvice] Neutral advice validation failed, using fallback');
-    const fallbackAdvice = `蛋白質${values.protein}g，脂肪${values.fat}g，碳水${values.carbs}g，熱量${values.kcal}kcal。`;
-    return {
-      rating,
-      neutralAdvice: fallbackAdvice,
-      personalityAdvice: fallbackAdvice,
-      facts,
-    };
-  }
-
-  // STEP 5: Transform to personality with AI (respecting facts)
-  const personalityAdvice = await transformToPersonalityWithAI(neutralAdvice, personality, facts, values);
-
-  // STEP 6: Final validation
-  if (!validateAdviceAgainstFacts(personalityAdvice, facts)) {
-    console.warn('[generateNutritionAdvice] Final validation failed, using neutral advice');
-    return {
-      rating,
-      neutralAdvice,
-      personalityAdvice: neutralAdvice,
-      facts,
-    };
-  }
+  // STEP 4: Generate real AI diet advice (interpretation + recommendation)
+  const aiDietAdvice = await generateAIDietAdviceWithAI(facts, values, personality);
 
   return {
     rating,
-    neutralAdvice,
-    personalityAdvice,
+    nutritionSummary,
+    aiDietAdvice,
     facts,
   };
 }

@@ -472,7 +472,8 @@ Rules:
           
           const adviceResult = await generateNutritionAdvice(nutritionValues, personalityType);
           const rating = adviceResult.rating;
-          const advice = adviceResult.personalityAdvice;
+          const nutritionSummary = adviceResult.nutritionSummary;
+          const aiDietAdvice = adviceResult.aiDietAdvice;
 
           return {
             success: true,
@@ -488,7 +489,8 @@ Rules:
             foodName,
             foodItems,
             mealQualityRating: rating,
-            aiAdvice: advice,
+            nutritionSummary,
+            aiAdvice: aiDietAdvice,
           };
         } catch (parseError) {
           const message = parseError instanceof Error ? parseError.message : 'Unknown parse error';

@@ -34,6 +34,7 @@ export default function FoodLog() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [photoFoodName, setPhotoFoodName] = useState('');
   const [photoMealRating, setPhotoMealRating] = useState('');
+  const [photoNutritionSummary, setPhotoNutritionSummary] = useState('');
   const [photoAiAdvice, setPhotoAiAdvice] = useState('');
   const [photoFoodItems, setPhotoFoodItems] = useState<string[]>([]);
   const [photoAnalysisComplete, setPhotoAnalysisComplete] = useState(false);
@@ -302,6 +303,7 @@ export default function FoodLog() {
         setPhotoFoodName(response.foodName || '已分析食物');
         setPhotoFoodItems(response.foodItems || [response.foodName || '已分析食物']);
         setPhotoMealRating(response.mealQualityRating || '');
+        setPhotoNutritionSummary(response.nutritionSummary || '');
         setPhotoAiAdvice(response.aiAdvice || '');
         setPhotoAnalysisComplete(true);
         toast.success('食物分析完成');
@@ -357,6 +359,7 @@ export default function FoodLog() {
       setPhotoFoodName('');
       setPhotoFoodItems([]);
       setPhotoMealRating('');
+      setPhotoNutritionSummary('');
       setPhotoAiAdvice('');
       setShowModal(false);
       setActiveTab('manual');
@@ -374,6 +377,7 @@ export default function FoodLog() {
     setPhotoFoodName('');
     setPhotoFoodItems([]);
     setPhotoMealRating('');
+    setPhotoNutritionSummary('');
     setPhotoAiAdvice('');
     // Clear nutrition fields
     setCalories('');
@@ -842,11 +846,19 @@ export default function FoodLog() {
                     </div>
                   )}
                   
-                  {/* AI Advice */}
+                  {/* Nutrition Summary */}
+                  {photoNutritionSummary && (
+                    <div className="bg-white rounded p-3 border border-emerald-200">
+                      <p className="text-xs text-emerald-600 font-medium mb-2">營養重點</p>
+                      <p className="text-sm text-emerald-900 font-mono">{photoNutritionSummary}</p>
+                    </div>
+                  )}
+                  
+                  {/* AI Diet Advice */}
                   {photoAiAdvice && (
                     <div className="bg-white rounded p-3 border border-emerald-200">
-                      <p className="text-xs text-emerald-600 font-medium mb-1">💡 AI 飲食建議</p>
-                      <p className="text-sm text-emerald-900">{photoAiAdvice}</p>
+                      <p className="text-xs text-emerald-600 font-medium mb-2">💡 AI 飲食建議</p>
+                      <p className="text-sm text-emerald-900 leading-relaxed">{photoAiAdvice}</p>
                     </div>
                   )}
                 </div>
