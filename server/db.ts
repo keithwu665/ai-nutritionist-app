@@ -352,7 +352,6 @@ export async function getAllFitastyProducts() {
   if (!db) return [];
   try {
     const result = await db.select().from(fitastyProducts)
-      .where(eq(fitastyProducts.is_active, 1))
       .orderBy(fitastyProducts.category);
     return result;
   } catch (error) {
@@ -366,7 +365,7 @@ export async function getFitastyProductsByCategory(category: string) {
   if (!db) return [];
   try {
     const result = await db.select().from(fitastyProducts)
-      .where(and(eq(fitastyProducts.category, category), eq(fitastyProducts.is_active, 1)))
+      .where(eq(fitastyProducts.category, category))
       .orderBy(fitastyProducts.product_name_zh);
     return result;
   } catch (error) {
@@ -393,8 +392,8 @@ export async function updateFitastyProduct(id: number, data: Partial<InsertFitas
 export async function deleteFitastyProduct(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Mark as inactive instead of deleting
-  await db.update(fitastyProducts).set({ is_active: 0 }).where(eq(fitastyProducts.id, id));
+  // Delete the product
+  await db.delete(fitastyProducts).where(eq(fitastyProducts.id, id));
   return true;
 }
 
@@ -404,10 +403,7 @@ export async function searchFitastyProducts(query: string) {
   try {
     const { like } = await import('drizzle-orm');
     const result = await db.select().from(fitastyProducts)
-      .where(and(
-        eq(fitastyProducts.is_active, 1),
-        like(fitastyProducts.product_name_zh, `%${query}%`)
-      ))
+      .where(like(fitastyProducts.product_name_zh, `%${query}%`))
       .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
       .limit(20);
     return result;
@@ -422,7 +418,7 @@ export async function getFitastyProductById(id: number) {
   if (!db) return null;
   try {
     const result = await db.select().from(fitastyProducts)
-      .where(and(eq(fitastyProducts.id, id), eq(fitastyProducts.is_active, 1)))
+      .where(eq(fitastyProducts.id, id))
       .limit(1);
     return result.length > 0 ? result[0] : null;
   } catch (error) {
@@ -436,7 +432,6 @@ export async function listFitastyProducts(limit: number = 20, offset: number = 0
   if (!db) return [];
   try {
     const result = await db.select().from(fitastyProducts)
-      .where(eq(fitastyProducts.is_active, 1))
       .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
       .limit(limit)
       .offset(offset);
