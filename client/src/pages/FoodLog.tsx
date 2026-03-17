@@ -650,9 +650,10 @@ export default function FoodLog() {
           </DialogHeader>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1 overflow-hidden">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="photo">影相</TabsTrigger>
               <TabsTrigger value="manual">手動輸入</TabsTrigger>
+              <TabsTrigger value="fitasty">Fitasty 產品庫</TabsTrigger>
             </TabsList>
 
             {/* Manual Input Tab */}
@@ -926,6 +927,102 @@ export default function FoodLog() {
               )}
 
               {/* Removed duplicate Meal Quality Rating and AI Diet Advice - kept only in green result card above */}
+            </TabsContent>
+
+            {/* Fitasty Products Tab */}
+            <TabsContent value="fitasty" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2">
+              {/* Meal Type */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">餐次</label>
+                <Select value={mealType} onValueChange={(value) => setMealType(value as 'breakfast' | 'lunch' | 'dinner' | 'snack')}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakfast">早餐</SelectItem>
+                    <SelectItem value="lunch">午餐</SelectItem>
+                    <SelectItem value="dinner">晚餐</SelectItem>
+                    <SelectItem value="snack">零食</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Product Search */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">搜尋產品 *</label>
+                <div className="relative">
+                  <Input
+                    placeholder="輸入產品名稱 (中文/英文)"
+                    value={foodName}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    onFocus={() => foodName.length >= 2 && setShowSearchResults(true)}
+                  />
+                  {showSearchResults && (searchResults.length > 0 || isSearching) && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                      {isSearching ? (
+                        <div className="px-4 py-3 text-center text-sm text-gray-500">搜尋中...</div>
+                      ) : searchResults.length > 0 ? (
+                        searchResults.map((result, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSelectFood(result)}
+                            className="w-full text-left px-4 py-3 hover:bg-emerald-50 border-b last:border-b-0 text-sm"
+                          >
+                            <div className="font-medium">{result.displayName || result.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {result.kcal_per_100g || result.kcal || 0} kcal · P:{result.proteinG || 0}g · C:{result.carbsG || 0}g · F:{result.fatG || 0}g
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-center text-sm text-gray-500">未找到結果</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Nutrition Info (auto-filled from product) */}
+              {(calories || proteinG || carbsG || fatG) && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">熱量 (kcal)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={calories}
+                      onChange={(e) => setCalories(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">蛋白質 (g)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={proteinG}
+                      onChange={(e) => setProteinG(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">碳水 (g)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={carbsG}
+                      onChange={(e) => setCarbsG(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">脂肪 (g)</label>
+                    <Input
+                      type="number"
+                      placeholder="0"
+                      value={fatG}
+                      onChange={(e) => setFatG(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
 
