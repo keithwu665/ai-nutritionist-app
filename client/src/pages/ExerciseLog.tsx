@@ -536,7 +536,7 @@ export default function ExerciseLog() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-blue-700">
                 <Users className="h-5 w-5" />
-                教練建議 👨‍🏫
+                運動建議 💪
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
