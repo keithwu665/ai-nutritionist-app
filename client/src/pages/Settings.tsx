@@ -24,6 +24,7 @@ export default function Settings() {
     fitnessGoal: 'maintain' as 'lose' | 'maintain' | 'gain',
     activityLevel: 'moderate' as 'sedentary' | 'light' | 'moderate' | 'high',
     aiToneStyle: 'gentle' as 'gentle' | 'coach' | 'hk_style',
+    displayName: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -41,6 +42,7 @@ export default function Settings() {
         fitnessGoal: profile.fitnessGoal,
         activityLevel: profile.activityLevel,
         aiToneStyle: profile.aiToneStyle || 'gentle',
+        displayName: profile.displayName || '',
       });
     } else {
       // Initialize with default values if no profile exists
@@ -52,6 +54,7 @@ export default function Settings() {
         fitnessGoal: 'maintain',
         activityLevel: 'moderate',
         aiToneStyle: 'gentle',
+        displayName: '',
       });
     }
   }, [profile]);
@@ -121,6 +124,7 @@ export default function Settings() {
         fitnessGoal: formData.fitnessGoal,
         activityLevel: formData.activityLevel,
         aiToneStyle: formData.aiToneStyle,
+        displayName: formData.displayName,
       });
     } else {
       updateMutation.mutate({
@@ -131,6 +135,7 @@ export default function Settings() {
         fitnessGoal: formData.fitnessGoal,
         activityLevel: formData.activityLevel,
         aiToneStyle: formData.aiToneStyle,
+        displayName: formData.displayName,
       });
     }
   };
@@ -217,6 +222,11 @@ export default function Settings() {
                     <SelectItem value="high">高度活動</SelectItem>
                   </SelectContent>
                 </Select>
+              </label>
+
+              <label className="block">
+                <p className="font-medium mb-2">稱呼</p>
+                <Input type="text" placeholder="輸入你的稱呼（例如：美怡 / 阿John / Coach）" value={formData.displayName} onChange={(e) => setFormData({ ...formData, displayName: e.target.value })} />
               </label>
             </div>
           </CardContent>

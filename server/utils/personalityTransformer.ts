@@ -69,7 +69,9 @@ export async function transformRecommendationMessage(
   originalMessage: string,
   personality: PersonalityType
 ): Promise<string> {
-  const prompt = PERSONALITY_PROMPTS[personality].replace('{originalMessage}', originalMessage);
+  // Defensive fallback: ensure personality is valid
+  const validPersonality = personality in PERSONALITY_PROMPTS ? personality : 'gentle';
+  const prompt = PERSONALITY_PROMPTS[validPersonality].replace('{originalMessage}', originalMessage);
 
   try {
     const response = await invokeLLM({
@@ -101,7 +103,9 @@ export async function transformActionText(
   originalAction: string,
   personality: PersonalityType
 ): Promise<string> {
-  const prompt = `Transform this action item into a ${personality === 'gentle' ? 'warm, caring' : personality === 'coach' ? 'strict, demanding' : 'sarcastic, playful Hong Kong'} tone.
+  // Defensive fallback: ensure personality is valid
+  const validPersonality = personality in PERSONALITY_PROMPTS ? personality : 'gentle';
+  const prompt = `Transform this action item into a ${validPersonality === 'gentle' ? 'warm, caring' : validPersonality === 'coach' ? 'strict, demanding' : 'sarcastic, playful Hong Kong'} tone.
 
 ORIGINAL: "${originalAction}"
 

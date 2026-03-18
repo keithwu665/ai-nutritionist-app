@@ -20,7 +20,7 @@ export default function Dashboard() {
     }
   }, [profileLoading, profile, setLocation]);
 
-  const isLoading = profileLoading || dashLoading;
+  const isLoading = profileLoading || dashLoading || recsLoading;
 
   if (isLoading) {
     return (
@@ -59,9 +59,14 @@ export default function Dashboard() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return '早晨，美怡！👋';
-    if (hour < 18) return '午安，美怡！☀️';
-    return '晚安，美怡！🌙';
+    const name = profile?.displayName || '';
+    const greeting = hour < 12 ? '早晨' : hour < 18 ? '午安' : '晚安';
+    const emoji = hour < 12 ? '👋' : hour < 18 ? '☀️' : '🌙';
+    
+    if (name) {
+      return `${greeting}，${name}！${emoji}`;
+    }
+    return `${greeting}！${emoji}`;
   };
 
   return (

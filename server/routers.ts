@@ -40,6 +40,7 @@ export const appRouter = router({
         fitnessGoal: z.enum(["lose", "maintain", "gain"]),
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
+        displayName: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.createUserProfile({
@@ -58,6 +59,7 @@ export const appRouter = router({
         fitnessGoal: z.enum(["lose", "maintain", "gain"]).optional(),
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]).optional(),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
+        displayName: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);
@@ -488,9 +490,15 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         try {
-          return db.deleteFoodLogItem(input.id, ctx.user.id);
+          return db.updateExercise(input.id, ctx.user.id, {
+            type: input.type,
+            durationMinutes: input.durationMinutes,
+            caloriesBurned: input.caloriesBurned,
+            intensity: input.intensity,
+            note: input.note,
+          });
         } catch (error) {
-          console.error('[FoodLogs] deleteItem error:', error instanceof Error ? error.message : String(error));
+          console.error('[Exercise] update error:', error instanceof Error ? error.message : String(error));
           throw error;
         }
       }),
@@ -648,11 +656,11 @@ export const appRouter = router({
 
       let recommendations = generateAllRecommendations(analysisData);
 
-      // Apply personality transformation if user has selected a personality
-      if (profile.aiToneStyle && profile.aiToneStyle !== 'gentle') {
-        const personality = profile.aiToneStyle === 'coach' ? 'coach' : profile.aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
-        recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality);
-      }
+      // Apply personality transformation for all personalities (including gentle)
+      // Default to 'gentle' if aiToneStyle is not set
+      const aiToneStyle = profile.aiToneStyle || 'gentle';
+      const personality = aiToneStyle === 'coach' ? 'coach' : aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
+      recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality);
 
       return {
         diet: recommendations.diet.slice(0, 3).map(r => ({
