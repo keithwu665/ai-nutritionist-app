@@ -280,13 +280,28 @@ export default function Settings() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gentle">溫柔營養師</SelectItem>
-                    <SelectItem value="coach">魔鬼教練</SelectItem>
-                    <SelectItem value="hk_style">香港寸嘴教練 😏</SelectItem>
+                    <SelectItem value="gentle">
+                      <div className="flex flex-col">
+                        <span>🌿 溫柔貼身教練</span>
+                        <span className="text-xs text-gray-500">細心提醒，陪你慢慢進步</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="coach">
+                      <div className="flex flex-col">
+                        <span>💪 魔鬼教練</span>
+                        <span className="text-xs text-gray-500">高要求無藉口，只講結果</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="hk_style">
+                      <div className="flex flex-col">
+                        <span>😏 香港寸嘴教練</span>
+                        <span className="text-xs text-gray-500">會寸爆你，但唔會放棄你</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </label>
-              <p className="text-xs text-gray-500">選擇你喜歡的 AI 教練人格風格</p>
+              <p className="text-xs text-gray-500">選擇你喜歡的 AI 教練人格風格。每個人格會以不同的方式提供建議。</p>
               <Button
                 onClick={handleSave}
                 disabled={updateMutation.isPending || createMutation.isPending}
