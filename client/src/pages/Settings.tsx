@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { PersonalitySelector } from '@/components/PersonalitySelector';
 import { Loader2, LogOut, User, Save, ChevronRight, Download, Lock, HelpCircle, Star, LogOutIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
@@ -273,35 +274,10 @@ export default function Settings() {
         <Card>
           <CardContent className="p-4">
             <div className="space-y-3">
-              <label className="block">
-                <p className="font-medium mb-2">AI 教練人格</p>
-                <Select value={formData.aiToneStyle} onValueChange={(value) => setFormData({ ...formData, aiToneStyle: value as 'gentle' | 'coach' | 'hk_style' })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="gentle">
-                      <div className="flex flex-col">
-                        <span>🌿 溫柔貼身教練</span>
-                        <span className="text-xs text-gray-500">細心提醒，陪你慢慢進步</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="coach">
-                      <div className="flex flex-col">
-                        <span>💪 魔鬼教練</span>
-                        <span className="text-xs text-gray-500">高要求無藉口，只講結果</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="hk_style">
-                      <div className="flex flex-col">
-                        <span>😏 香港寸嘴教練</span>
-                        <span className="text-xs text-gray-500">會寸爆你，但唔會放棄你</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </label>
-              <p className="text-xs text-gray-500">選擇你喜歡的 AI 教練人格風格。每個人格會以不同的方式提供建議。</p>
+              <PersonalitySelector
+                value={formData.aiToneStyle}
+                onChange={(value) => setFormData({ ...formData, aiToneStyle: value })}
+              />
               <Button
                 onClick={handleSave}
                 disabled={updateMutation.isPending || createMutation.isPending}
