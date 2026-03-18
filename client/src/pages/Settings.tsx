@@ -139,6 +139,7 @@ export default function Settings() {
         displayName: formData.displayName,
         goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
         goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
+        calorieMode: formData.calorieMode,
       });
     } else {
       updateMutation.mutate({
@@ -152,6 +153,7 @@ export default function Settings() {
         displayName: formData.displayName,
         goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
         goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
+        calorieMode: formData.calorieMode,
       });
     }
   };
