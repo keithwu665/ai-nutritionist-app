@@ -164,6 +164,8 @@ export default function Dashboard() {
           goalKg={profile.goalKg ? Number(profile.goalKg) : null}
           goalDays={profile.goalDays}
           currentWeight={Number(profile.weightKg)}
+          gender={profile.gender}
+          tdee={tdee}
         />
 
         {/* Body Metrics Cards - 3 Column */}

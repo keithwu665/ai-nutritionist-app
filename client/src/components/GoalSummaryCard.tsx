@@ -6,6 +6,8 @@ interface GoalSummaryCardProps {
   goalKg?: number | null;
   goalDays?: number | null;
   currentWeight?: number;
+  gender?: string;
+  tdee?: number;
 }
 
 export function GoalSummaryCard({
@@ -13,6 +15,8 @@ export function GoalSummaryCard({
   goalKg,
   goalDays,
   currentWeight,
+  gender = 'male',
+  tdee = 0,
 }: GoalSummaryCardProps) {
   // Show empty state if no goal is set
   if (!fitnessGoal || !goalKg || !goalDays) {
@@ -31,6 +35,23 @@ export function GoalSummaryCard({
         </div>
       </Card>
     );
+  }
+
+  // Calculate daily deficit and safety
+  const KCAL_PER_KG_FAT = 7700;
+  const MIN_CALORIES = gender === 'female' ? 1200 : 1500;
+  
+  let dailyDeficit = 0;
+  let isAggressive = false;
+  
+  if (fitnessGoal === 'lose' && goalKg && goalDays) {
+    dailyDeficit = Math.round((goalKg * KCAL_PER_KG_FAT) / goalDays);
+    const dailyCalories = tdee - dailyDeficit;
+    if (dailyCalories < MIN_CALORIES) {
+      isAggressive = true;
+    }
+  } else if (fitnessGoal === 'gain' && goalKg && goalDays) {
+    dailyDeficit = Math.round((goalKg * KCAL_PER_KG_FAT) / goalDays);
   }
 
   // Calculate goal text based on fitnessGoal type
@@ -70,7 +91,21 @@ export function GoalSummaryCard({
               👉 建議進度：{weeklyTarget}
             </p>
           )}
+          {dailyDeficit > 0 && (
+            <p className="text-sm text-slate-700 dark:text-slate-300">
+              👉 每日建議赤字：{dailyDeficit} kcal
+            </p>
+          )}
         </div>
+
+        {/* Warning if goal is too aggressive */}
+        {isAggressive && (
+          <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded p-3 mt-2">
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              ⚠️ 目標過於進取，已調整至安全範圍
+            </p>
+          </div>
+        )}
       </div>
     </Card>
   );

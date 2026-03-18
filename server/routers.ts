@@ -628,7 +628,7 @@ export const appRouter = router({
 
       const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
       const tdee = calculateTDEE(bmr, profile.activityLevel);
-      const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal);
+      const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg, profile.goalDays, profile.gender);
 
       // Use enhanced recommendation engine
       const analysisData: AnalysisData = {
