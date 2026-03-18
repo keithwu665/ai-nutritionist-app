@@ -41,6 +41,8 @@ export const appRouter = router({
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
         displayName: z.string().nullable().optional(),
+        goalKg: z.number().optional(),
+        goalDays: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.createUserProfile({
@@ -60,6 +62,8 @@ export const appRouter = router({
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]).optional(),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
         displayName: z.string().nullable().optional(),
+        goalKg: z.number().optional(),
+        goalDays: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);
