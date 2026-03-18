@@ -43,12 +43,14 @@ export const appRouter = router({
         displayName: z.string().nullable().optional(),
         goalKg: z.number().optional(),
         goalDays: z.number().optional(),
+        calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.createUserProfile({
           userId: ctx.user.id,
           ...input,
           aiToneStyle: input.aiToneStyle || 'gentle',
+          calorieMode: input.calorieMode || 'safe',
         });
       }),
 
@@ -64,6 +66,7 @@ export const appRouter = router({
         displayName: z.string().nullable().optional(),
         goalKg: z.number().optional(),
         goalDays: z.number().optional(),
+        calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { PersonalitySelector } from '@/components/PersonalitySelector';
+import { AggressiveCalorieModal } from '@/components/AggressiveCalorieModal';
 import { Loader2, LogOut, User, Save, ChevronRight, Download, Lock, HelpCircle, Star, LogOutIcon, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
@@ -27,7 +28,11 @@ export default function Settings() {
     displayName: '',
     goalKg: '',
     goalDays: '',
+    calorieMode: 'safe' as 'safe' | 'aggressive',
   });
+
+  const [showAggressiveModal, setShowAggressiveModal] = useState(false);
+  const [pendingCalorieMode, setPendingCalorieMode] = useState<'safe' | 'aggressive'>('safe');
 
   const [notifications, setNotifications] = useState({
     dailyReminder: true,
@@ -47,6 +52,7 @@ export default function Settings() {
         displayName: profile.displayName || '',
         goalKg: profile.goalKg ? String(profile.goalKg) : '',
         goalDays: profile.goalDays ? String(profile.goalDays) : '',
+        calorieMode: profile.calorieMode || 'safe',
       });
     } else {
       // Initialize with default values if no profile exists
@@ -279,6 +285,36 @@ export default function Settings() {
                 <div className="col-span-2">
                   <p className="text-sm text-gray-600">目標：{formData.fitnessGoal === 'lose' ? '減重' : formData.fitnessGoal === 'maintain' ? '維持' : '增肌'}</p>
                 </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600 mb-2">卡路里模式</p>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="calorieMode"
+                        value="safe"
+                        checked={formData.calorieMode === 'safe'}
+                        onChange={(e) => setFormData({ ...formData, calorieMode: 'safe' })}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm">安全模式（建議）</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="calorieMode"
+                        value="aggressive"
+                        checked={formData.calorieMode === 'aggressive'}
+                        onChange={(e) => {
+                          setPendingCalorieMode('aggressive');
+                          setShowAggressiveModal(true);
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm">進取模式</span>
+                    </label>
+                  </div>
+                </div>
                 {metabolicData.isAggressive && metabolicData.originalTarget !== metabolicData.target && (
                   <div className="col-span-2">
                     <p className="text-sm text-gray-600">原始計算目標</p>
@@ -397,6 +433,19 @@ export default function Settings() {
         <LogOut className="h-4 w-4 mr-2" />
         登出
       </Button>
+
+      {/* Aggressive Calorie Mode Modal */}
+      <AggressiveCalorieModal
+        isOpen={showAggressiveModal}
+        originalCalories={metabolicData.originalTarget}
+        onConfirm={() => {
+          setFormData({ ...formData, calorieMode: 'aggressive' });
+          setShowAggressiveModal(false);
+        }}
+        onCancel={() => {
+          setShowAggressiveModal(false);
+        }}
+      />
     </div>
   );
 }

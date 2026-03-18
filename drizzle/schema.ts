@@ -186,6 +186,7 @@ export const userProfiles = mysqlTable("user_profiles", {
 	goalKg: decimal({ precision: 5, scale: 1 }),
 	goalDays: int(),
 	displayName: varchar({ length: 100 }),
+	calorieMode: mysqlEnum(['safe','aggressive']).default('safe').notNull(),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 	aiToneStyle: mysqlEnum(['gentle','coach','hk_style']).default('gentle').notNull(),
