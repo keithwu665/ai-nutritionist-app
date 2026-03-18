@@ -35,7 +35,13 @@ export default function Dashboard() {
 
   const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
   const tdee = calculateTDEE(bmr, profile.activityLevel);
-  const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal);
+  const goalKg = profile.goalKg ? Number(profile.goalKg) : 0;
+  const goalDays = profile.goalDays ? Number(profile.goalDays) : 0;
+  const calorieCalc = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, goalKg, goalDays, profile.gender);
+  let target = Number(calorieCalc?.dailyCalories) || 2000;
+  if (!isFinite(target) || target <= 0) {
+    target = 2000;
+  }
 
   const todayCalories = dashData?.today.calories ?? 0;
   const todayExercise = dashData?.today.exerciseCalories ?? 0;
