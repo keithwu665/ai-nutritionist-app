@@ -124,7 +124,7 @@ export function calculateDailyCalorieTarget(
   goalKg?: number | null,
   goalDays?: number | null,
   gender: Gender = 'male'
-): { dailyCalories: number; dailyDeficit: number; isAggressive: boolean } {
+): { dailyCalories: number; originalCalories: number; dailyDeficit: number; isAggressive: boolean } {
   const KCAL_PER_KG_FAT = 7700;
   const MIN_CALORIES = gender === 'female' ? 1200 : 1500;
   
@@ -153,8 +153,11 @@ export function calculateDailyCalorieTarget(
       dailyDeficit = 0;
   }
 
-  let dailyCalories = tdee - dailyDeficit;
-
+  // Calculate original target before safety clamping
+  const originalCalories = tdee - dailyDeficit;
+  
+  // Apply safety minimum
+  let dailyCalories = originalCalories;
   if (dailyCalories < MIN_CALORIES) {
     isAggressive = true;
     dailyCalories = MIN_CALORIES;
@@ -162,6 +165,7 @@ export function calculateDailyCalorieTarget(
 
   return {
     dailyCalories: Math.round(dailyCalories),
+    originalCalories: Math.round(originalCalories),
     dailyDeficit: Math.round(dailyDeficit),
     isAggressive,
   };

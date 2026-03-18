@@ -155,7 +155,7 @@ export default function Settings() {
     const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
     const tdee = calculateTDEE(bmr, profile.activityLevel);
     const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender);
-    return { bmr, tdee, target: calcResult.dailyCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
+    return { bmr, tdee, target: calcResult.dailyCalories, originalTarget: calcResult.originalCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
   })() : null;
 
   if (isLoading) {
@@ -277,17 +277,27 @@ export default function Settings() {
                   <p className="text-xs text-gray-500">kcal/天</p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-600">目標：{formData.fitnessGoal === 'lose' ? '減重' : formData.fitnessGoal === 'maintain' ? '維持' : '增肌'}，每日 {Math.round(metabolicData.target)} kcal</p>
+                  <p className="text-sm text-gray-600">目標：{formData.fitnessGoal === 'lose' ? '減重' : formData.fitnessGoal === 'maintain' ? '維持' : '增肌'}</p>
                 </div>
-                {metabolicData.deficit > 0 && (
+                {metabolicData.isAggressive && metabolicData.originalTarget !== metabolicData.target && (
                   <div className="col-span-2">
-                    <p className="text-sm text-gray-600">每日建議赤字</p>
-                    <p className="text-lg font-semibold">{Math.round(metabolicData.deficit)} kcal</p>
+                    <p className="text-sm text-gray-600">原始計算目標</p>
+                    <p className="text-lg font-semibold">{Math.round(metabolicData.originalTarget)} kcal/天</p>
+                  </div>
+                )}
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">安全調整後每日目標</p>
+                  <p className="text-2xl font-bold text-blue-600">{Math.round(metabolicData.target)} kcal/天</p>
+                </div>
+                {metabolicData.deficit !== 0 && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-600">每日建議{formData.fitnessGoal === 'lose' ? '赤字' : '盈餘'}</p>
+                    <p className="text-lg font-semibold">{Math.abs(Math.round(metabolicData.deficit))} kcal</p>
                   </div>
                 )}
                 {metabolicData.isAggressive && (
                   <div className="col-span-2 bg-amber-50 border border-amber-200 rounded p-3">
-                    <p className="text-sm text-amber-800">⚠️ 目標過於進取，已調整至安全範圍</p>
+                    <p className="text-sm text-amber-800">⚠️ 目標過於進取，原始目標低於安全範圍，已調整至安全攝取下限</p>
                   </div>
                 )}
               </div>
