@@ -59,6 +59,17 @@ export default function Settings() {
     onSuccess: () => {
       toast.success('個人資訊已建立');
       utils.profile.get.invalidate();
+      // Save personality to localStorage and dispatch event
+      const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
+        'gentle': 'gentle',
+        'coach': 'strict',
+        'hk_style': 'hongkong'
+      };
+      const mappedPersonality = personalityMap[formData.aiToneStyle];
+      localStorage.setItem('aiPersonality', mappedPersonality);
+      // Dispatch custom event to notify other pages
+      window.dispatchEvent(new Event('personalityChanged'));
+      console.log('Personality saved to localStorage:', mappedPersonality);
     },
     onError: (err) => {
       console.error('Create profile error:', err);
@@ -70,6 +81,17 @@ export default function Settings() {
     onSuccess: () => {
       toast.success('個人資訊已更新');
       utils.profile.get.invalidate();
+      // Save personality to localStorage and dispatch event
+      const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
+        'gentle': 'gentle',
+        'coach': 'strict',
+        'hk_style': 'hongkong'
+      };
+      const mappedPersonality = personalityMap[formData.aiToneStyle];
+      localStorage.setItem('aiPersonality', mappedPersonality);
+      // Dispatch custom event to notify other pages
+      window.dispatchEvent(new Event('personalityChanged'));
+      console.log('Personality saved to localStorage:', mappedPersonality);
     },
     onError: (err) => {
       console.error('Update profile error:', err);

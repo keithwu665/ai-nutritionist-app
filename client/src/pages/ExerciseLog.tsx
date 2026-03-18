@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
-import { useAuth } from '@/_core/hooks/useAuth';
+  import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,6 +69,32 @@ export default function ExerciseLog() {
   });
   const [manualOverride, setManualOverride] = useState(false);
 
+  const [personality, setPersonality] = React.useState<'gentle' | 'strict' | 'hongkong'>('gentle');
+  const utils = trpc.useUtils();
+  
+  // Load personality from localStorage on mount and listen for changes
+  React.useEffect(() => {
+    const loadPersonality = () => {
+      const savedPersonality = localStorage.getItem('aiPersonality') as 'gentle' | 'strict' | 'hongkong' | null;
+      if (savedPersonality) {
+        console.log('Exercise personality loaded:', savedPersonality);
+        setPersonality(savedPersonality);
+      }
+    };
+    
+    loadPersonality();
+    
+    // Listen for storage changes from other tabs/windows
+    window.addEventListener('storage', loadPersonality);
+    // Also listen for custom events from settings changes
+    window.addEventListener('personalityChanged', loadPersonality);
+    
+    return () => {
+      window.removeEventListener('storage', loadPersonality);
+      window.removeEventListener('personalityChanged', loadPersonality);
+    };
+  }, []);
+  
   // Reset modal date when modal opens
   useEffect(() => {
     if (isAddOpen) {
@@ -78,6 +104,13 @@ export default function ExerciseLog() {
       }));
     }
   }, [isAddOpen, date]);
+  
+  // Refetch advice when personality changes
+  useEffect(() => {
+    if (activeTab === 'suggestions') {
+      utils.exercises.generateAdvice.invalidate();
+    }
+  }, [personality, utils.exercises.generateAdvice, activeTab]);
 
   // Get exercises for selected date
   const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date }, { staleTime: 0 });
@@ -86,18 +119,6 @@ export default function ExerciseLog() {
   const endDate = today;
   const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const { data: last7DaysExercises = [] } = trpc.exercises.listForRange.useQuery({ startDate, endDate }, { staleTime: 0 });
-  
-  const [personality, setPersonality] = React.useState<'gentle' | 'strict' | 'hongkong'>('gentle');
-  
-  // Load personality from localStorage on mount
-  React.useEffect(() => {
-    const savedPersonality = localStorage.getItem('aiPersonality') as 'gentle' | 'strict' | 'hongkong' | null;
-    if (savedPersonality) {
-      setPersonality(savedPersonality);
-    }
-  }, []);
-  
-  const utils = trpc.useUtils();
 
   // Use tRPC to calculate calories
   const { data: calculatedCalories, isLoading: isCalculating } = trpc.exercises.calculateCalories.useQuery(
@@ -125,25 +146,33 @@ export default function ExerciseLog() {
   // Generate exercise advice when tab changes or exercises update
   const shouldFetchAdvice = activeTab === 'suggestions' && exercises && personality;
   const { data: adviceData, isLoading: isAdviceLoading } = trpc.exercises.generateAdvice.useQuery(
-    shouldFetchAdvice ? {
-      caloriesBurned: exercises.reduce((s: number, e: any) => s + Number(e.caloriesBurned), 0),
-      workoutCount: exercises.length,
-      totalDuration: exercises.reduce((s: number, e: any) => s + e.durationMinutes, 0),
-      lastWorkoutType: exercises.length > 0 ? exercises[exercises.length - 1]?.type : undefined,
+    {
+      caloriesBurned: shouldFetchAdvice ? exercises.reduce((s: number, e: any) => s + Number(e.caloriesBurned), 0) : 0,
+      workoutCount: shouldFetchAdvice ? exercises.length : 0,
+      totalDuration: shouldFetchAdvice ? exercises.reduce((s: number, e: any) => s + e.durationMinutes, 0) : 0,
+      lastWorkoutType: shouldFetchAdvice && exercises.length > 0 ? exercises[exercises.length - 1]?.type : undefined,
       personality: personality,
-    } : { caloriesBurned: 0, workoutCount: 0, totalDuration: 0, personality: 'gentle' },
+    },
     { enabled: !!shouldFetchAdvice }
   );
+  
+  // Debug log
+  useEffect(() => {
+    console.log('Exercise personality:', personality);
+  }, [personality]);
 
   useEffect(() => {
     if (adviceData?.success) {
+      console.log('Exercise advice updated with personality:', personality);
       setExerciseAdvice(adviceData.advice);
     }
-  }, [adviceData]);
+  }, [adviceData, personality]);
 
   useEffect(() => {
     setIsLoadingAdvice(isAdviceLoading);
   }, [isAdviceLoading]);
+  
+
 
 
   // Handle exercise type change
