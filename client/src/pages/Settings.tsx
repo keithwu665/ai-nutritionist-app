@@ -160,7 +160,7 @@ export default function Settings() {
   const metabolicData = profile ? (() => {
     const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
     const tdee = calculateTDEE(bmr, profile.activityLevel);
-    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender);
+    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, formData.calorieMode);
     return { bmr, tdee, target: calcResult.dailyCalories, originalTarget: calcResult.originalCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
   })() : null;
 
@@ -322,7 +322,11 @@ export default function Settings() {
                   </div>
                 )}
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-600">安全調整後每日目標</p>
+                  <p className="text-sm text-gray-600">當前模式</p>
+                  <p className="text-lg font-semibold">{formData.calorieMode === 'aggressive' ? '進取模式' : '安全模式（建議）'}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm text-gray-600">{formData.calorieMode === 'aggressive' ? '每日目標' : '安全調整後每日目標'}</p>
                   <p className="text-2xl font-bold text-blue-600">{Math.round(metabolicData.target)} kcal/天</p>
                 </div>
                 {metabolicData.deficit !== 0 && (

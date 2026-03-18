@@ -41,7 +41,7 @@ export const appRouter = router({
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
         displayName: z.string().nullable().optional(),
-        goalKg: z.number().optional(),
+        goalKg: z.string().optional(),
         goalDays: z.number().optional(),
         calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
@@ -64,7 +64,7 @@ export const appRouter = router({
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]).optional(),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
         displayName: z.string().nullable().optional(),
-        goalKg: z.number().optional(),
+        goalKg: z.string().optional(),
         goalDays: z.number().optional(),
         calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
@@ -631,7 +631,7 @@ export const appRouter = router({
 
       const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
       const tdee = calculateTDEE(bmr, profile.activityLevel);
-      const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg, profile.goalDays, profile.gender);
+      const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, profile.calorieMode || 'safe');
 
       // Use enhanced recommendation engine
       const analysisData: AnalysisData = {
@@ -656,7 +656,7 @@ export const appRouter = router({
         profile: {
           heightCm: Number(profile.heightCm),
           currentWeight: Number(profile.weightKg),
-          tdee: target,
+          tdee: calcResult.dailyCalories,
           bmr: bmr,
         },
       };

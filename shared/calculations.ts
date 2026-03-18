@@ -110,12 +110,13 @@ export function calculateTDEE(bmr: number, activity_level: ActivityLevel): numbe
 }
 
 /**
- * Calculate daily calorie target based on fitness goal with goal-specific calculations
- * @param tdee Total Daily Energy Expenditure
- * @param fitness_goal 'lose' | 'maintain' | 'gain'
+ * Calculate daily calorie target based on fitness goal
+ * @param tdee Total daily energy expenditure
+ * @param fitness_goal The fitness goal (lose, maintain, gain)
  * @param goalKg Target weight change in kg (optional)
  * @param goalDays Target duration in days (optional)
  * @param gender Gender for minimum calorie safety check
+ * @param calorieMode 'safe' (default) clamps to minimum, 'aggressive' uses original calculated value
  * @returns Object with dailyCalories, dailyDeficit, and isAggressive flag
  */
 export function calculateDailyCalorieTarget(
@@ -123,7 +124,8 @@ export function calculateDailyCalorieTarget(
   fitness_goal: FitnessGoal,
   goalKg?: number | null,
   goalDays?: number | null,
-  gender: Gender = 'male'
+  gender: Gender = 'male',
+  calorieMode: 'safe' | 'aggressive' = 'safe'
 ): { dailyCalories: number; originalCalories: number; dailyDeficit: number; isAggressive: boolean } {
   const KCAL_PER_KG_FAT = 7700;
   const MIN_CALORIES = gender === 'female' ? 1200 : 1500;
@@ -160,7 +162,10 @@ export function calculateDailyCalorieTarget(
   let dailyCalories = originalCalories;
   if (dailyCalories < MIN_CALORIES) {
     isAggressive = true;
-    dailyCalories = MIN_CALORIES;
+    // If in aggressive mode, use original calories; otherwise clamp to safe minimum
+    if (calorieMode !== 'aggressive') {
+      dailyCalories = MIN_CALORIES;
+    }
   }
 
   return {

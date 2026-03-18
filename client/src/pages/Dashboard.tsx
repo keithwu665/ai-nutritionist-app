@@ -37,7 +37,7 @@ export default function Dashboard() {
   const tdee = calculateTDEE(bmr, profile.activityLevel);
   const goalKg = profile.goalKg ? Number(profile.goalKg) : 0;
   const goalDays = profile.goalDays ? Number(profile.goalDays) : 0;
-  const calorieCalc = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, goalKg, goalDays, profile.gender);
+  const calorieCalc = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, goalKg, goalDays, profile.gender, profile.calorieMode || 'safe');
   let target = Number(calorieCalc?.dailyCalories) || 2000;
   if (!isFinite(target) || target <= 0) {
     target = 2000;

@@ -140,6 +140,7 @@ export async function getUserProfile(userId: number) {
     goalKg: userProfiles.goalKg,
     goalDays: userProfiles.goalDays,
     displayName: userProfiles.displayName,
+    calorieMode: userProfiles.calorieMode,
     createdAt: userProfiles.createdAt,
     updatedAt: userProfiles.updatedAt,
     aiToneStyle: userProfiles.aiToneStyle,
@@ -174,6 +175,7 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
       activityLevel: data.activityLevel || 'moderate',
       aiToneStyle: data.aiToneStyle || 'gentle',
       displayName: data.displayName,
+      calorieMode: data.calorieMode || 'safe',
     };
     await db.insert(userProfiles).values(createData);
   } else {
@@ -182,6 +184,10 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
     // Ensure displayName is always included, convert empty string to null
     if ('displayName' in data) {
       updateData.displayName = data.displayName && data.displayName.trim() ? data.displayName.trim() : null;
+    }
+    // Handle calorieMode
+    if ('calorieMode' in data && data.calorieMode) {
+      updateData.calorieMode = data.calorieMode;
     }
     console.log('[updateUserProfile] Update data:', updateData);
     await db.update(userProfiles).set(updateData).where(eq(userProfiles.userId, userId));
