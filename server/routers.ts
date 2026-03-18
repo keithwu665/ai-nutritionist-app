@@ -8,7 +8,7 @@ import { bodyMetricsImportRouter } from "./routers/bodyMetricsImport";
 import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
-import { generateAllRecommendations, type AnalysisData } from "./utils/recommendationEngine";
+import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
 
 export const appRouter = router({
   system: systemRouter,
@@ -646,7 +646,13 @@ export const appRouter = router({
         },
       };
 
-      const recommendations = generateAllRecommendations(analysisData);
+      let recommendations = generateAllRecommendations(analysisData);
+
+      // Apply personality transformation if user has selected a personality
+      if (profile.aiToneStyle && profile.aiToneStyle !== 'gentle') {
+        const personality = profile.aiToneStyle === 'coach' ? 'coach' : profile.aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
+        recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality);
+      }
 
       return {
         diet: recommendations.diet.slice(0, 3).map(r => ({
