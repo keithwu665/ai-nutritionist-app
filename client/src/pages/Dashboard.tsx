@@ -71,22 +71,20 @@ export default function Dashboard() {
 
   return (
     <div className="pb-32 md:pb-8">
-      {/* Top Header with Date, Greeting, Notifications */}
-      <div className="bg-background border-b border-border p-4">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-xs text-muted-foreground mb-3">{getDateString()}</p>
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">{getGreeting()}</h1>
-            <div className="flex items-center gap-4">
-              <button className="p-2 hover:bg-muted rounded-full transition-colors">
-                <Bell className="h-5 w-5 text-foreground" />
-              </button>
-              <button className="p-2 hover:bg-muted rounded-full transition-colors">
-                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary" />
-                </div>
-              </button>
-            </div>
+      {/* Greeting Section - Rebuilt from Screenshot */}
+      <div className="p-4">
+        <p className="text-xs text-muted-foreground mb-4">{getDateString()}</p>
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold">{getGreeting()}</h1>
+          <div className="flex items-center gap-3">
+            <button className="p-2 hover:bg-muted rounded-full transition-colors">
+              <Bell className="h-5 w-5 text-foreground" />
+            </button>
+            <button className="p-2 hover:bg-muted rounded-full transition-colors">
+              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                <User className="h-4 w-4 text-primary" />
+              </div>
+            </button>
           </div>
         </div>
       </div>
