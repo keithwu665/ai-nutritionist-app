@@ -154,8 +154,8 @@ export default function Settings() {
   const metabolicData = profile ? (() => {
     const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
     const tdee = calculateTDEE(bmr, profile.activityLevel);
-    const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal);
-    return { bmr, tdee, target };
+    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender);
+    return { bmr, tdee, target: calcResult.dailyCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
   })() : null;
 
   if (isLoading) {
@@ -279,6 +279,17 @@ export default function Settings() {
                 <div className="col-span-2">
                   <p className="text-sm text-gray-600">目標：{formData.fitnessGoal === 'lose' ? '減重' : formData.fitnessGoal === 'maintain' ? '維持' : '增肌'}，每日 {Math.round(metabolicData.target)} kcal</p>
                 </div>
+                {metabolicData.deficit > 0 && (
+                  <div className="col-span-2">
+                    <p className="text-sm text-gray-600">每日建議赤字</p>
+                    <p className="text-lg font-semibold">{Math.round(metabolicData.deficit)} kcal</p>
+                  </div>
+                )}
+                {metabolicData.isAggressive && (
+                  <div className="col-span-2 bg-amber-50 border border-amber-200 rounded p-3">
+                    <p className="text-sm text-amber-800">⚠️ 目標過於進取，已調整至安全範圍</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
