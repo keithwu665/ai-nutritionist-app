@@ -282,7 +282,7 @@ export default function Settings() {
                   <SelectContent>
                     <SelectItem value="gentle">溫柔營養師</SelectItem>
                     <SelectItem value="coach">魔鬼教練</SelectItem>
-                    <SelectItem value="hk_style">香港粗口教練（粗口警告）</SelectItem>
+                    <SelectItem value="hk_style">香港寸嘴教練 😏</SelectItem>
                   </SelectContent>
                 </Select>
               </label>
