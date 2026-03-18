@@ -500,6 +500,33 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         return db.deleteExercise(input.id, ctx.user.id);
       }),
+
+    generateAdvice: protectedProcedure
+      .input(z.object({
+        caloriesBurned: z.number(),
+        workoutCount: z.number(),
+        totalDuration: z.number(),
+        lastWorkoutType: z.string().optional(),
+        personality: z.enum(['gentle', 'strict', 'hongkong']),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { generateExerciseAdviceWithFallback } = await import('./exerciseAdviceEngine');
+        try {
+          const advice = await generateExerciseAdviceWithFallback(
+            {
+              caloriesBurned: input.caloriesBurned,
+              workoutCount: input.workoutCount,
+              totalDuration: input.totalDuration,
+              lastWorkoutType: input.lastWorkoutType,
+            },
+            input.personality
+          );
+          return { advice, success: true };
+        } catch (error) {
+          console.error('Error generating exercise advice:', error);
+          return { advice: 'Unable to generate advice', success: false };
+        }
+      }),
   }),
 
   // ========================================================================
