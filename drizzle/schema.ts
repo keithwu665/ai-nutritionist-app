@@ -183,6 +183,8 @@ export const userProfiles = mysqlTable("user_profiles", {
 	weightKg: decimal({ precision: 5, scale: 1 }).notNull(),
 	fitnessGoal: mysqlEnum(['lose','maintain','gain']).notNull(),
 	activityLevel: mysqlEnum(['sedentary','light','moderate','high']).notNull(),
+	goalKg: decimal({ precision: 5, scale: 1 }),
+	goalDays: int(),
 	displayName: varchar({ length: 100 }),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),

@@ -137,6 +137,8 @@ export async function getUserProfile(userId: number) {
     weightKg: userProfiles.weightKg,
     fitnessGoal: userProfiles.fitnessGoal,
     activityLevel: userProfiles.activityLevel,
+    goalKg: userProfiles.goalKg,
+    goalDays: userProfiles.goalDays,
     displayName: userProfiles.displayName,
     createdAt: userProfiles.createdAt,
     updatedAt: userProfiles.updatedAt,

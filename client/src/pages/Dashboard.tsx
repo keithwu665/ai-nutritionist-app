@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
+import { GoalSummaryCard } from '@/components/GoalSummaryCard';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -156,6 +157,14 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Goal Summary Card */}
+        <GoalSummaryCard
+          fitnessGoal={profile.fitnessGoal}
+          goalKg={profile.goalKg ? Number(profile.goalKg) : null}
+          goalDays={profile.goalDays}
+          currentWeight={Number(profile.weightKg)}
+        />
 
         {/* Body Metrics Cards - 3 Column */}
         <div className="grid grid-cols-3 gap-3 md:gap-4">

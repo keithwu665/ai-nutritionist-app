@@ -25,6 +25,8 @@ export default function Settings() {
     activityLevel: 'moderate' as 'sedentary' | 'light' | 'moderate' | 'high',
     aiToneStyle: 'gentle' as 'gentle' | 'coach' | 'hk_style',
     displayName: '',
+    goalKg: '',
+    goalDays: '',
   });
 
   const [notifications, setNotifications] = useState({
@@ -43,6 +45,8 @@ export default function Settings() {
         activityLevel: profile.activityLevel,
         aiToneStyle: profile.aiToneStyle || 'gentle',
         displayName: profile.displayName || '',
+        goalKg: profile.goalKg ? String(profile.goalKg) : '',
+        goalDays: profile.goalDays ? String(profile.goalDays) : '',
       });
     } else {
       // Initialize with default values if no profile exists
@@ -55,6 +59,8 @@ export default function Settings() {
         activityLevel: 'moderate',
         aiToneStyle: 'gentle',
         displayName: '',
+        goalKg: '',
+        goalDays: '',
       });
     }
   }, [profile]);
@@ -125,6 +131,8 @@ export default function Settings() {
         activityLevel: formData.activityLevel,
         aiToneStyle: formData.aiToneStyle,
         displayName: formData.displayName,
+        goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
+        goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
       });
     } else {
       updateMutation.mutate({
@@ -136,6 +144,8 @@ export default function Settings() {
         activityLevel: formData.activityLevel,
         aiToneStyle: formData.aiToneStyle,
         displayName: formData.displayName,
+        goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
+        goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
       });
     }
   };
@@ -213,6 +223,20 @@ export default function Settings() {
                   </SelectContent>
                 </Select>
               </label>
+
+              {formData.fitnessGoal !== 'maintain' && (
+                <>
+                  <label className="block">
+                    <p className="font-medium mb-2">目標重量變化 (kg)</p>
+                    <Input type="number" step="0.1" value={formData.goalKg} onChange={(e) => setFormData({ ...formData, goalKg: e.target.value })} placeholder="例如：5" />
+                  </label>
+
+                  <label className="block">
+                    <p className="font-medium mb-2">目標天數</p>
+                    <Input type="number" value={formData.goalDays} onChange={(e) => setFormData({ ...formData, goalDays: e.target.value })} placeholder="例如：60" />
+                  </label>
+                </>
+              )}
 
               <label className="block">
                 <p className="font-medium mb-2">活動水平</p>
