@@ -18,15 +18,29 @@ export function GoalSummaryCard({
   gender = 'male',
   tdee = 0,
 }: GoalSummaryCardProps) {
-  // Show empty state if no goal is set
-  if (!fitnessGoal || !goalKg || !goalDays) {
+  // Safe numeric parsing and validation
+  const parseNumber = (value: any): number | null => {
+    if (value === null || value === undefined) return null;
+    const num = Number(value);
+    return !isNaN(num) && isFinite(num) ? num : null;
+  };
+
+  const goalKgNum = parseNumber(goalKg);
+  const goalDaysNum = parseNumber(goalDays);
+  const tdeeNum = parseNumber(tdee);
+  const genderStr = gender?.toLowerCase() || 'male';
+
+  // Show empty state if no goal is set or invalid data
+  const hasValidGoal = fitnessGoal && goalKgNum !== null && goalDaysNum !== null && goalDaysNum > 0;
+
+  if (!hasValidGoal) {
     return (
       <Card className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-slate-200 dark:border-slate-700">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground mb-2">🎯 我的目標</p>
             <p className="text-lg font-semibold text-slate-600 dark:text-slate-300">
-              尚未設定目標
+              {fitnessGoal ? '目標資料未完整' : '尚未設定目標'}
             </p>
           </div>
           <Link href="/settings" className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
@@ -39,32 +53,36 @@ export function GoalSummaryCard({
 
   // Calculate daily deficit and safety
   const KCAL_PER_KG_FAT = 7700;
-  const MIN_CALORIES = gender === 'female' ? 1200 : 1500;
+  const MIN_CALORIES = genderStr === 'female' ? 1200 : 1500;
   
   let dailyDeficit = 0;
+  let dailyCalories = tdeeNum || 2000; // Use default if TDEE not provided
   let isAggressive = false;
   
-  if (fitnessGoal === 'lose' && goalKg && goalDays) {
-    dailyDeficit = Math.round((goalKg * KCAL_PER_KG_FAT) / goalDays);
-    const dailyCalories = tdee - dailyDeficit;
+  if (fitnessGoal === 'lose' && goalKgNum > 0 && goalDaysNum > 0) {
+    dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
+    dailyCalories = tdeeNum ? tdeeNum - dailyDeficit : 2000 - dailyDeficit;
     if (dailyCalories < MIN_CALORIES) {
       isAggressive = true;
+      dailyCalories = MIN_CALORIES;
     }
-  } else if (fitnessGoal === 'gain' && goalKg && goalDays) {
-    dailyDeficit = Math.round((goalKg * KCAL_PER_KG_FAT) / goalDays);
+  } else if (fitnessGoal === 'gain' && goalKgNum > 0 && goalDaysNum > 0) {
+    dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
+    dailyCalories = tdeeNum ? tdeeNum + dailyDeficit : 2000 + dailyDeficit;
+  } else if (fitnessGoal === 'maintain') {
+    dailyCalories = tdeeNum || 2000;
   }
 
   // Calculate goal text based on fitnessGoal type
   let goalText = '';
-  let progressHint = '';
   let weeklyTarget = '';
 
   if (fitnessGoal === 'lose') {
-    goalText = `目標：${goalDays}日內減 ${goalKg}kg`;
-    weeklyTarget = `每週減 ${(goalKg / (goalDays / 7)).toFixed(1)}kg`;
+    goalText = `目標：${goalDaysNum}日內減 ${goalKgNum}kg`;
+    weeklyTarget = `每週減 ${(goalKgNum / (goalDaysNum / 7)).toFixed(1)}kg`;
   } else if (fitnessGoal === 'gain') {
-    goalText = `目標：${goalDays}日內增加 ${goalKg}kg`;
-    weeklyTarget = `每週增 ${(goalKg / (goalDays / 7)).toFixed(1)}kg`;
+    goalText = `目標：${goalDaysNum}日內增加 ${goalKgNum}kg`;
+    weeklyTarget = `每週增 ${(goalKgNum / (goalDaysNum / 7)).toFixed(1)}kg`;
   } else if (fitnessGoal === 'maintain') {
     goalText = '目標：維持目前體重';
     weeklyTarget = '';
@@ -84,7 +102,7 @@ export function GoalSummaryCard({
         {/* Progress Hints */}
         <div className="space-y-2 pt-2 border-t border-blue-200 dark:border-blue-800">
           <p className="text-sm text-slate-700 dark:text-slate-300">
-            👉 已進行：0 / {goalDays} 日
+            👉 已進行：0 / {goalDaysNum} 日
           </p>
           {weeklyTarget && (
             <p className="text-sm text-slate-700 dark:text-slate-300">
@@ -94,6 +112,11 @@ export function GoalSummaryCard({
           {dailyDeficit > 0 && (
             <p className="text-sm text-slate-700 dark:text-slate-300">
               👉 每日建議赤字：{dailyDeficit} kcal
+            </p>
+          )}
+          {(fitnessGoal === 'lose' || fitnessGoal === 'gain') && (
+            <p className="text-sm text-slate-700 dark:text-slate-300">
+              👉 每日目標熱量：{Math.round(dailyCalories)} kcal
             </p>
           )}
         </div>

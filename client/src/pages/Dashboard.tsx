@@ -162,7 +162,7 @@ export default function Dashboard() {
         <GoalSummaryCard
           fitnessGoal={profile.fitnessGoal}
           goalKg={profile.goalKg ? Number(profile.goalKg) : null}
-          goalDays={profile.goalDays}
+          goalDays={profile.goalDays ? Number(profile.goalDays) : null}
           currentWeight={Number(profile.weightKg)}
           gender={profile.gender}
           tdee={tdee}
