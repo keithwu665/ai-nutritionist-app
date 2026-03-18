@@ -61,7 +61,7 @@ export default function Dashboard() {
     const hour = new Date().getHours();
     const name = profile?.displayName || '';
     const greeting = hour < 12 ? '早晨' : hour < 18 ? '午安' : '晚安';
-    const emoji = hour < 12 ? '👋' : hour < 18 ? '☀️' : '🌙';
+    const emoji = hour < 12 ? '🌤️' : hour < 18 ? '☀️' : '🌙';
     
     if (name) {
       return `${greeting}，${name}！${emoji}`;

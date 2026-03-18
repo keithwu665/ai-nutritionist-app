@@ -158,6 +158,7 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
       fitnessGoal: data.fitnessGoal || 'maintain',
       activityLevel: data.activityLevel || 'moderate',
       aiToneStyle: data.aiToneStyle || 'gentle',
+      displayName: data.displayName,
     };
     await db.insert(userProfiles).values(createData);
   } else {

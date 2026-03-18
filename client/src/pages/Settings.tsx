@@ -168,6 +168,11 @@ export default function Settings() {
           <CardContent className="p-4">
             <div className="space-y-3">
               <label className="block">
+                <p className="font-medium mb-2">稱呼</p>
+                <Input type="text" placeholder="輸入你的稱呼（例如：美怡 / 阿John / Coach）" value={formData.displayName} onChange={(e) => setFormData({ ...formData, displayName: e.target.value })} />
+              </label>
+
+              <label className="block">
                 <p className="font-medium mb-2">性別</p>
                 <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value as 'male' | 'female' })}>
                   <SelectTrigger>
@@ -224,10 +229,6 @@ export default function Settings() {
                 </Select>
               </label>
 
-              <label className="block">
-                <p className="font-medium mb-2">稱呼</p>
-                <Input type="text" placeholder="輸入你的稱呼（例如：美怡 / 阿John / Coach）" value={formData.displayName} onChange={(e) => setFormData({ ...formData, displayName: e.target.value })} />
-              </label>
             </div>
           </CardContent>
         </Card>
