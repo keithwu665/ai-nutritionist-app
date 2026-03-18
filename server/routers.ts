@@ -1017,19 +1017,19 @@ export const appRouter = router({
         if (!product) throw new Error("Product not found");
         const log = await db.getOrCreateFoodLog(ctx.user.id, input.date);
         const calories = Number(product.calories) * input.quantity;
-        const proteinG = product.protein_g ? Number(product.protein_g) * input.quantity : null;
-        const carbsG = product.carbs_g ? Number(product.carbs_g) * input.quantity : null;
-        const fatG = product.fat_g ? Number(product.fat_g) * input.quantity : null;
+        const proteinG = product.proteinG ? Number(product.proteinG) * input.quantity : null;
+        const carbsG = product.carbsG ? Number(product.carbsG) * input.quantity : null;
+        const fatG = product.fatG ? Number(product.fatG) * input.quantity : null;
         return db.createFoodLogItem({
           foodLogId: log.id,
           userId: ctx.user.id,
           mealType: input.mealType,
-          name: product.product_name_zh || product.product_name_en || 'Unknown',
-          calories: calories.toString(),
-          proteinG: proteinG ? proteinG.toString() : null,
-          carbsG: carbsG ? carbsG.toString() : null,
-          fatG: fatG ? fatG.toString() : null,
-        });
+          name: product.productNameZh || product.productNameEn || 'Unknown',
+          calories: String(calories),
+          proteinG: proteinG !== null ? String(proteinG) : null,
+          carbsG: carbsG !== null ? String(carbsG) : null,
+          fatG: fatG !== null ? String(fatG) : null,
+        } as any);
       }),
   }),
 

@@ -34,17 +34,17 @@ export async function searchUnifiedFood(
   for (const product of fitastyResults) {
     const per100g = convertFitastyToPer100g(
       Number(product.calories) || 0,
-      product.protein_g ? Number(product.protein_g) : null,
-      product.carbs_g ? Number(product.carbs_g) : null,
-      product.fat_g ? Number(product.fat_g) : null,
-      product.serving_size || 100 // Default to 100g if not specified
+      product.proteinG ? Number(product.proteinG) : null,
+      product.carbsG ? Number(product.carbsG) : null,
+      product.fatG ? Number(product.fatG) : null,
+      Number(product.servingSize) || 100 // Default to 100g if not specified
     );
 
     results.push({
       source: "fitasty",
       id: product.id.toString(),
-      displayName: product.product_name_zh || product.product_name_en || 'Unknown',
-      brand: product.brand_name || undefined,
+      displayName: product.productNameZh || product.productNameEn || 'Unknown',
+      brand: product.brandName || undefined,
       badge: "Fitasty",
       kcal_per_100g: per100g.kcal,
       protein_g_per_100g: per100g.protein,

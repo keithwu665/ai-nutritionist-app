@@ -55,8 +55,8 @@ async function searchFitasty(query: string): Promise<FoodSearchResult[]> {
       .from(fitastyProducts)
       .where(
         and(
-          eq(fitastyProducts.is_active, 1 as any),
-          like(fitastyProducts.product_name_zh, `%${query}%`)
+          eq(fitastyProducts.isActive, 1 as any),
+          like(fitastyProducts.productNameZh, `%${query}%`)
         )
       )
       .limit(5);
@@ -64,13 +64,13 @@ async function searchFitasty(query: string): Promise<FoodSearchResult[]> {
     return products.map((p: any) => ({
       source: 'fitasty' as const,
       id: p.id,
-      displayName: p.product_name_zh || p.product_name_en || 'Unknown',
-      brand: p.brand_name || undefined,
+      displayName: p.productNameZh || p.productNameEn || 'Unknown',
+      brand: p.brandName || undefined,
       badge: 'Fitasty' as const,
-      kcal_per_100g: p.calories ? Math.round((p.calories * 100) / (p.serving_size || 100)) : null,
-      protein_g_per_100g: p.protein_g ? Math.round((p.protein_g * 100) / (p.serving_size || 100) * 10) / 10 : null,
-      carbs_g_per_100g: p.carbs_g ? Math.round((p.carbs_g * 100) / (p.serving_size || 100) * 10) / 10 : null,
-      fat_g_per_100g: p.fat_g ? Math.round((p.fat_g * 100) / (p.serving_size || 100) * 10) / 10 : null,
+      kcal_per_100g: p.calories ? Math.round((p.calories * 100) / (p.servingSize || 100)) : null,
+      protein_g_per_100g: p.proteinG ? Math.round((p.proteinG * 100) / (p.servingSize || 100) * 10) / 10 : null,
+      carbs_g_per_100g: p.carbsG ? Math.round((p.carbsG * 100) / (p.servingSize || 100) * 10) / 10 : null,
+      fat_g_per_100g: p.fatG ? Math.round((p.fatG * 100) / (p.servingSize || 100) * 10) / 10 : null,
     }));
   } catch (error) {
     console.error('Error searching Fitasty:', error);
@@ -98,7 +98,7 @@ async function searchUSDA(query: string, locale: 'zh-HK' | 'en'): Promise<FoodSe
       .where(
         and(
           eq(generalFoodCache.source, 'usda'),
-          like(generalFoodCache.display_name, `%${query}%`)
+          like(generalFoodCache.displayName, `%${query}%`)
         )
       )
       .limit(5);
@@ -106,8 +106,8 @@ async function searchUSDA(query: string, locale: 'zh-HK' | 'en'): Promise<FoodSe
     if (cached.length > 0) {
       return cached.map((c: any) => ({
         source: 'usda' as const,
-        id: c.external_id,
-        displayName: c.display_name,
+        id: c.externalId,
+        displayName: c.displayName,
         brand: c.brand || undefined,
         badge: 'USDA' as const,
         kcal_per_100g: c.kcal_per_100g,
