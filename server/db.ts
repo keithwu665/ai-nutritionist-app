@@ -128,7 +128,20 @@ export async function getUserByOpenId(openId: string) {
 export async function getUserProfile(userId: number) {
   const db = await getDb();
   if (!db) return null;
-  const result = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+  const result = await db.select({
+    id: userProfiles.id,
+    userId: userProfiles.userId,
+    gender: userProfiles.gender,
+    age: userProfiles.age,
+    heightCm: userProfiles.heightCm,
+    weightKg: userProfiles.weightKg,
+    fitnessGoal: userProfiles.fitnessGoal,
+    activityLevel: userProfiles.activityLevel,
+    displayName: userProfiles.displayName,
+    createdAt: userProfiles.createdAt,
+    updatedAt: userProfiles.updatedAt,
+    aiToneStyle: userProfiles.aiToneStyle,
+  }).from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
   return result.length > 0 ? result[0] : null;
 }
 
@@ -163,7 +176,13 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
     await db.insert(userProfiles).values(createData);
   } else {
     // Profile exists, update it
-    await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+    const updateData: any = { ...data };
+    // Ensure displayName is always included, convert empty string to null
+    if ('displayName' in data) {
+      updateData.displayName = data.displayName && data.displayName.trim() ? data.displayName.trim() : null;
+    }
+    console.log('[updateUserProfile] Update data:', updateData);
+    await db.update(userProfiles).set(updateData).where(eq(userProfiles.userId, userId));
   }
   
   const updated = await getUserProfile(userId);
