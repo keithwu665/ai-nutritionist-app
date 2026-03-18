@@ -145,7 +145,7 @@ export default function ExerciseLog() {
 
   // Generate exercise advice when tab changes or exercises update
   const shouldFetchAdvice = activeTab === 'suggestions' && exercises && personality;
-  const { data: adviceData, isLoading: isAdviceLoading } = trpc.exercises.generateAdvice.useQuery(
+  const { data: adviceData, isLoading: isAdviceLoading, refetch } = trpc.exercises.generateAdvice.useQuery(
     {
       caloriesBurned: shouldFetchAdvice ? exercises.reduce((s: number, e: any) => s + Number(e.caloriesBurned), 0) : 0,
       workoutCount: shouldFetchAdvice ? exercises.length : 0,
@@ -155,6 +155,14 @@ export default function ExerciseLog() {
     },
     { enabled: !!shouldFetchAdvice }
   );
+  
+  // Invalidate and refetch when personality changes
+  useEffect(() => {
+    if (shouldFetchAdvice) {
+      utils.exercises.generateAdvice.invalidate();
+      refetch();
+    }
+  }, [personality, shouldFetchAdvice, utils, refetch]);
   
   // Debug log
   useEffect(() => {
