@@ -105,8 +105,15 @@ export default function Settings() {
     onSuccess: () => {
       console.log('[Settings] Personal info saved successfully');
       toast.success('個人資料已保存');
-      utils.profile.get.refetch().catch((err) => {
+      utils.profile.get.refetch().then(() => {
+        console.log('[Settings] Profile refetch succeeded');
+      }).catch((err) => {
         console.error('[Settings] Profile refetch failed:', err);
+      });
+      utils.dashboard.getData.refetch().then(() => {
+        console.log('[Settings] Dashboard data refetch succeeded');
+      }).catch((err) => {
+        console.error('[Settings] Dashboard data refetch failed:', err);
       });
     },
     onError: (err: any) => {
@@ -141,8 +148,15 @@ export default function Settings() {
       console.log('[Settings] Goal settings saved successfully');
       toast.success('目標設定已保存');
       setAggressiveModeConfirmed(false);
-      utils.profile.get.refetch().catch((err) => {
+      utils.profile.get.refetch().then(() => {
+        console.log('[Settings] Profile refetch succeeded');
+      }).catch((err) => {
         console.error('[Settings] Profile refetch failed:', err);
+      });
+      utils.dashboard.getData.refetch().then(() => {
+        console.log('[Settings] Dashboard data refetch succeeded');
+      }).catch((err) => {
+        console.error('[Settings] Dashboard data refetch failed:', err);
       });
     },
     onError: (err: any) => {
@@ -185,8 +199,15 @@ export default function Settings() {
       localStorage.setItem('aiPersonality', mappedPersonality);
       window.dispatchEvent(new Event('personalityChanged'));
       
-      utils.profile.get.refetch().catch((err) => {
+      utils.profile.get.refetch().then(() => {
+        console.log('[Settings] Profile refetch succeeded');
+      }).catch((err) => {
         console.error('[Settings] Profile refetch failed:', err);
+      });
+      utils.dashboard.getData.refetch().then(() => {
+        console.log('[Settings] Dashboard data refetch succeeded');
+      }).catch((err) => {
+        console.error('[Settings] Dashboard data refetch failed:', err);
       });
     },
     onError: (err: any) => {
