@@ -374,8 +374,20 @@ export default function Settings() {
                   </div>
                 )}
                 {aggressiveModeConfirmed && formData.calorieMode === 'aggressive' && (
-                  <div className="col-span-2 bg-blue-50 border border-blue-200 rounded p-3">
-                    <p className="text-sm text-blue-800">✓ 你已選擇進取模式，請按『確定並保存』生效</p>
+                  <div className="col-span-2 space-y-3">
+                    <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                      <p className="text-sm text-blue-800">✓ 你已選擇進取模式，請按『確定並保存』生效</p>
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        setFormData({ ...formData, calorieMode: 'aggressive' });
+                        handleSave();
+                        setAggressiveModeConfirmed(false);
+                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                    >
+                      確定並保存
+                    </Button>
                   </div>
                 )}
                 {metabolicData.isAggressive && (
