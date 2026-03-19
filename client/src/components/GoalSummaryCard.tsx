@@ -61,15 +61,17 @@ export function GoalSummaryCard({
   
   let dailyDeficit = 0;
   let dailyCalories = tdeeNum || 2000; // Use default if TDEE not provided
-  let isAggressive = calorieMode === 'aggressive';
+  let wasClamped = false; // Track if clamping occurred
   
   if (fitnessGoal === 'lose' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
     dailyCalories = tdeeNum ? tdeeNum - dailyDeficit : 2000 - dailyDeficit;
     if (calorieMode === 'safe' && dailyCalories < MIN_CALORIES_SAFE) {
       dailyCalories = MIN_CALORIES_SAFE;
+      wasClamped = true;
     } else if (calorieMode === 'aggressive' && dailyCalories < MIN_CALORIES_AGGRESSIVE) {
       dailyCalories = MIN_CALORIES_AGGRESSIVE;
+      wasClamped = true;
     }
   } else if (fitnessGoal === 'gain' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
@@ -126,8 +128,8 @@ export function GoalSummaryCard({
           )}
         </div>
 
-        {/* Warning if goal is too aggressive */}
-        {isAggressive && (
+        {/* Warning if goal was clamped to safety minimum */}
+        {wasClamped && (
           <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded p-3 mt-2">
             <p className="text-sm text-amber-800 dark:text-amber-200">
               ⚠️ 目標過於進取，已調整至安全範圍
