@@ -33,6 +33,7 @@ export default function Settings() {
 
   const [showAggressiveModal, setShowAggressiveModal] = useState(false);
   const [pendingCalorieMode, setPendingCalorieMode] = useState<'safe' | 'aggressive'>('safe');
+  const [aggressiveModeConfirmed, setAggressiveModeConfirmed] = useState(false);
 
   const [notifications, setNotifications] = useState({
     dailyReminder: true,
@@ -372,6 +373,11 @@ export default function Settings() {
                     <p className="text-lg font-semibold">{Math.abs(Math.round(metabolicData.deficit))} kcal</p>
                   </div>
                 )}
+                {aggressiveModeConfirmed && formData.calorieMode === 'aggressive' && (
+                  <div className="col-span-2 bg-blue-50 border border-blue-200 rounded p-3">
+                    <p className="text-sm text-blue-800">✓ 你已選擇進取模式，請按『確定並保存』生效</p>
+                  </div>
+                )}
                 {metabolicData.isAggressive && (
                   <div className="col-span-2 bg-amber-50 border border-amber-200 rounded p-3">
                     <p className="text-sm text-amber-800">⚠️ 目標過於進取，原始目標低於安全範圍，已調整至安全攝取下限</p>
@@ -481,9 +487,12 @@ export default function Settings() {
         originalCalories={metabolicData.originalTarget}
         onConfirm={() => {
           setFormData({ ...formData, calorieMode: 'aggressive' });
+          setAggressiveModeConfirmed(true);
           setShowAggressiveModal(false);
         }}
         onCancel={() => {
+          setFormData({ ...formData, calorieMode: 'safe' });
+          setAggressiveModeConfirmed(false);
           setShowAggressiveModal(false);
         }}
       />
