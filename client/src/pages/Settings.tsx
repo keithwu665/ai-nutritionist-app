@@ -144,8 +144,8 @@ export default function Settings() {
     },
   });
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     console.log('[Settings] handleSave called at', new Date().toISOString(), 'with formData:', formData);
     const age = parseInt(formData.age) || 25;
     if (isNaN(age)) {
@@ -380,9 +380,14 @@ export default function Settings() {
                     </div>
                     <Button 
                       onClick={() => {
-                        setFormData({ ...formData, calorieMode: 'aggressive' });
-                        handleSave();
-                        setAggressiveModeConfirmed(false);
+                        console.log('[Settings] Confirm button clicked');
+                        setFormData(prev => ({ ...prev, calorieMode: 'aggressive' }));
+                        // Trigger save with the updated form data
+                        setTimeout(() => {
+                          console.log('[Settings] Calling handleSave from confirm button');
+                          handleSave();
+                          setAggressiveModeConfirmed(false);
+                        }, 0);
                       }}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                     >
