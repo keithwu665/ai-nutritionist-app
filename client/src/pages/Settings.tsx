@@ -2,12 +2,12 @@ import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { PersonalitySelector } from '@/components/PersonalitySelector';
 import { AggressiveCalorieModal } from '@/components/AggressiveCalorieModal';
-import { Loader2, LogOut, User, Save, ChevronRight, Download, Lock, HelpCircle, Star, LogOutIcon, Trash2 } from 'lucide-react';
+import { Loader2, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
 import { useState, useEffect } from 'react';
@@ -17,190 +17,225 @@ export default function Settings() {
   const { data: profile, isLoading } = trpc.profile.get.useQuery();
   const utils = trpc.useUtils();
 
-  const [formData, setFormData] = useState({
+  // ========================================================================
+  // SECTION 1: PERSONAL INFO STATE
+  // ========================================================================
+  const [personalInfo, setPersonalInfo] = useState({
+    displayName: '',
     gender: 'male' as 'male' | 'female',
     age: '',
     heightCm: '',
     weightKg: '',
-    fitnessGoal: 'maintain' as 'lose' | 'maintain' | 'gain',
     activityLevel: 'moderate' as 'sedentary' | 'light' | 'moderate' | 'high',
-    aiToneStyle: 'gentle' as 'gentle' | 'coach' | 'hk_style',
-    displayName: '',
+  });
+
+  // ========================================================================
+  // SECTION 2: GOAL SETTINGS STATE
+  // ========================================================================
+  const [goalSettings, setGoalSettings] = useState({
+    fitnessGoal: 'maintain' as 'lose' | 'maintain' | 'gain',
     goalKg: '',
     goalDays: '',
     calorieMode: 'safe' as 'safe' | 'aggressive',
   });
 
-  const [showAggressiveModal, setShowAggressiveModal] = useState(false);
-  const [pendingCalorieMode, setPendingCalorieMode] = useState<'safe' | 'aggressive'>('safe');
-  const [aggressiveModeConfirmed, setAggressiveModeConfirmed] = useState(false);
+  // ========================================================================
+  // SECTION 3: AI COACH STATE
+  // ========================================================================
+  const [aiCoach, setAiCoach] = useState({
+    aiToneStyle: 'gentle' as 'gentle' | 'coach' | 'hk_style',
+  });
 
+  // ========================================================================
+  // SECTION 4: NOTIFICATIONS STATE
+  // ========================================================================
   const [notifications, setNotifications] = useState({
     dailyReminder: true,
     foodReminder: true,
   });
 
+  // ========================================================================
+  // AGGRESSIVE MODE MODAL STATE
+  // ========================================================================
+  const [showAggressiveModal, setShowAggressiveModal] = useState(false);
+  const [aggressiveModeConfirmed, setAggressiveModeConfirmed] = useState(false);
+  const [pendingCalorieMode, setPendingCalorieMode] = useState<'safe' | 'aggressive'>('safe');
+
+  // ========================================================================
+  // METABOLIC DATA CALCULATION
+  // ========================================================================
+  const metabolicData = profile ? (() => {
+    const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
+    const tdee = calculateTDEE(bmr, profile.activityLevel);
+    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, goalSettings.calorieMode);
+    return { bmr, tdee, target: calcResult.dailyCalories, originalTarget: calcResult.originalCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
+  })() : null;
+
+  // ========================================================================
+  // INITIALIZE FORM DATA FROM PROFILE
+  // ========================================================================
   useEffect(() => {
     if (profile) {
-      setFormData({
+      setPersonalInfo({
+        displayName: profile.displayName || '',
         gender: profile.gender,
         age: String(profile.age),
         heightCm: String(profile.heightCm),
         weightKg: String(profile.weightKg),
-        fitnessGoal: profile.fitnessGoal,
         activityLevel: profile.activityLevel,
-        aiToneStyle: profile.aiToneStyle || 'gentle',
-        displayName: profile.displayName || '',
+      });
+
+      setGoalSettings({
+        fitnessGoal: profile.fitnessGoal,
         goalKg: profile.goalKg ? String(profile.goalKg) : '',
         goalDays: profile.goalDays ? String(profile.goalDays) : '',
         calorieMode: profile.calorieMode || 'safe',
       });
-    } else {
-      // Initialize with default values if no profile exists
-      setFormData({
-        gender: 'male',
-        age: '25',
-        heightCm: '170',
-        weightKg: '70',
-        fitnessGoal: 'maintain',
-        activityLevel: 'moderate',
-        aiToneStyle: 'gentle',
-        displayName: '',
-        goalKg: '',
-        goalDays: '',
+
+      setAiCoach({
+        aiToneStyle: profile.aiToneStyle || 'gentle',
       });
     }
   }, [profile]);
 
-  const createMutation = trpc.profile.create.useMutation({
-    onSuccess: (data) => {
-      console.log('[Settings] Create mutation onSuccess called with data:', data);
-      console.log('[Settings] About to show create success toast at', new Date().toISOString());
-      toast.success('個人資訊已建立');
-      console.log('[Settings] Create success toast shown at', new Date().toISOString());
-      // Save personality to localStorage and dispatch event
-      const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
-        'gentle': 'gentle',
-        'coach': 'strict',
-        'hk_style': 'hongkong'
-      };
-      const mappedPersonality = personalityMap[formData.aiToneStyle];
-      localStorage.setItem('aiPersonality', mappedPersonality);
-      // Dispatch custom event to notify other pages
-      window.dispatchEvent(new Event('personalityChanged'));
-      console.log('[Settings] Personality saved to localStorage:', mappedPersonality);
-      // Refetch profile with explicit error handling
-      console.log('[Settings] Refetching profile after create...');
+  // ========================================================================
+  // SECTION 1: PERSONAL INFO MUTATION
+  // ========================================================================
+  const personalInfoMutation = trpc.profile.update.useMutation({
+    onSuccess: () => {
+      console.log('[Settings] Personal info saved successfully');
+      toast.success('個人資料已保存');
       utils.profile.get.refetch().catch((err) => {
-        console.error('[Settings] Profile refetch failed after create:', err);
+        console.error('[Settings] Profile refetch failed:', err);
       });
     },
     onError: (err: any) => {
-      console.error('[Settings] Create mutation onError called at', new Date().toISOString(), 'with error:', err);
-      console.error('[Settings] Error details:', {
-        message: err.message,
-        code: err.code,
-        shape: err.shape,
-        data: err.data
-      });
-      console.error('[Settings] Stack trace:', err.stack);
-      toast.error('建立失敗');
+      console.error('[Settings] Personal info save failed:', err);
+      toast.error('個人資料保存失敗');
     },
   });
 
-  const updateMutation = trpc.profile.update.useMutation({
-    onSuccess: (data) => {
-      console.log('[Settings] Update mutation onSuccess called with data:', data);
-      console.log('[Settings] About to show success toast at', new Date().toISOString());
-      toast.success('個人資訊已更新');
-      console.log('[Settings] Success toast shown at', new Date().toISOString());
-      // Save personality to localStorage and dispatch event
-      const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
-        'gentle': 'gentle',
-        'coach': 'strict',
-        'hk_style': 'hongkong'
-      };
-      const mappedPersonality = personalityMap[formData.aiToneStyle];
-      localStorage.setItem('aiPersonality', mappedPersonality);
-      // Dispatch custom event to notify other pages
-      window.dispatchEvent(new Event('personalityChanged'));
-      console.log('[Settings] Personality saved to localStorage:', mappedPersonality);
-      // Refetch profile with explicit error handling
-      console.log('[Settings] Refetching profile after update...');
-      utils.profile.get.refetch().catch((err) => {
-        console.error('[Settings] Profile refetch failed after update:', err);
-      });
-    },
-    onError: (err: any) => {
-      console.error('[Settings] Update mutation onError called at', new Date().toISOString(), 'with error:', err);
-      console.error('[Settings] Error details:', {
-        message: err.message,
-        code: err.code,
-        shape: err.shape,
-        data: err.data
-      });
-      console.error('[Settings] Stack trace:', err.stack);
-      toast.error('更新失敗');
-    },
-  });
-
-  const handleSave = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    console.log('[Settings] handleSave called at', new Date().toISOString(), 'with formData:', formData);
-    const age = parseInt(formData.age) || 25;
+  const handleSavePersonalInfo = () => {
+    console.log('[Settings] Saving personal info:', personalInfo);
+    const age = parseInt(personalInfo.age) || 25;
     if (isNaN(age)) {
       toast.error('年齡必須是有效的數字');
       return;
     }
-    
-    const heightCm = formData.heightCm || '170';
-    const weightKg = formData.weightKg || '70';
-    
-    // If profile doesn't exist, create it; otherwise update it
-    if (!profile) {
-      const createPayload = {
-        gender: formData.gender,
-        age,
-        heightCm,
-        weightKg,
-        fitnessGoal: formData.fitnessGoal,
-        activityLevel: formData.activityLevel,
-        aiToneStyle: formData.aiToneStyle,
-        displayName: formData.displayName,
-        goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
-        goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
-        calorieMode: formData.calorieMode,
-      };
-      console.log('[Settings] Creating profile with payload:', createPayload);
-      createMutation.mutate(createPayload);
-    } else {
-      const updatePayload = {
-        gender: formData.gender,
-        age,
-        heightCm,
-        weightKg,
-        fitnessGoal: formData.fitnessGoal,
-        activityLevel: formData.activityLevel,
-        aiToneStyle: formData.aiToneStyle,
-        displayName: formData.displayName,
-        goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
-        goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
-        calorieMode: formData.calorieMode,
-      };
-      console.log('[Settings] Updating profile with payload at', new Date().toISOString(), ':', updatePayload);
-      console.log('[Settings] updateMutation.mutate() called');
-      updateMutation.mutate(updatePayload);
-      console.log('[Settings] updateMutation.mutate() returned (async)');
-    }
+
+    personalInfoMutation.mutate({
+      displayName: personalInfo.displayName || null,
+      gender: personalInfo.gender,
+      age,
+      heightCm: personalInfo.heightCm,
+      weightKg: personalInfo.weightKg,
+      activityLevel: personalInfo.activityLevel,
+    });
   };
 
-  // Calculate metabolic data for display
-  const metabolicData = profile ? (() => {
-    const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
-    const tdee = calculateTDEE(bmr, profile.activityLevel);
-    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, formData.calorieMode);
-    return { bmr, tdee, target: calcResult.dailyCalories, originalTarget: calcResult.originalCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
-  })() : null;
+  // ========================================================================
+  // SECTION 2: GOAL SETTINGS MUTATION
+  // ========================================================================
+  const goalSettingsMutation = trpc.profile.update.useMutation({
+    onSuccess: () => {
+      console.log('[Settings] Goal settings saved successfully');
+      toast.success('目標設定已保存');
+      setAggressiveModeConfirmed(false);
+      utils.profile.get.refetch().catch((err) => {
+        console.error('[Settings] Profile refetch failed:', err);
+      });
+    },
+    onError: (err: any) => {
+      console.error('[Settings] Goal settings save failed:', err);
+      toast.error('目標設定保存失敗');
+    },
+  });
+
+  const handleSaveGoalSettings = () => {
+    console.log('[Settings] Saving goal settings:', goalSettings);
+    const updatePayload: any = {
+      fitnessGoal: goalSettings.fitnessGoal,
+      calorieMode: goalSettings.calorieMode,
+    };
+
+    if (goalSettings.fitnessGoal !== 'maintain') {
+      updatePayload.goalKg = goalSettings.goalKg ? parseFloat(goalSettings.goalKg) : undefined;
+      updatePayload.goalDays = goalSettings.goalDays ? parseInt(goalSettings.goalDays) : undefined;
+    }
+
+    goalSettingsMutation.mutate(updatePayload);
+  };
+
+  // ========================================================================
+  // SECTION 3: AI COACH MUTATION
+  // ========================================================================
+  const aiCoachMutation = trpc.profile.update.useMutation({
+    onSuccess: () => {
+      console.log('[Settings] AI coach personality saved successfully');
+      toast.success('教練設定已保存');
+      
+      // Save personality to localStorage and dispatch event
+      const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
+        'gentle': 'gentle',
+        'coach': 'strict',
+        'hk_style': 'hongkong'
+      };
+      const mappedPersonality = personalityMap[aiCoach.aiToneStyle];
+      localStorage.setItem('aiPersonality', mappedPersonality);
+      window.dispatchEvent(new Event('personalityChanged'));
+      
+      utils.profile.get.refetch().catch((err) => {
+        console.error('[Settings] Profile refetch failed:', err);
+      });
+    },
+    onError: (err: any) => {
+      console.error('[Settings] AI coach save failed:', err);
+      toast.error('教練設定保存失敗');
+    },
+  });
+
+  const handleSaveAiCoach = () => {
+    console.log('[Settings] Saving AI coach:', aiCoach);
+    aiCoachMutation.mutate({
+      aiToneStyle: aiCoach.aiToneStyle,
+    });
+  };
+
+  // ========================================================================
+  // SECTION 4: NOTIFICATIONS (AUTO-SAVE)
+  // ========================================================================
+  const notificationsMutation = trpc.profile.update.useMutation({
+    onError: (err: any) => {
+      console.error('[Settings] Notifications save failed:', err);
+      toast.error('通知設定保存失敗');
+    },
+  });
+
+  const handleToggleNotification = (key: 'dailyReminder' | 'foodReminder', value: boolean) => {
+    setNotifications(prev => ({ ...prev, [key]: value }));
+    // Auto-save notifications
+    notificationsMutation.mutate({
+      // For now, we just acknowledge the change
+      // In a real app, you might want to persist these to the database
+    });
+  };
+
+  // ========================================================================
+  // AGGRESSIVE MODE MODAL HANDLERS
+  // ========================================================================
+  const handleCalorieModeChange = (mode: 'safe' | 'aggressive') => {
+    console.log('[Settings] handleCalorieModeChange called with mode:', mode);
+    console.log('[Settings] Current calorieMode:', goalSettings.calorieMode);
+    if (mode === 'aggressive' && goalSettings.calorieMode !== 'aggressive') {
+      console.log('[Settings] Setting aggressive mode modal to true');
+      setPendingCalorieMode('aggressive');
+      setShowAggressiveModal(true);
+    } else if (mode === 'safe') {
+      console.log('[Settings] Setting safe mode');
+      setGoalSettings(prev => ({ ...prev, calorieMode: 'safe' }));
+      setAggressiveModeConfirmed(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -214,21 +249,28 @@ export default function Settings() {
     <div className="container max-w-2xl py-8">
       <h1 className="text-3xl font-bold mb-8">設定</h1>
 
-      {/* Personal Profile */}
-      <div className="space-y-4">
+      {/* ================================================================== */}
+      {/* SECTION 1: PERSONAL INFO */}
+      {/* ================================================================== */}
+      <div className="space-y-4 mb-8">
         <h3 className="text-lg font-bold">個人資料</h3>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="space-y-3">
               <label className="block">
                 <p className="font-medium mb-2">稱呼</p>
-                <Input type="text" placeholder="輸入你的稱呼（例如：美怡 / 阿John / Coach）" value={formData.displayName} onChange={(e) => setFormData({ ...formData, displayName: e.target.value })} />
+                <Input
+                  type="text"
+                  placeholder="輸入你的稱呼（例如：美怡 / 阿John / Coach）"
+                  value={personalInfo.displayName}
+                  onChange={(e) => setPersonalInfo({ ...personalInfo, displayName: e.target.value })}
+                />
               </label>
 
               <label className="block">
                 <p className="font-medium mb-2">性別</p>
-                <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value as 'male' | 'female' })}>
+                <Select value={personalInfo.gender} onValueChange={(value) => setPersonalInfo({ ...personalInfo, gender: value as 'male' | 'female' })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -241,50 +283,34 @@ export default function Settings() {
 
               <label className="block">
                 <p className="font-medium mb-2">年齡</p>
-                <Input type="number" value={formData.age} onChange={(e) => setFormData({ ...formData, age: e.target.value })} />
+                <Input
+                  type="number"
+                  value={personalInfo.age}
+                  onChange={(e) => setPersonalInfo({ ...personalInfo, age: e.target.value })}
+                />
               </label>
 
               <label className="block">
                 <p className="font-medium mb-2">身高 (cm)</p>
-                <Input type="text" value={formData.heightCm} onChange={(e) => setFormData({ ...formData, heightCm: e.target.value })} />
+                <Input
+                  type="text"
+                  value={personalInfo.heightCm}
+                  onChange={(e) => setPersonalInfo({ ...personalInfo, heightCm: e.target.value })}
+                />
               </label>
 
               <label className="block">
                 <p className="font-medium mb-2">體重 (kg)</p>
-                <Input type="text" value={formData.weightKg} onChange={(e) => setFormData({ ...formData, weightKg: e.target.value })} />
+                <Input
+                  type="text"
+                  value={personalInfo.weightKg}
+                  onChange={(e) => setPersonalInfo({ ...personalInfo, weightKg: e.target.value })}
+                />
               </label>
-
-              <label className="block">
-                <p className="font-medium mb-2">健身目標</p>
-                <Select value={formData.fitnessGoal} onValueChange={(value) => setFormData({ ...formData, fitnessGoal: value as 'lose' | 'maintain' | 'gain' })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="lose">減重</SelectItem>
-                    <SelectItem value="maintain">維持</SelectItem>
-                    <SelectItem value="gain">增肌</SelectItem>
-                  </SelectContent>
-                </Select>
-              </label>
-
-              {formData.fitnessGoal !== 'maintain' && (
-                <>
-                  <label className="block">
-                    <p className="font-medium mb-2">目標重量變化 (kg)</p>
-                    <Input type="number" step="0.1" value={formData.goalKg} onChange={(e) => setFormData({ ...formData, goalKg: e.target.value })} placeholder="例如：5" />
-                  </label>
-
-                  <label className="block">
-                    <p className="font-medium mb-2">目標天數</p>
-                    <Input type="number" value={formData.goalDays} onChange={(e) => setFormData({ ...formData, goalDays: e.target.value })} placeholder="例如：60" />
-                  </label>
-                </>
-              )}
 
               <label className="block">
                 <p className="font-medium mb-2">活動水平</p>
-                <Select value={formData.activityLevel} onValueChange={(value) => setFormData({ ...formData, activityLevel: value as 'sedentary' | 'light' | 'moderate' | 'high' })}>
+                <Select value={personalInfo.activityLevel} onValueChange={(value) => setPersonalInfo({ ...personalInfo, activityLevel: value as 'sedentary' | 'light' | 'moderate' | 'high' })}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -297,42 +323,99 @@ export default function Settings() {
                 </Select>
               </label>
 
+              <Button
+                onClick={handleSavePersonalInfo}
+                disabled={personalInfoMutation.isPending}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-4"
+              >
+                {personalInfoMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    保存中...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    保存個人資料
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Target Settings */}
+      {/* ================================================================== */}
+      {/* SECTION 2: GOAL SETTINGS */}
+      {/* ================================================================== */}
       {profile && metabolicData && (
-        <div className="space-y-4 mt-8">
+        <div className="space-y-4 mb-8">
           <h3 className="text-lg font-bold">🎯 目標設定</h3>
-          
+
           <Card>
             <CardContent className="p-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600">基礎代謝率 (BMR)</p>
                   <p className="text-2xl font-bold">{Math.round(metabolicData.bmr)}</p>
                   <p className="text-xs text-gray-500">kcal/天</p>
                 </div>
+
                 <div>
                   <p className="text-sm text-gray-600">每日消耗 (TDEE)</p>
                   <p className="text-2xl font-bold">{Math.round(metabolicData.tdee)}</p>
                   <p className="text-xs text-gray-500">kcal/天</p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-600">目標：{formData.fitnessGoal === 'lose' ? '減重' : formData.fitnessGoal === 'maintain' ? '維持' : '增肌'}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-600 mb-2">卡路里模式</p>
+
+                <label className="block">
+                  <p className="font-medium mb-2">健身目標</p>
+                  <Select value={goalSettings.fitnessGoal} onValueChange={(value) => setGoalSettings({ ...goalSettings, fitnessGoal: value as 'lose' | 'maintain' | 'gain' })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="lose">減重</SelectItem>
+                      <SelectItem value="maintain">維持</SelectItem>
+                      <SelectItem value="gain">增肌</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </label>
+
+                {goalSettings.fitnessGoal !== 'maintain' && (
+                  <>
+                    <label className="block">
+                      <p className="font-medium mb-2">目標重量變化 (kg)</p>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={goalSettings.goalKg}
+                        onChange={(e) => setGoalSettings({ ...goalSettings, goalKg: e.target.value })}
+                        placeholder="例如：5"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <p className="font-medium mb-2">目標天數</p>
+                      <Input
+                        type="number"
+                        value={goalSettings.goalDays}
+                        onChange={(e) => setGoalSettings({ ...goalSettings, goalDays: e.target.value })}
+                        placeholder="例如：60"
+                      />
+                    </label>
+                  </>
+                )}
+
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-600 mb-3">卡路里模式</p>
                   <div className="space-y-2">
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="radio"
                         name="calorieMode"
                         value="safe"
-                        checked={formData.calorieMode === 'safe'}
-                        onChange={(e) => setFormData({ ...formData, calorieMode: 'safe' })}
+                        checked={goalSettings.calorieMode === 'safe'}
+                        onChange={() => handleCalorieModeChange('safe')}
                         className="w-4 h-4"
                       />
                       <span className="text-sm">安全模式（建議）</span>
@@ -342,119 +425,72 @@ export default function Settings() {
                         type="radio"
                         name="calorieMode"
                         value="aggressive"
-                        checked={formData.calorieMode === 'aggressive'}
-                        onChange={(e) => {
-                          if (e.target.checked && formData.calorieMode !== 'aggressive') {
-                            console.log('[Settings] Switching from safe to aggressive, opening modal');
-                            setPendingCalorieMode('aggressive');
-                            setShowAggressiveModal(true);
-                          }
-                        }}
+                        checked={goalSettings.calorieMode === 'aggressive'}
+                        onChange={() => handleCalorieModeChange('aggressive')}
                         className="w-4 h-4"
                       />
                       <span className="text-sm">進取模式</span>
                     </label>
-                    {profile?.calorieMode === 'aggressive' && !aggressiveModeConfirmed && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          console.log('[Settings] Re-opening aggressive mode modal');
-                          setShowAggressiveModal(true);
-                        }}
-                        className="mt-2 text-sm text-blue-600 hover:text-blue-700 underline"
-                      >
-                        重新確認進取模式
-                      </button>
-                    )}
                   </div>
                 </div>
-                {metabolicData.isAggressive && metabolicData.originalTarget !== metabolicData.target && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-600">原始計算目標</p>
-                    <p className="text-lg font-semibold">{Math.round(metabolicData.originalTarget)} kcal/天</p>
-                  </div>
-                )}
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-600">當前模式</p>
-                  <p className="text-lg font-semibold">{formData.calorieMode === 'aggressive' ? '進取模式' : '安全模式（建議）'}</p>
+
+                <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                  <p className="text-sm text-blue-800">
+                    {goalSettings.calorieMode === 'aggressive' ? '進取模式' : '安全模式（建議）'}
+                  </p>
+                  <p className="text-2xl font-bold text-blue-600 mt-2">{Math.round(metabolicData.target)} kcal/天</p>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-600">{formData.calorieMode === 'aggressive' ? '每日目標' : '安全調整後每日目標'}</p>
-                  <p className="text-2xl font-bold text-blue-600">{Math.round(metabolicData.target)} kcal/天</p>
-                </div>
+
                 {metabolicData.deficit !== 0 && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-600">每日建議{formData.fitnessGoal === 'lose' ? '赤字' : '盈餘'}</p>
+                  <div>
+                    <p className="text-sm text-gray-600">每日建議{goalSettings.fitnessGoal === 'lose' ? '赤字' : '盈餘'}</p>
                     <p className="text-lg font-semibold">{Math.abs(Math.round(metabolicData.deficit))} kcal</p>
                   </div>
                 )}
-                {aggressiveModeConfirmed && formData.calorieMode === 'aggressive' && (
-                  <div className="col-span-2 space-y-3">
-                    <div className="bg-blue-50 border border-blue-200 rounded p-3">
-                      <p className="text-sm text-blue-800">✓ 你已選擇進取模式，請按『確定並保存』生效</p>
-                    </div>
-                    <Button 
-                      onClick={() => {
-                        console.log('[Settings] Confirm button clicked');
-                        setFormData(prev => ({ ...prev, calorieMode: 'aggressive' }));
-                        // Trigger save with the updated form data
-                        setTimeout(() => {
-                          console.log('[Settings] Calling handleSave from confirm button');
-                          handleSave();
-                          setAggressiveModeConfirmed(false);
-                        }, 0);
-                      }}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-                    >
-                      確定並保存
-                    </Button>
-                  </div>
-                )}
-                {metabolicData.isAggressive && (
-                  <div className="col-span-2 bg-amber-50 border border-amber-200 rounded p-3">
-                    <p className="text-sm text-amber-800">⚠️ 目標過於進取，原始目標低於安全範圍，已調整至安全攝取下限</p>
-                  </div>
-                )}
+
+                <Button
+                  onClick={handleSaveGoalSettings}
+                  disabled={goalSettingsMutation.isPending}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white mt-4"
+                >
+                  {goalSettingsMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      保存中...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      保存目標設定
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* InBody / Boditrax Integration */}
-      <div className="space-y-4 mt-8">
-        <h3 className="text-lg font-bold">📱 InBody / Boditrax 整合</h3>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="space-y-3">
-              <p className="text-sm text-gray-600">CSV 匯入、API 匯入（開發中）</p>
-              <Button variant="outline" className="w-full" disabled>
-                <Download className="h-4 w-4 mr-2" />
-                匯入身體數據
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* AI Coach Settings */}
-      <div className="space-y-4 mt-8">
+      {/* ================================================================== */}
+      {/* SECTION 3: AI COACH */}
+      {/* ================================================================== */}
+      <div className="space-y-4 mb-8">
         <h3 className="text-lg font-bold">AI 教練設定</h3>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="space-y-3">
               <PersonalitySelector
-                value={formData.aiToneStyle}
-                onChange={(value) => setFormData({ ...formData, aiToneStyle: value })}
+                value={aiCoach.aiToneStyle}
+                onChange={(value) => setAiCoach({ aiToneStyle: value })}
               />
+
               <Button
-                onClick={handleSave}
-                disabled={updateMutation.isPending || createMutation.isPending}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white mt-4"
+                onClick={handleSaveAiCoach}
+                disabled={aiCoachMutation.isPending}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white mt-4"
               >
-                {updateMutation.isPending || createMutation.isPending ? (
+                {aiCoachMutation.isPending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     保存中...
@@ -462,7 +498,7 @@ export default function Settings() {
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    保存設定
+                    保存教練設定
                   </>
                 )}
               </Button>
@@ -471,10 +507,12 @@ export default function Settings() {
         </Card>
       </div>
 
-      {/* Notification Settings */}
-      <div className="space-y-4 mt-8">
+      {/* ================================================================== */}
+      {/* SECTION 4: NOTIFICATIONS */}
+      {/* ================================================================== */}
+      <div className="space-y-4 mb-8">
         <h3 className="text-lg font-bold">通知設定</h3>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="space-y-3">
@@ -483,7 +521,10 @@ export default function Settings() {
                   <p className="font-medium">每日提醒</p>
                   <p className="text-xs text-gray-500 ml-2">每日提醒記錄飲食</p>
                 </label>
-                <Switch checked={notifications.dailyReminder} onCheckedChange={(checked) => setNotifications({ ...notifications, dailyReminder: checked })} />
+                <Switch
+                  checked={notifications.dailyReminder}
+                  onCheckedChange={(checked) => handleToggleNotification('dailyReminder', checked)}
+                />
               </div>
 
               <div className="flex items-center justify-between">
@@ -491,14 +532,19 @@ export default function Settings() {
                   <p className="font-medium">食物提醒</p>
                   <p className="text-xs text-gray-500 ml-2">記錄食物時提醒</p>
                 </label>
-                <Switch checked={notifications.foodReminder} onCheckedChange={(checked) => setNotifications({ ...notifications, foodReminder: checked })} />
+                <Switch
+                  checked={notifications.foodReminder}
+                  onCheckedChange={(checked) => handleToggleNotification('foodReminder', checked)}
+                />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Footer Links */}
+      {/* ================================================================== */}
+      {/* FOOTER */}
+      {/* ================================================================== */}
       <div className="space-y-4 mt-8 pt-8 border-t">
         <div className="flex justify-center gap-4">
           <a href="#" className="text-sm text-gray-600 hover:text-gray-900">私隱政策</a>
@@ -507,23 +553,24 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* Logout Button */}
       <Button onClick={logout} variant="outline" className="w-full mt-8">
         <LogOut className="h-4 w-4 mr-2" />
         登出
       </Button>
 
-      {/* Aggressive Calorie Mode Modal */}
+      {/* ================================================================== */}
+      {/* AGGRESSIVE CALORIE MODE MODAL */}
+      {/* ================================================================== */}
       <AggressiveCalorieModal
         isOpen={showAggressiveModal}
-        originalCalories={metabolicData.originalTarget}
+        originalCalories={metabolicData?.originalTarget || 0}
         onConfirm={() => {
-          setFormData({ ...formData, calorieMode: 'aggressive' });
+          setGoalSettings(prev => ({ ...prev, calorieMode: 'aggressive' }));
           setAggressiveModeConfirmed(true);
           setShowAggressiveModal(false);
         }}
         onCancel={() => {
-          setFormData({ ...formData, calorieMode: 'safe' });
+          setGoalSettings(prev => ({ ...prev, calorieMode: 'safe' }));
           setAggressiveModeConfirmed(false);
           setShowAggressiveModal(false);
         }}
