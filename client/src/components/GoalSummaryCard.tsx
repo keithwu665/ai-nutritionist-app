@@ -8,6 +8,7 @@ interface GoalSummaryCardProps {
   currentWeight?: number;
   gender?: string;
   tdee?: number;
+  calorieMode?: string;
 }
 
 export function GoalSummaryCard({
@@ -17,6 +18,7 @@ export function GoalSummaryCard({
   currentWeight,
   gender = 'male',
   tdee = 0,
+  calorieMode = 'safe',
 }: GoalSummaryCardProps) {
   // Safe numeric parsing and validation
   const parseNumber = (value: any): number | null => {
@@ -53,18 +55,21 @@ export function GoalSummaryCard({
 
   // Calculate daily deficit and safety
   const KCAL_PER_KG_FAT = 7700;
-  const MIN_CALORIES = genderStr === 'female' ? 1200 : 1500;
+  const MIN_CALORIES_SAFE = genderStr === 'female' ? 1200 : 1500;
+  const MIN_CALORIES_AGGRESSIVE = genderStr === 'female' ? 1000 : 1200;
+  const MIN_CALORIES = calorieMode === 'aggressive' ? MIN_CALORIES_AGGRESSIVE : MIN_CALORIES_SAFE;
   
   let dailyDeficit = 0;
   let dailyCalories = tdeeNum || 2000; // Use default if TDEE not provided
-  let isAggressive = false;
+  let isAggressive = calorieMode === 'aggressive';
   
   if (fitnessGoal === 'lose' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
     dailyCalories = tdeeNum ? tdeeNum - dailyDeficit : 2000 - dailyDeficit;
-    if (dailyCalories < MIN_CALORIES) {
-      isAggressive = true;
-      dailyCalories = MIN_CALORIES;
+    if (calorieMode === 'safe' && dailyCalories < MIN_CALORIES_SAFE) {
+      dailyCalories = MIN_CALORIES_SAFE;
+    } else if (calorieMode === 'aggressive' && dailyCalories < MIN_CALORIES_AGGRESSIVE) {
+      dailyCalories = MIN_CALORIES_AGGRESSIVE;
     }
   } else if (fitnessGoal === 'gain' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
