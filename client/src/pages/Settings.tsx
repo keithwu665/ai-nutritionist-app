@@ -344,13 +344,28 @@ export default function Settings() {
                         value="aggressive"
                         checked={formData.calorieMode === 'aggressive'}
                         onChange={(e) => {
-                          setPendingCalorieMode('aggressive');
-                          setShowAggressiveModal(true);
+                          if (e.target.checked && formData.calorieMode !== 'aggressive') {
+                            console.log('[Settings] Switching from safe to aggressive, opening modal');
+                            setPendingCalorieMode('aggressive');
+                            setShowAggressiveModal(true);
+                          }
                         }}
                         className="w-4 h-4"
                       />
                       <span className="text-sm">進取模式</span>
                     </label>
+                    {profile?.calorieMode === 'aggressive' && !aggressiveModeConfirmed && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          console.log('[Settings] Re-opening aggressive mode modal');
+                          setShowAggressiveModal(true);
+                        }}
+                        className="mt-2 text-sm text-blue-600 hover:text-blue-700 underline"
+                      >
+                        重新確認進取模式
+                      </button>
+                    )}
                   </div>
                 </div>
                 {metabolicData.isAggressive && metabolicData.originalTarget !== metabolicData.target && (
