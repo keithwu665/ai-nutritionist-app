@@ -159,10 +159,11 @@ export default function Settings() {
     };
 
     if (goalSettings.fitnessGoal !== 'maintain') {
-      updatePayload.goalKg = goalSettings.goalKg ? parseFloat(goalSettings.goalKg) : undefined;
+      updatePayload.goalKg = goalSettings.goalKg ? String(goalSettings.goalKg) : undefined;
       updatePayload.goalDays = goalSettings.goalDays ? parseInt(goalSettings.goalDays) : undefined;
     }
 
+    console.log('[Settings] Goal settings payload:', updatePayload);
     goalSettingsMutation.mutate(updatePayload);
   };
 
