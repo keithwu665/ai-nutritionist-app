@@ -72,9 +72,11 @@ export default function Settings() {
   }, [profile]);
 
   const createMutation = trpc.profile.create.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('[Settings] Create mutation onSuccess called with data:', data);
+      console.log('[Settings] About to show create success toast at', new Date().toISOString());
       toast.success('個人資訊已建立');
-      utils.profile.get.invalidate();
+      console.log('[Settings] Create success toast shown at', new Date().toISOString());
       // Save personality to localStorage and dispatch event
       const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
         'gentle': 'gentle',
@@ -85,18 +87,32 @@ export default function Settings() {
       localStorage.setItem('aiPersonality', mappedPersonality);
       // Dispatch custom event to notify other pages
       window.dispatchEvent(new Event('personalityChanged'));
-      console.log('Personality saved to localStorage:', mappedPersonality);
+      console.log('[Settings] Personality saved to localStorage:', mappedPersonality);
+      // Refetch profile with explicit error handling
+      console.log('[Settings] Refetching profile after create...');
+      utils.profile.get.refetch().catch((err) => {
+        console.error('[Settings] Profile refetch failed after create:', err);
+      });
     },
-    onError: (err) => {
-      console.error('Create profile error:', err);
+    onError: (err: any) => {
+      console.error('[Settings] Create mutation onError called at', new Date().toISOString(), 'with error:', err);
+      console.error('[Settings] Error details:', {
+        message: err.message,
+        code: err.code,
+        shape: err.shape,
+        data: err.data
+      });
+      console.error('[Settings] Stack trace:', err.stack);
       toast.error('建立失敗');
     },
   });
 
   const updateMutation = trpc.profile.update.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('[Settings] Update mutation onSuccess called with data:', data);
+      console.log('[Settings] About to show success toast at', new Date().toISOString());
       toast.success('個人資訊已更新');
-      utils.profile.get.invalidate();
+      console.log('[Settings] Success toast shown at', new Date().toISOString());
       // Save personality to localStorage and dispatch event
       const personalityMap: Record<string, 'gentle' | 'strict' | 'hongkong'> = {
         'gentle': 'gentle',
@@ -107,16 +123,29 @@ export default function Settings() {
       localStorage.setItem('aiPersonality', mappedPersonality);
       // Dispatch custom event to notify other pages
       window.dispatchEvent(new Event('personalityChanged'));
-      console.log('Personality saved to localStorage:', mappedPersonality);
+      console.log('[Settings] Personality saved to localStorage:', mappedPersonality);
+      // Refetch profile with explicit error handling
+      console.log('[Settings] Refetching profile after update...');
+      utils.profile.get.refetch().catch((err) => {
+        console.error('[Settings] Profile refetch failed after update:', err);
+      });
     },
-    onError: (err) => {
-      console.error('Update profile error:', err);
+    onError: (err: any) => {
+      console.error('[Settings] Update mutation onError called at', new Date().toISOString(), 'with error:', err);
+      console.error('[Settings] Error details:', {
+        message: err.message,
+        code: err.code,
+        shape: err.shape,
+        data: err.data
+      });
+      console.error('[Settings] Stack trace:', err.stack);
       toast.error('更新失敗');
     },
   });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('[Settings] handleSave called at', new Date().toISOString(), 'with formData:', formData);
     const age = parseInt(formData.age) || 25;
     if (isNaN(age)) {
       toast.error('年齡必須是有效的數字');
@@ -128,7 +157,7 @@ export default function Settings() {
     
     // If profile doesn't exist, create it; otherwise update it
     if (!profile) {
-      createMutation.mutate({
+      const createPayload = {
         gender: formData.gender,
         age,
         heightCm,
@@ -140,9 +169,11 @@ export default function Settings() {
         goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
         goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
         calorieMode: formData.calorieMode,
-      });
+      };
+      console.log('[Settings] Creating profile with payload:', createPayload);
+      createMutation.mutate(createPayload);
     } else {
-      updateMutation.mutate({
+      const updatePayload = {
         gender: formData.gender,
         age,
         heightCm,
@@ -154,7 +185,11 @@ export default function Settings() {
         goalKg: formData.goalKg ? parseFloat(formData.goalKg) : undefined,
         goalDays: formData.goalDays ? parseInt(formData.goalDays) : undefined,
         calorieMode: formData.calorieMode,
-      });
+      };
+      console.log('[Settings] Updating profile with payload at', new Date().toISOString(), ':', updatePayload);
+      console.log('[Settings] updateMutation.mutate() called');
+      updateMutation.mutate(updatePayload);
+      console.log('[Settings] updateMutation.mutate() returned (async)');
     }
   };
 
