@@ -179,7 +179,7 @@ export default function Dashboard() {
           <Card className="rounded-2xl">
             <CardContent className="pt-4 pb-4">
               <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
-              <p className="text-2xl font-bold">{bodyMetrics?.weightKg ?? profile.weightKg}</p>
+              <p className="text-2xl font-bold">{profile.weightKg}</p>
               <p className="text-xs text-muted-foreground mt-1">kg</p>
               {bodyMetrics && (
                 <p className="text-xs text-green-600 mt-1">-0.2 kg</p>

@@ -115,6 +115,11 @@ export default function Settings() {
       }).catch((err) => {
         console.error('[Settings] Dashboard data refetch failed:', err);
       });
+      utils.bodyMetrics.latest.refetch().then(() => {
+        console.log('[Settings] Body metrics refetch succeeded');
+      }).catch((err) => {
+        console.error('[Settings] Body metrics refetch failed:', err);
+      });
     },
     onError: (err: any) => {
       console.error('[Settings] Personal info save failed:', err);
