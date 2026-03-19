@@ -21,7 +21,7 @@ export default function Dashboard() {
     }
   }, [profileLoading, profile, setLocation]);
 
-  const isLoading = profileLoading || dashLoading || recsLoading;
+  const isLoading = (!profile && profileLoading) || (!dashData && dashLoading) || (!recs && recsLoading);
 
   if (isLoading) {
     return (
