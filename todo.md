@@ -268,3 +268,9 @@
 - [x] Remove redundant "我的目標" card from dashboard (not needed - GoalSummaryCard already serves this purpose)
 - [x] Add weekly weight loss helper line under "目標進度"
 - [x] Verify dashboard is cleaner and displays correct information
+
+
+## Remove "我的目標" Section
+- [x] Locate and remove entire "我的目標" card from dashboard
+- [x] Verify no duplicate goal information remains
+- [x] Confirm dashboard structure is clean and simplified
