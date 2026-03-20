@@ -392,9 +392,6 @@ function RecCard({ rec, icon, isEncouragement }: { rec: { title: string; content
           <div className="flex-1">
             <p className="font-semibold text-sm">{rec.title}</p>
             <p className="text-xs text-muted-foreground mt-1">{rec.content}</p>
-            <div className="mt-3 p-2 bg-primary/10 rounded-lg">
-              <p className="text-xs text-primary font-medium">👉 {rec.action}</p>
-            </div>
           </div>
         </div>
       </CardContent>
