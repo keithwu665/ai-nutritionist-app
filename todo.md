@@ -290,3 +290,11 @@
 - [x] Create EatingOutSuggestions page with static eating-out tips
 - [x] Integrate Diet Inspiration section into Food Logging page
 - [x] Test navigation and verify feature works correctly
+
+
+## Diet Record Simplification (Single-Day View)
+- [x] Remove "最近記錄" section from Food Log page
+- [x] Remove multi-day list display
+- [x] Refactor to show only selected day's data
+- [x] Reorganize meal breakdown display (早餐, 午餐, 晩餐, 小食)
+- [x] Test calendar navigation and single-day view

@@ -487,12 +487,8 @@ export default function FoodLog() {
         {/* Diet Inspiration Section */}
         <DietInspirationCards />
 
-        {/* Recent Records Section */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">最近記錄</h2>
-
-          {/* Today's Summary */}
-          <Card className="rounded-2xl border-2 border-emerald-200 bg-emerald-50">
+        {/* Selected Day Summary */}
+        <Card className="rounded-2xl border-2 border-emerald-200 bg-emerald-50">
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
                 {/* Date Badge */}
@@ -538,10 +534,10 @@ export default function FoodLog() {
                     </div>
               </div>
             </CardContent>
-          </Card>
+        </Card>
 
-          {/* Food Items for Today */}
-          {items.length > 0 && (
+        {/* Food Items for Selected Day */}
+        {items.length > 0 && (
             <Card className="rounded-2xl">
               <CardContent className="p-4 space-y-2">
                 {items.map((item) => (
@@ -564,64 +560,26 @@ export default function FoodLog() {
                 ))}
               </CardContent>
             </Card>
-          )}
+        )}
 
-          {/* Last 7 Days */}
-          <div className="space-y-2">
-            {last7DaysData.slice(0, -1).map((day) => {
-              const dayNum = day.date.getDate();
-              const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'][day.date.getDay()];
-              const dayPercentage = Math.round((day.kcal / dailyCalorieGoal) * 100);
-
-              return (
-                <button
-                  key={day.dateStr}
-                  onClick={() => setDate(day.dateStr)}
-                  className="w-full text-left p-4 rounded-2xl bg-white hover:bg-gray-50 transition-colors border border-gray-200"
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Date Badge */}
-                    <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-700 flex flex-col items-center justify-center font-bold flex-shrink-0">
-                      <span className="text-lg">{dayNum}</span>
-                      <span className="text-xs">週{dayOfWeek}</span>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-gray-600 mb-2">{String(day.dateStr)}</div>
-                      {/* Progress Bar */}
-                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                        <div
-                          className={`h-full transition-all ${
-                            day.kcal >= dailyCalorieGoal ? 'bg-red-500' : 'bg-emerald-500'
-                          }`}
-                          style={{
-                            width: `${Math.min((day.kcal / dailyCalorieGoal) * 100, 100)}%`,
-                          }}
-                        />
-                      </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        目標 {dailyCalorieGoal} kcal · {dayPercentage}%
-                      </div>
-                    </div>
-
-                    {/* Kcal Display */}
-                    <div className="text-right flex-shrink-0">
-                      <div
-                        className={`text-lg font-bold ${
-                          day.kcal >= dailyCalorieGoal ? 'text-red-600' : 'text-emerald-600'
-                        }`}
-                      >
-                        {String(Math.round(day.kcal))} kcal
-                      </div>
-                      <ChevronRightIcon className="w-4 h-4 text-gray-400 mt-1 ml-auto" />
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        {/* No items message */}
+        {items.length === 0 && (
+          <Card className="rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50">
+            <CardContent className="p-8 text-center">
+              <p className="text-gray-600 mb-4">這天還沒有記錄任何食物</p>
+              <Button
+                onClick={() => {
+                  setShowModal(true);
+                  setActiveTab('photo');
+                }}
+                className="bg-emerald-500 hover:bg-emerald-600"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                新增飲食
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Fitasty Banner */}
         <div 
