@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@tailwind base, components, utilities;
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -43,166 +43,191 @@
 }
 
 :root {
-  /* Fitasty Reference: Emerald Green Primary */
-  --primary: oklch(0.56 0.18 160);
+  /* Fitasty Brand Colors - Calm Wellness Experience */
+  
+  /* Primary: Warm Beige/Cream - Premium, calming background */
+  --primary: oklch(0.50 0.12 140);
   --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.56 0.18 160);
+  --sidebar-primary: oklch(0.50 0.12 140);
   --sidebar-primary-foreground: oklch(0.98 0 0);
   
-  /* Chart Colors - Matching Fitasty Palette */
-  --chart-1: oklch(0.56 0.18 160);
-  --chart-2: oklch(0.50 0.16 160);
-  --chart-3: oklch(0.45 0.14 160);
-  --chart-4: oklch(0.75 0.12 250);
-  --chart-5: oklch(0.60 0.15 50);
+  /* Chart Colors - Muted, natural palette */
+  --chart-1: oklch(0.50 0.12 140);
+  --chart-2: oklch(0.55 0.10 140);
+  --chart-3: oklch(0.45 0.08 140);
+  --chart-4: oklch(0.60 0.08 250);
+  --chart-5: oklch(0.65 0.10 80);
   
   /* Spacing and Radius - Fitasty Style */
-  --radius: 1rem;
+  --radius: 0.75rem;
   
-  /* Light Mode - Fitasty Clean White */
-  --background: oklch(0.99 0.001 0);
-  --foreground: oklch(0.25 0.02 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.25 0.02 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.25 0.02 65);
+  /* Light Mode - Warm Beige Background */
+  --background: oklch(0.97 0.01 70);
+  --foreground: oklch(0.35 0.02 65);
+  --card: oklch(0.99 0.005 70);
+  --card-foreground: oklch(0.35 0.02 65);
+  --popover: oklch(0.99 0.005 70);
+  --popover-foreground: oklch(0.35 0.02 65);
   
-  /* Secondary and Muted */
-  --secondary: oklch(0.95 0.01 286);
+  /* Secondary: Soft Grey - Text, labels */
+  --secondary: oklch(0.70 0.02 286);
   --secondary-foreground: oklch(0.35 0.02 65);
-  --muted: oklch(0.92 0.01 286);
-  --muted-foreground: oklch(0.55 0.02 286);
-  --accent: oklch(0.92 0.01 286);
-  --accent-foreground: oklch(0.15 0.01 286);
+  --muted: oklch(0.88 0.01 286);
+  --muted-foreground: oklch(0.60 0.02 286);
+  --accent: oklch(0.50 0.12 140);
+  --accent-foreground: oklch(0.98 0 0);
   
-  /* Destructive - Coral/Red accent */
-  --destructive: oklch(0.65 0.20 30);
+  /* Destructive - Soft coral */
+  --destructive: oklch(0.60 0.15 30);
   --destructive-foreground: oklch(0.98 0 0);
   
-  /* Borders and Inputs */
-  --border: oklch(0.90 0.01 286);
-  --input: oklch(0.95 0.005 286);
-  --ring: oklch(0.56 0.18 160);
+  /* Borders and Inputs - Soft, minimal */
+  --border: oklch(0.92 0.01 286);
+  --input: oklch(0.96 0.005 70);
+  --ring: oklch(0.50 0.12 140);
   
   /* Sidebar */
-  --sidebar: oklch(0.98 0.001 0);
-  --sidebar-foreground: oklch(0.25 0.02 65);
-  --sidebar-accent: oklch(0.92 0.01 286);
-  --sidebar-accent-foreground: oklch(0.15 0.01 286);
-  --sidebar-border: oklch(0.90 0.01 286);
-  --sidebar-ring: oklch(0.56 0.18 160);
+  --sidebar: oklch(0.97 0.01 70);
+  --sidebar-foreground: oklch(0.35 0.02 65);
+  --sidebar-accent: oklch(0.50 0.12 140);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.92 0.01 286);
+  --sidebar-ring: oklch(0.50 0.12 140);
 }
 
 .dark {
-  --primary: oklch(0.62 0.16 160);
+  /* Fitasty Dark Mode - Calm Wellness Experience */
+  
+  /* Primary: Muted Green */
+  --primary: oklch(0.55 0.10 140);
   --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.62 0.16 160);
+  --sidebar-primary: oklch(0.55 0.10 140);
   --sidebar-primary-foreground: oklch(0.98 0 0);
   
-  /* Dark Mode Background */
-  --background: oklch(0.12 0.01 286);
-  --foreground: oklch(0.92 0.01 65);
-  --card: oklch(0.18 0.01 286);
-  --card-foreground: oklch(0.92 0.01 65);
-  --popover: oklch(0.18 0.01 286);
-  --popover-foreground: oklch(0.92 0.01 65);
+  /* Dark Mode Background - Warm, dark tone */
+  --background: oklch(0.15 0.01 70);
+  --foreground: oklch(0.90 0.01 65);
+  --card: oklch(0.22 0.01 70);
+  --card-foreground: oklch(0.90 0.01 65);
+  --popover: oklch(0.22 0.01 70);
+  --popover-foreground: oklch(0.90 0.01 65);
   
-  /* Dark Mode Secondary */
-  --secondary: oklch(0.22 0.01 286);
-  --secondary-foreground: oklch(0.80 0.01 65);
-  --muted: oklch(0.28 0.01 286);
-  --muted-foreground: oklch(0.70 0.02 286);
-  --accent: oklch(0.28 0.01 286);
-  --accent-foreground: oklch(0.95 0.01 65);
+  /* Dark Mode Secondary - Soft Grey */
+  --secondary: oklch(0.35 0.01 286);
+  --secondary-foreground: oklch(0.85 0.01 65);
+  --muted: oklch(0.32 0.01 286);
+  --muted-foreground: oklch(0.65 0.02 286);
+  --accent: oklch(0.55 0.10 140);
+  --accent-foreground: oklch(0.98 0 0);
   
-  /* Dark Mode Destructive */
-  --destructive: oklch(0.70 0.18 27);
+  /* Dark Mode Destructive - Soft coral */
+  --destructive: oklch(0.65 0.15 30);
   --destructive-foreground: oklch(0.98 0 0);
   
-  /* Dark Mode Borders */
-  --border: oklch(0.25 0.01 286);
-  --input: oklch(0.22 0.01 286);
-  --ring: oklch(0.62 0.16 160);
+  /* Dark Mode Borders - Subtle */
+  --border: oklch(0.28 0.01 286);
+  --input: oklch(0.25 0.01 70);
+  --ring: oklch(0.55 0.10 140);
   
   /* Dark Mode Sidebar */
-  --sidebar: oklch(0.18 0.01 286);
-  --sidebar-foreground: oklch(0.92 0.01 65);
-  --sidebar-accent: oklch(0.28 0.01 286);
-  --sidebar-accent-foreground: oklch(0.95 0.01 65);
-  --sidebar-border: oklch(0.25 0.01 286);
-  --sidebar-ring: oklch(0.62 0.16 160);
+  --sidebar: oklch(0.20 0.01 70);
+  --sidebar-foreground: oklch(0.90 0.01 65);
+  --sidebar-accent: oklch(0.55 0.10 140);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.28 0.01 286);
+  --sidebar-ring: oklch(0.55 0.10 140);
   
-  /* Dark Mode Charts */
-  --chart-1: oklch(0.70 0.15 160);
-  --chart-2: oklch(0.62 0.14 160);
-  --chart-3: oklch(0.52 0.12 160);
-  --chart-4: oklch(0.80 0.10 250);
-  --chart-5: oklch(0.65 0.12 50);
+  /* Dark Mode Charts - Muted palette */
+  --chart-1: oklch(0.60 0.10 140);
+  --chart-2: oklch(0.55 0.09 140);
+  --chart-3: oklch(0.50 0.08 140);
+  --chart-4: oklch(0.65 0.08 250);
+  --chart-5: oklch(0.70 0.10 80);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: rgb(var(--ring) / 0.5);
   }
   
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
-  
+
+  /* Typography - Fitasty Premium Style */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-family: 'Garamond', 'Georgia', serif;
+  }
+
   h1 {
-    @apply text-3xl font-bold tracking-tight;
+    font-size: 2.25rem;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
   }
-  
+
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 3rem;
+    }
+  }
+
   h2 {
-    @apply text-2xl font-semibold tracking-tight;
+    font-size: 1.875rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
   }
-  
+
+  @media (min-width: 768px) {
+    h2 {
+      font-size: 2.25rem;
+    }
+  }
+
   h3 {
-    @apply text-xl font-semibold tracking-tight;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    margin-bottom: 0.75rem;
   }
-  
+
+  @media (min-width: 768px) {
+    h3 {
+      font-size: 1.875rem;
+    }
+  }
+
   h4 {
-    @apply text-lg font-semibold;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
   }
-  
+
+  @media (min-width: 768px) {
+    h4 {
+      font-size: 1.5rem;
+    }
+  }
+
   p {
-    @apply text-base leading-relaxed;
-  }
-  
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  a[href],
-  select:not(:disabled),
-  input[type="checkbox"]:not(:disabled),
-  input[type="radio"]:not(:disabled) {
-    @apply cursor-pointer;
+    line-height: 1.625;
+    font-size: 1rem;
   }
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   */
   .container {
-    width: 100%;
     margin-left: auto;
     margin-right: auto;
+    max-width: 80rem;
     padding-left: 1rem;
     padding-right: 1rem;
   }
 
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
-  /* Responsive Padding */
   @media (min-width: 640px) {
     .container {
       padding-left: 1.5rem;
@@ -214,16 +239,123 @@
     .container {
       padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px;
     }
   }
 
-  /* Utility Classes for Spacing */
-  .space-between-sections {
-    @apply space-y-6 sm:space-y-8;
+  /* Card refinements - Softer, premium feel */
+  .card {
+    background-color: var(--card);
+    color: var(--card-foreground);
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
 
-  .grid-responsive {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+  /* Button refinements - Larger, more breathing space */
+  .btn {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
   }
+
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn-secondary {
+    background-color: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
+  .btn-secondary:hover {
+    opacity: 0.9;
+  }
+
+  /* Reduced visual density */
+  .section {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-family: 'Garamond', 'Georgia', serif;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Whitespace and spacing improvements */
+  .content-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .content-grid {
+      gap: 2rem;
+    }
+  }
+
+  /* Minimal icon styling */
+  .icon-minimal {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: currentColor;
+  }
+}
+
+/* Utility classes for editorial layout */
+.editorial-spacing {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .editorial-spacing {
+    gap: 3rem;
+  }
+}
+
+.soft-shadow {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.soft-shadow:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  transition: box-shadow 200ms ease-in-out;
+}
+
+.calm-transition {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+/* Remove harsh elements */
+.no-harsh-borders {
+  border: 0;
+}
+
+.minimal-border {
+  border: 1px solid;
+  border-color: rgb(var(--border) / 0.5);
 }

@@ -79,10 +79,10 @@ export default function Dashboard() {
   return (
     <div className="pb-32 md:pb-8">
       {/* Greeting Section - Rebuilt from Screenshot */}
-      <div className="p-4">
-        <p className="text-xs text-muted-foreground mb-4">{getDateString()}</p>
+      <div className="p-6 md:p-8 pb-4">
+        <p className="text-xs text-muted-foreground mb-6 tracking-wide">{getDateString()}</p>
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold">{getGreeting()}</h1>
+          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight" style={{fontFamily: "'Garamond', 'Georgia', serif"}}>{getGreeting()}</h1>
           <div className="flex items-center gap-3">
             <button className="p-2 hover:bg-muted rounded-full transition-colors">
               <Bell className="h-5 w-5 text-foreground" />
@@ -97,10 +97,10 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="p-4 md:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
+      <div className="p-6 md:p-12 space-y-8 md:space-y-12 max-w-7xl mx-auto editorial-spacing">
         
-        {/* Hero Calorie Card - Emerald Green */}
-        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-6 md:p-8 text-white shadow-lg">
+        {/* Hero Calorie Card - Fitasty Premium */}
+        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-8 md:p-10 text-white soft-shadow">
           <div className="grid grid-cols-2 gap-6 mb-6">
             {/* Left: Intake */}
             <div>
@@ -164,10 +164,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Body Metrics Cards - 3 Column */}
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
-          <Card className="rounded-2xl">
-            <CardContent className="pt-4 pb-4">
+        {/* Body Metrics Cards - 3 Column - Editorial Spacing */}
+        <div className="grid grid-cols-3 gap-4 md:gap-6 pt-4">
+          <Card className="rounded-lg soft-shadow">
+            <CardContent className="pt-6 pb-6 px-6">
               <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
               <p className="text-2xl font-bold">{profile.weightKg}</p>
               <p className="text-xs text-muted-foreground mt-1">kg</p>
@@ -177,8 +177,8 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardContent className="pt-4 pb-4">
+          <Card className="rounded-lg soft-shadow">
+            <CardContent className="pt-6 pb-6 px-6">
               <p className="text-xs text-muted-foreground font-medium mb-2">體脂 %</p>
               <p className="text-2xl font-bold">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
               <p className="text-xs text-muted-foreground mt-1">%</p>
@@ -188,8 +188,8 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardContent className="pt-4 pb-4">
+          <Card className="rounded-lg soft-shadow">
+            <CardContent className="pt-6 pb-6 px-6">
               <p className="text-xs text-muted-foreground font-medium mb-2">BMI</p>
               <p className="text-2xl font-bold">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
               <p className="text-xs text-muted-foreground mt-1">kg/m²</p>
