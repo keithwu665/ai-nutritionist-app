@@ -274,3 +274,11 @@
 - [x] Locate and remove entire "我的目標" card from dashboard
 - [x] Verify no duplicate goal information remains
 - [x] Confirm dashboard structure is clean and simplified
+
+
+## Body Data Section Layout Refactor
+- [x] Locate current Body Data section in Dashboard or Settings
+- [x] Move "+新增量度" to primary position (always visible, not scrollable)
+- [x] Reorganize secondary actions (進度照片, 匯入 CSV, 匯入報告) in horizontal row
+- [x] Improve visual hierarchy with button styling
+- [x] Test on mobile and desktop for usability
