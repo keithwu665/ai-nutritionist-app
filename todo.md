@@ -298,3 +298,11 @@
 - [x] Refactor to show only selected day's data
 - [x] Reorganize meal breakdown display (早餐, 午餐, 晩餐, 小食)
 - [x] Test calendar navigation and single-day view
+
+
+## Diet Inspiration Layout Improvement
+- [x] Move 飲食靈感 section below food logging area
+- [x] Update DietInspirationCards to horizontal side-by-side layout
+- [x] Add icons and subtitles to each card
+- [x] Improve card styling with soft shadows and rounded corners
+- [x] Test responsive layout on mobile and desktop
