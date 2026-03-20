@@ -405,3 +405,11 @@
 - [x] Add console logs for debugging button clicks and AI execution
 - [x] Test AI suggestion generation with different scenarios
 - [x] Verify "暫無建議" never appears (always shows content or reason)
+
+
+## AI Suggestion Fix - Date-Specific and Status Correct
+- [x] Fix backend status evaluation logic to correctly classify progress
+- [x] Implement date-specific suggestion generation with proper cache key
+- [x] Add debug logging for selected date, progress, and status
+- [ ] Test AI suggestions across different dates
+- [ ] Verify suggestions change when date/data changes

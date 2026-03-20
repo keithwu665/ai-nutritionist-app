@@ -135,6 +135,7 @@ export const appRouter = router({
         muscleMassKg: z.number().nullable(),
         personality: z.enum(['gentle', 'strict', 'hongkong']),
         weightTrend: z.enum(['increasing', 'decreasing']).nullable(),
+        selectedDate: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
         const profile = await db.getUserProfile(ctx.user.id);
@@ -151,14 +152,38 @@ export const appRouter = router({
             actionUrl: '/settings'
           };
         }
-
-        const dailyDeficit = (Math.abs(goalKg) * 7700) / goalDays;
+        // Get all body metrics to find baseline and calculate progress
+        const allMetrics = await db.getBodyMetrics(ctx.user.id, 365);
+        const baselineMetric = allMetrics[allMetrics.length - 1]; // Oldest metric
+        const baselineWeight = baselineMetric ? Number(baselineMetric.weightKg) : input.weight;
+        
+        // Calculate days elapsed from baseline to selected date
+        const selectedDateObj = new Date(input.selectedDate);
+        const baselineDate = baselineMetric ? new Date(baselineMetric.date) : selectedDateObj;
+        const daysElapsed = Math.max(1, Math.floor((selectedDateObj.getTime() - baselineDate.getTime()) / (1000 * 60 * 60 * 24)));
+        
+        // Calculate expected vs actual progress
+        const expectedProgress = (daysElapsed / goalDays) * Math.abs(goalKg);
+        const actualProgress = Math.abs(baselineWeight - input.weight);
+        
+        // Determine status based on progress comparison
         let status = 'on_track';
+        const progressRatio = actualProgress / expectedProgress;
+        
+        if (progressRatio >= 0.9) {
+          status = 'on_track';
+        } else if (progressRatio >= 0.7) {
+          status = 'slightly_behind';
+        } else {
+          status = 'off_track';
+        }
+        
+        // If weight is increasing when goal is to lose, mark as off_track
         if (input.weightTrend === 'increasing' && goalKg < 0) {
           status = 'off_track';
-        } else if (input.weightTrend === 'increasing' && goalKg > 0) {
-          status = 'slightly_behind';
         }
+        
+        const dailyDeficit = (Math.abs(goalKg) * 7700) / goalDays;
 
         let advice = '';
         if (input.personality === 'gentle') {
@@ -194,6 +219,10 @@ export const appRouter = router({
           dailyDeficit: Math.round(dailyDeficit),
           goalKg,
           goalDays,
+          daysElapsed,
+          expectedProgress: Math.round(expectedProgress * 10) / 10,
+          actualProgress: Math.round(actualProgress * 10) / 10,
+          progressRatio: Math.round(progressRatio * 100),
         };
       }),
   }),

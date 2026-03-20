@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -26,11 +26,13 @@ export default function BodyMetrics() {
 
   // Load personality from localStorage
   useEffect(() => {
-    const savedPersonality = localStorage.getItem('aiPersonality') as 'gentle' | 'strict' | 'hongkong' | null;
+    const savedPersonality = localStorage.getItem('coachPersonality');
     if (savedPersonality) {
-      setPersonality(savedPersonality);
+      setPersonality(savedPersonality as 'gentle' | 'strict' | 'hongkong');
     }
   }, []);
+
+
 
   const deleteMutation = trpc.bodyMetrics.delete.useMutation({
     onSuccess: () => {
@@ -44,6 +46,8 @@ export default function BodyMetrics() {
   const coachAdviceMutation = trpc.bodyMetrics.getCoachAdvice.useMutation({
     onSuccess: (data) => {
       console.log('✓ AI suggestion received from backend:', data);
+      console.log('Status:', data.status);
+      console.log('Progress:', data.actualProgress, '/', data.expectedProgress, '(', data.progressRatio, '%)');
       console.log('Setting coachAdvice state to:', data);
       setCoachAdvice(data);
     },
@@ -102,8 +106,9 @@ export default function BodyMetrics() {
   const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg, previousMetric?.muscleMassKg);
 
   // Generate AI Coach Advice
-  const generateAdvice = () => {
+  const generateAdvice = useCallback(() => {
     console.log('=== generateAdvice called ===');
+    console.log('selectedDate:', selectedDate);
     console.log('selectedDayMetric:', selectedDayMetric);
     console.log('bmiData:', bmiData);
     console.log('selectedWeight:', selectedWeight);
@@ -121,12 +126,13 @@ export default function BodyMetrics() {
       setCoachAdvice({ type: 'no_data', advice: '無法計算 BMI，請確保已設定身高' });
       return;
     }
-    console.log('\u2713 All required data available, triggering mutation...');
+    console.log('✓ All required data available, triggering mutation...');
     console.log('Payload:', {
       weight: selectedWeight,
       bmi: bmiData.value,
       personality,
       weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
+      selectedDate,
     });
     
     coachAdviceMutation.mutate({
@@ -136,24 +142,33 @@ export default function BodyMetrics() {
       muscleMassKg: selectedDayMetric.muscleMassKg ? Number(selectedDayMetric.muscleMassKg) : null,
       personality,
       weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
+      selectedDate,
     });
-  };
+  }, [selectedDate, selectedDayMetric, bmiData, selectedWeight, personality, weightTrend, coachAdviceMutation]);
+
+  // Regenerate advice when selected date changes (only when advice tab is active)
+  useEffect(() => {
+    if (activeTab === 'advice' && selectedDayMetric && bmiData) {
+      console.log('📅 Selected date changed, regenerating advice...');
+      generateAdvice();
+    }
+  }, [selectedDate, activeTab, selectedDayMetric, bmiData, generateAdvice]);
 
   // Navigate to previous day
-  const handlePrevDay = () => {
+  const handlePrevDay = useCallback(() => {
     const prevDate = new Date(selectedDate);
     prevDate.setDate(prevDate.getDate() - 1);
     setSelectedDate(prevDate.toISOString().split('T')[0]);
-  };
+  }, [selectedDate]);
 
   // Navigate to next day
-  const handleNextDay = () => {
+  const handleNextDay = useCallback(() => {
     const nextDate = new Date(selectedDate);
     nextDate.setDate(nextDate.getDate() + 1);
     if (nextDate.toISOString().split('T')[0] <= today) {
       setSelectedDate(nextDate.toISOString().split('T')[0]);
     }
-  };
+  }, [selectedDate, today]);
 
   // Format date for display
   const formatDate = (dateStr: string) => {
