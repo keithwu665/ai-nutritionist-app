@@ -255,3 +255,10 @@
 - [x] Update GoalSummaryCard to show actual user target (not clamped value)
 - [x] Update display to show "進取模式" label when in aggressive mode
 - [x] Test that user target is preserved after aggressive mode confirmation
+
+
+## Calorie Mode Differentiation Fix
+- [x] Implement separate deficit calculations for safe mode (300-500 kcal) and aggressive mode (500-800 kcal)
+- [x] Ensure safe mode produces higher calorie targets than aggressive mode
+- [x] Test with various TDEE values to verify different results
+- [x] Update UI to display mode-specific targets correctly

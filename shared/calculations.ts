@@ -136,20 +136,36 @@ export function calculateDailyCalorieTarget(
   let dailyDeficit = 0;
   let wasClamped = false;
 
+  // Define different deficit ranges for safe vs aggressive modes
+  const SAFE_DEFICIT_MIN = 300;
+  const SAFE_DEFICIT_MAX = 500;
+  const AGGRESSIVE_DEFICIT_MIN = 500;
+  const AGGRESSIVE_DEFICIT_MAX = 800;
+
   switch (fitness_goal) {
     case 'lose': {
       if (goalKg && goalDays && goalKg > 0 && goalDays > 0) {
-        dailyDeficit = (goalKg * KCAL_PER_KG_FAT) / goalDays;
+        const calculatedDeficit = (goalKg * KCAL_PER_KG_FAT) / goalDays;
+        if (calorieMode === 'safe') {
+          dailyDeficit = Math.min(Math.max(calculatedDeficit, SAFE_DEFICIT_MIN), SAFE_DEFICIT_MAX);
+        } else {
+          dailyDeficit = Math.min(Math.max(calculatedDeficit, AGGRESSIVE_DEFICIT_MIN), AGGRESSIVE_DEFICIT_MAX);
+        }
       } else {
-        dailyDeficit = 400;
+        dailyDeficit = calorieMode === 'safe' ? 400 : 600;
       }
       break;
     }
     case 'gain': {
       if (goalKg && goalDays && goalKg > 0 && goalDays > 0) {
-        dailyDeficit = -(goalKg * KCAL_PER_KG_FAT) / goalDays;
+        const calculatedDeficit = -(goalKg * KCAL_PER_KG_FAT) / goalDays;
+        if (calorieMode === 'safe') {
+          dailyDeficit = Math.max(Math.min(calculatedDeficit, -SAFE_DEFICIT_MIN), -SAFE_DEFICIT_MAX);
+        } else {
+          dailyDeficit = Math.max(Math.min(calculatedDeficit, -AGGRESSIVE_DEFICIT_MIN), -AGGRESSIVE_DEFICIT_MAX);
+        }
       } else {
-        dailyDeficit = -250;
+        dailyDeficit = calorieMode === 'safe' ? -250 : -400;
       }
       break;
     }
