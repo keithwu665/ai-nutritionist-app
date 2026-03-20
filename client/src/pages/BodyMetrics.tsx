@@ -34,13 +34,25 @@ export default function BodyMetrics() {
   const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
   const utils = trpc.useUtils();
 
-  // Load personality from localStorage
+  // Load personality from localStorage (Settings saves it as 'aiPersonality')
+  // Also listen to personalityChanged event when user updates it in Settings
   useEffect(() => {
-    const savedPersonality = localStorage.getItem('coachPersonality');
-    if (savedPersonality) {
-      setPersonality(savedPersonality as 'gentle' | 'strict' | 'hongkong');
-    }
-  }, []);
+    const loadPersonality = () => {
+      const savedPersonality = localStorage.getItem('aiPersonality');
+      if (savedPersonality) {
+        const newPersonality = savedPersonality as 'gentle' | 'strict' | 'hongkong';
+        console.log('🎭 Loaded coach personality from Settings:', newPersonality);
+        setPersonality(newPersonality);
+      }
+    };
+    
+    // Load on mount
+    loadPersonality();
+    
+    // Listen for personality changes from Settings page
+    window.addEventListener('personalityChanged', loadPersonality);
+    return () => window.removeEventListener('personalityChanged', loadPersonality);
+  }, []); // Only run on mount
 
 
 
@@ -121,10 +133,16 @@ export default function BodyMetrics() {
     };
   }, [heightCm, selectedWeight]);
 
-  // Calculate trend (compare selected day with previous)
+  // Calculate trend (compare selected day with previous day chronologically)
+  // Note: metrics array is in reverse chronological order, so we need to compare correctly
   const getTrend = (currentValue: number | null | undefined, previousValue: number | null | undefined): { value: number; direction: 'up' | 'down' } | null => {
     if (!currentValue || !previousValue) return null;
+    // previousValue is actually the OLDER value (previous day)
+    // So: diff = newer - older
+    // If diff > 0: weight went UP (gained weight)
+    // If diff < 0: weight went DOWN (lost weight)
     const diff = Number(currentValue) - Number(previousValue);
+    console.log(`📊 Trend calculation: current=${currentValue}, previous=${previousValue}, diff=${diff}`);
     return {
       value: Math.abs(diff),
       direction: diff > 0 ? 'up' : 'down',
@@ -138,7 +156,12 @@ export default function BodyMetrics() {
     }
     return match;
   }) ?? -1;
+  // Since metrics are in reverse chronological order, selectedIndex + 1 is the OLDER record (previous day)
   const previousMetric = selectedIndex > 0 && metrics ? metrics[selectedIndex + 1] : null;
+  console.log(`📅 Selected index: ${selectedIndex}, has previous: ${!!previousMetric}`);
+  if (previousMetric) {
+    console.log(`   Current date: ${selectedDate}, Previous date: ${previousMetric.date}`);
+  }
   const weightTrend = getTrend(selectedWeight, previousMetric ? Number(previousMetric.weightKg) : null);
   const bodyFatTrend = getTrend(selectedDayMetric?.bodyFatPercent, previousMetric?.bodyFatPercent);
   const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg, previousMetric?.muscleMassKg);

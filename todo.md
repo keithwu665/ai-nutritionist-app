@@ -435,3 +435,8 @@
 - [x] Fix date navigation functions to use local date parsing
 - [x] Fix date formatting to use local date parsing
 - [x] Add debug logging to getBodyMetrics function
+
+
+## AI Suggestion Coach Personality & Weight Trend Bugs
+- [x] BUG 1: Coach personality not synced - AI suggestion tone doesn't match Settings selection (FIXED: Changed localStorage key from 'coachPersonality' to 'aiPersonality' and added event listener)
+- [x] BUG 2: Weight trend direction wrong - UI shows DOWN but AI says UP (FIXED: Corrected trend calculation logic in getTrend function)
