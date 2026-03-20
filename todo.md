@@ -282,3 +282,11 @@
 - [x] Reorganize secondary actions (進度照片, 匯入 CSV, 匯入報告) in horizontal row
 - [x] Improve visual hierarchy with button styling
 - [x] Test on mobile and desktop for usability
+
+
+## Diet Inspiration Feature (食食靈感)
+- [x] Create DietInspirationCards component with two cards (在家料理, 外食選擇)
+- [x] Create HomeCookingSuggestions page with static meal ideas
+- [x] Create EatingOutSuggestions page with static eating-out tips
+- [x] Integrate Diet Inspiration section into Food Logging page
+- [x] Test navigation and verify feature works correctly

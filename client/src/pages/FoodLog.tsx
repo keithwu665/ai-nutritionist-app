@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { ChevronRightIcon, Plus, X } from 'lucide-react';
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import DietInspirationCards from '@/components/DietInspirationCards';
 
 export default function FoodLog() {
   const { user } = useAuth() || {};
@@ -482,6 +483,9 @@ export default function FoodLog() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Diet Inspiration Section */}
+        <DietInspirationCards />
 
         {/* Recent Records Section */}
         <div className="space-y-4">
