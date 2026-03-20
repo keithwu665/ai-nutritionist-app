@@ -571,17 +571,6 @@ export default function Settings() {
       </div>
 
       {/* ================================================================== */}
-      {/* FOOTER */}
-      {/* ================================================================== */}
-      <div className="space-y-4 mt-8 pt-8 border-t">
-        <div className="flex justify-center gap-4">
-          <a href="#" className="text-sm text-gray-600 hover:text-gray-900">私隱政策</a>
-          <a href="#" className="text-sm text-gray-600 hover:text-gray-900">使用條款</a>
-          <a href="#" className="text-sm text-gray-600 hover:text-gray-900">聯絡我們</a>
-        </div>
-      </div>
-
-      {/* ================================================================== */}
       {/* DATA EXPORT SECTION */}
       {/* ================================================================== */}
       <div className="mt-8">
@@ -592,6 +581,17 @@ export default function Settings() {
         <LogOut className="h-4 w-4 mr-2" />
         登出
       </Button>
+
+      {/* ================================================================== */}
+      {/* FOOTER */}
+      {/* ================================================================== */}
+      <div className="space-y-4 mt-8 pt-8 border-t">
+        <div className="flex justify-center gap-4">
+          <a href="#" className="text-sm text-gray-600 hover:text-gray-900">私隱政策</a>
+          <a href="#" className="text-sm text-gray-600 hover:text-gray-900">使用條款</a>
+          <a href="#" className="text-sm text-gray-600 hover:text-gray-900">聯絡我們</a>
+        </div>
+      </div>
 
       {/* ================================================================== */}
       {/* AGGRESSIVE CALORIE MODE MODAL */}

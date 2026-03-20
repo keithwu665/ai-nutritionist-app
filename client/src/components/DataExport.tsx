@@ -35,7 +35,8 @@ export function DataExport() {
   const [includeFood, setIncludeFood] = useState(true);
   const [includeWorkout, setIncludeWorkout] = useState(true);
   const [includeWeight, setIncludeWeight] = useState(true);
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const generateExcelMutation = trpc.dataExport.generateExcel.useMutation();
   const generatePDFMutation = trpc.dataExport.generatePDF.useMutation();
@@ -62,9 +63,9 @@ export function DataExport() {
       return;
     }
 
-    setIsExporting(true);
-    try {
-      if (format === 'excel') {
+    if (format === 'excel') {
+      setIsExportingExcel(true);
+      try {
         const result = await generateExcelMutation.mutateAsync({
           startDate: dates.startDate,
           endDate: dates.endDate,
@@ -74,7 +75,15 @@ export function DataExport() {
         });
         downloadFile(result.buffer, result.fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         toast.success('Excel 文件已下載');
-      } else {
+      } catch (error) {
+        console.error('Excel export error:', error);
+        toast.error('Excel 匯出失敗，請重試');
+      } finally {
+        setIsExportingExcel(false);
+      }
+    } else {
+      setIsExportingPDF(true);
+      try {
         const result = await generatePDFMutation.mutateAsync({
           startDate: dates.startDate,
           endDate: dates.endDate,
@@ -84,30 +93,35 @@ export function DataExport() {
         });
         downloadFile(result.buffer, result.fileName, 'application/pdf');
         toast.success('PDF 文件已下載');
+      } catch (error) {
+        console.error('PDF export error:', error);
+        toast.error('PDF 匯出失敗，請重試');
+      } finally {
+        setIsExportingPDF(false);
       }
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error('匯出失敗，請重試');
-    } finally {
-      setIsExporting(false);
     }
   };
 
   const downloadFile = (base64Data: string, fileName: string, mimeType: string) => {
-    const binaryString = atob(base64Data);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+    try {
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('文件下載失敗');
     }
-    const blob = new Blob([bytes], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -210,19 +224,19 @@ export function DataExport() {
         <div className="flex gap-3">
           <Button
             onClick={() => handleExport('excel')}
-            disabled={isExporting}
+            disabled={isExportingExcel || isExportingPDF}
             className="flex-1"
             variant="default"
           >
-            {isExporting ? '匯出中...' : '匯出為 Excel'}
+            {isExportingExcel ? '匯出中...' : '匯出為 Excel'}
           </Button>
           <Button
             onClick={() => handleExport('pdf')}
-            disabled={isExporting}
+            disabled={isExportingExcel || isExportingPDF}
             className="flex-1"
             variant="outline"
           >
-            {isExporting ? '匯出中...' : '匯出為 PDF'}
+            {isExportingPDF ? '匯出中...' : '匯出為 PDF'}
           </Button>
         </div>
       </CardContent>
