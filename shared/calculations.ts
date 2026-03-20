@@ -164,11 +164,16 @@ export function calculateDailyCalorieTarget(
   // Result is always the calorie intake target (positive number)
   const originalCalories = tdee - dailyDeficit;
   
-  // Apply safety minimum ONLY when calculated target is below the floor
+  // Apply safety minimum ONLY in safe mode when calculated target is below the floor
+  // In aggressive mode, allow user to keep their chosen target without forced adjustment
   let dailyCalories = originalCalories;
-  if (dailyCalories < MIN_CALORIES) {
+  if (calorieMode === 'safe' && dailyCalories < MIN_CALORIES) {
     wasClamped = true;
     dailyCalories = MIN_CALORIES;
+  }
+  // In aggressive mode, mark as aggressive if below safe minimum (for UI warning)
+  if (calorieMode === 'aggressive' && dailyCalories < MIN_CALORIES_SAFE) {
+    wasClamped = true;
   }
 
   return {

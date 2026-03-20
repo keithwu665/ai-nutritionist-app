@@ -247,3 +247,11 @@
 - [x] Show both user target and safety minimum in modal
 - [x] Ensure safety minimum follows formula: max(1200, BMR, TDEE - 500)
 - [x] Test with various TDEE and goal scenarios
+
+
+## Aggressive Mode True Behavior Implementation
+- [x] Modify calculateDailyCalorieTarget to NOT clamp in aggressive mode
+- [x] Update Settings to preserve user target when aggressive mode confirmed
+- [x] Update GoalSummaryCard to show actual user target (not clamped value)
+- [x] Update display to show "進取模式" label when in aggressive mode
+- [x] Test that user target is preserved after aggressive mode confirmation

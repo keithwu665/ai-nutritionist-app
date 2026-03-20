@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+
 import { Card } from '@/components/ui/card';
 
 interface GoalSummaryCardProps {
@@ -45,9 +45,9 @@ export function GoalSummaryCard({
               {fitnessGoal ? '目標資料未完整' : '尚未設定目標'}
             </p>
           </div>
-          <Link href="/settings" className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+          <a href="/settings" className="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium cursor-pointer">
             去設定目標 →
-          </Link>
+          </a>
         </div>
       </Card>
     );
@@ -57,23 +57,26 @@ export function GoalSummaryCard({
   const KCAL_PER_KG_FAT = 7700;
   const MIN_CALORIES_SAFE = genderStr === 'female' ? 1200 : 1200;
   const MIN_CALORIES_AGGRESSIVE = genderStr === 'female' ? 1000 : 1200;
-  const MIN_CALORIES = calorieMode === 'aggressive' ? MIN_CALORIES_AGGRESSIVE : MIN_CALORIES_SAFE;
   
   let dailyDeficit = 0;
   let calculatedCalories = tdeeNum || 2000; // Calculated value before clamping
-  let dailyCalories = tdeeNum || 2000; // Final value after clamping
-  let wasClamped = false; // Track if clamping occurred
+  let dailyCalories = tdeeNum || 2000; // Final value (clamped in safe mode, user choice in aggressive)
+  let isBelowSafeMinimum = false; // Track if below safe minimum for warning
   
   if (fitnessGoal === 'lose' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
     calculatedCalories = tdeeNum ? tdeeNum - dailyDeficit : 2000 - dailyDeficit;
     dailyCalories = calculatedCalories;
+    
+    // In safe mode, clamp to safety minimum
     if (calorieMode === 'safe' && dailyCalories < MIN_CALORIES_SAFE) {
       dailyCalories = MIN_CALORIES_SAFE;
-      wasClamped = true;
-    } else if (calorieMode === 'aggressive' && dailyCalories < MIN_CALORIES_AGGRESSIVE) {
-      dailyCalories = MIN_CALORIES_AGGRESSIVE;
-      wasClamped = true;
+    }
+    
+    // In aggressive mode, allow user to keep their chosen target (no clamping)
+    // but mark if below safe minimum (for UI warning)
+    if (dailyCalories < MIN_CALORIES_SAFE) {
+      isBelowSafeMinimum = true;
     }
   } else if (fitnessGoal === 'gain' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
@@ -108,6 +111,11 @@ export function GoalSummaryCard({
           <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             👉 {goalText}
           </p>
+          {calorieMode === 'aggressive' && (
+            <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+              模式：進取模式
+            </p>
+          )}
         </div>
 
         {/* Progress Hints */}
@@ -149,11 +157,11 @@ export function GoalSummaryCard({
           )}
         </div>
 
-        {/* Warning if goal was clamped to safety minimum */}
-        {wasClamped && (
+        {/* Warning if in aggressive mode and below safe minimum */}
+        {calorieMode === 'aggressive' && isBelowSafeMinimum && (
           <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded p-3 mt-2">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              ⚠️ 目標過於進取，已調整至安全最低攝取（{MIN_CALORIES} kcal）
+              ⚠️ 此目標低於建議安全攝取，請留意身體狀況
             </p>
           </div>
         )}

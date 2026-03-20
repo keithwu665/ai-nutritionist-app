@@ -18,7 +18,8 @@ export function AggressiveCalorieModal({
 }: AggressiveCalorieModalProps) {
   // Ensure values are always positive
   const displayUserTarget = Math.abs(Math.round(userTarget));
-  const displaySafetyMin = Math.abs(Math.round(safetyMinimum));
+  // Safety minimum should be at least 1200 kcal for safe mode
+  const displaySafetyMin = Math.max(1200, Math.abs(Math.round(safetyMinimum)));
   
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
