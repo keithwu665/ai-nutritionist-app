@@ -41,6 +41,17 @@ export default function BodyMetrics() {
     onError: () => toast.error('刪除失敗'),
   });
 
+  const coachAdviceMutation = trpc.bodyMetrics.getCoachAdvice.useMutation({
+    onSuccess: (data) => {
+      console.log('AI suggestion generated:', data);
+      setCoachAdvice(data);
+    },
+    onError: (error) => {
+      console.error('Failed to generate advice:', error);
+      setCoachAdvice({ type: 'error', advice: '無法生成建議，請稍後重試' });
+    },
+  });
+
   const chartData = useMemo(() => {
     if (!metrics) return [];
     return [...metrics].reverse().map((m) => ({
@@ -90,31 +101,28 @@ export default function BodyMetrics() {
   const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg, previousMetric?.muscleMassKg);
 
   // Generate AI Coach Advice
-  const generateAdvice = async () => {
-    if (!selectedDayMetric || !bmiData) return;
-    
-    setIsLoadingAdvice(true);
-    try {
-      const response = await fetch('/api/trpc/bodyMetrics.getCoachAdvice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weight: selectedWeight,
-          bmi: bmiData.value,
-          bodyFatPercent: selectedDayMetric.bodyFatPercent,
-          muscleMassKg: selectedDayMetric.muscleMassKg,
-          personality,
-          weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
-        }),
-      });
-      const data = await response.json();
-      setCoachAdvice(data.result || { type: 'empty', advice: '暫無建議' });
-    } catch (error) {
-      console.error('Failed to generate advice:', error);
-      setCoachAdvice({ type: 'error', advice: '無法生成建議，請稍後重試' });
-    } finally {
-      setIsLoadingAdvice(false);
+  const generateAdvice = () => {
+    console.log('generateAdvice called, selectedDayMetric:', !!selectedDayMetric, 'bmiData:', !!bmiData);
+    if (!selectedDayMetric || !bmiData) {
+      console.warn('Missing selectedDayMetric or bmiData');
+      return;
     }
+    
+    console.log('Triggering coachAdviceMutation with:', {
+      weight: selectedWeight,
+      bmi: bmiData.value,
+      personality,
+      weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
+    });
+    
+    coachAdviceMutation.mutate({
+      weight: selectedWeight || 0,
+      bmi: bmiData.value,
+      bodyFatPercent: selectedDayMetric.bodyFatPercent ? Number(selectedDayMetric.bodyFatPercent) : null,
+      muscleMassKg: selectedDayMetric.muscleMassKg ? Number(selectedDayMetric.muscleMassKg) : null,
+      personality,
+      weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
+    });
   };
 
   // Navigate to previous day
@@ -313,7 +321,7 @@ export default function BodyMetrics() {
           <Button
             variant={activeTab === 'advice' ? 'default' : 'outline'}
             className={`flex-1 rounded-full ${activeTab === 'advice' ? 'bg-primary hover:bg-primary/90' : ''}`}
-            onClick={() => { setActiveTab('advice'); if (!coachAdvice) generateAdvice(); }}
+            onClick={() => { setActiveTab('advice'); generateAdvice(); }}
           >
             AI 建議
           </Button>
@@ -344,7 +352,7 @@ export default function BodyMetrics() {
         {/* AI Advice Tab */}
         {activeTab === 'advice' && (
           <div className="space-y-4">
-            {isLoadingAdvice ? (
+            {coachAdviceMutation.isPending ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
@@ -368,10 +376,10 @@ export default function BodyMetrics() {
                   {coachAdvice?.type !== 'no_goal' && (
                     <Button
                       onClick={generateAdvice}
-                      disabled={isLoadingAdvice}
+                      disabled={coachAdviceMutation.isPending}
                       className="mt-4 w-full"
                     >
-                      {isLoadingAdvice ? '生成中...' : '重新生成建議'}
+                      {coachAdviceMutation.isPending ? '生成中...' : '重新生成建議'}
                     </Button>
                   )}
                 </CardContent>

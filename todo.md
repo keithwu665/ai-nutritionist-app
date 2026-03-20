@@ -395,3 +395,13 @@
 - [x] Ensure "重新生成建議" button always triggers valid logic
 - [x] Test all scenarios (no goal, insufficient data, valid data)
 - [x] Verify no empty/null states are shown to user
+
+
+## AI Suggestion Fix - NOT Generating
+- [x] Debug button click to verify "重新生成建議" triggers function
+- [x] Check backend getCoachAdvice execution and output
+- [x] Ensure backend NEVER returns empty/null (always has fallback)
+- [x] Fix frontend to properly handle and display AI response
+- [x] Add console logs for debugging button clicks and AI execution
+- [x] Test AI suggestion generation with different scenarios
+- [x] Verify "暫無建議" never appears (always shows content or reason)
