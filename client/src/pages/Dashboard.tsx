@@ -336,16 +336,15 @@ export default function Dashboard() {
               </div>
             ) : recs && (recs.diet?.length || recs.exercise?.length || recs.encouragement?.length) ? (
               <>
-                {/* Display only the first (most important) recommendation */}
-                {recs.diet && recs.diet.length > 0 && (
-                  <RecCard key="diet-0" rec={recs.diet[0]} icon="🍽" />
-                )}
-                {(!recs.diet || recs.diet.length === 0) && recs.exercise && recs.exercise.length > 0 && (
-                  <RecCard key="ex-0" rec={recs.exercise[0]} icon="🏃" />
-                )}
-                {(!recs.diet || recs.diet.length === 0) && (!recs.exercise || recs.exercise.length === 0) && recs.encouragement && recs.encouragement.length > 0 && (
-                  <RecCard key="enc-0" rec={recs.encouragement[0]} icon="⭐" isEncouragement />
-                )}
+                {recs.diet?.map((rec, i) => (
+                  <RecCard key={`diet-${i}`} rec={rec} icon="🍽" />
+                ))}
+                {recs.exercise?.map((rec, i) => (
+                  <RecCard key={`ex-${i}`} rec={rec} icon="🏃" />
+                ))}
+                {recs.encouragement?.map((rec, i) => (
+                  <RecCard key={`enc-${i}`} rec={rec} icon="⭐" isEncouragement />
+                ))}
               </>
             ) : (
               <p className="text-sm text-muted-foreground">暫無建議</p>
