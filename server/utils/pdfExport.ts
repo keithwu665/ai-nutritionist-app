@@ -1,6 +1,6 @@
-import pdfMake from 'pdfmake/build/pdfmake';
+import pdfMake from 'pdfmake/build/pdfmake.js';
 // @ts-ignore
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import pdfFonts from 'pdfmake/build/vfs_fonts.js';
 
 // @ts-ignore
 if (pdfFonts && pdfFonts.pdfMake && pdfFonts.pdfMake.vfs) {
