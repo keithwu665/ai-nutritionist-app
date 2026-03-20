@@ -320,3 +320,11 @@
 - [x] Add trend display for each metric (↓ -0.2 kg, ↑ +0.1 kg)
 - [x] Organize metrics in two sections: top (weight, BMI) and bottom (body fat %, muscle mass)
 - [x] Test visual hierarchy and spacing
+
+
+## Body Data UI Refactor - Improved Clarity
+- [x] Simplify top blue card to show only 今日體重 and BMI
+- [x] Remove 脂肪重量, 瘦體重, 肌肉量 from top card
+- [x] Restore lower metric cards grid (2x2 layout)
+- [x] Add trend indicators to all metric cards
+- [x] Test UI clarity and readability

@@ -124,7 +124,7 @@ export default function BodyMetrics() {
 
       <div className="p-4 md:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
         
-        {/* Hero Card - Dark Navy Background - CONSOLIDATED ALL METRICS */}
+        {/* Hero Card - Dark Navy Background - SIMPLIFIED */}
         {profileLoading || isLoading ? (
           <Card className="rounded-3xl">
             <CardContent className="py-8 flex justify-center">
@@ -161,8 +161,7 @@ export default function BodyMetrics() {
           </Card>
         ) : bmiData ? (
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 md:p-8 text-white shadow-lg">
-            {/* Top Section: Weight & BMI */}
-            <div className="grid grid-cols-2 gap-6 mb-8 pb-8 border-b border-slate-700/50">
+            <div className="grid grid-cols-2 gap-6">
               {/* Left: Weight */}
               <div>
                 <p className="text-sm font-medium opacity-90 mb-1">今日體重</p>
@@ -182,39 +181,63 @@ export default function BodyMetrics() {
                 <p className="text-xs opacity-75 mt-3">{bmiData.statusText}</p>
               </div>
             </div>
+          </div>
+        ) : null}
 
-            {/* Bottom Section: Body Fat % & Muscle Mass */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Left: Body Fat % */}
-              <div>
-                <p className="text-sm font-medium opacity-90 mb-1">體脂率</p>
-                <p className="text-3xl md:text-4xl font-bold mb-2">
-                  {latestMetric?.bodyFatPercent ?? '—'}
-                </p>
-                <p className="text-xs opacity-75 mb-3">%</p>
+        {/* Metric Cards Grid - 2x2 */}
+        {!isLoading && latestMetric && (
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
+                <p className="text-2xl font-bold">{latestMetric.weightKg}</p>
+                <p className="text-xs text-muted-foreground mt-1">kg</p>
+                {weightTrend && (
+                  <p className={`text-xs font-medium mt-2 ${weightTrend.direction === 'down' ? 'text-green-600' : 'text-red-600'}`}>
+                    {weightTrend.direction === 'down' ? '↓' : '↑'} {weightTrend.value.toFixed(1)} kg
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2">體脂率</p>
+                <p className="text-2xl font-bold text-red-500">{latestMetric.bodyFatPercent ?? '—'}</p>
+                <p className="text-xs text-muted-foreground mt-1">%</p>
                 {bodyFatTrend && (
-                  <p className={`text-sm font-medium ${bodyFatTrend.direction === 'down' ? 'text-green-400' : 'text-red-400'}`}>
+                  <p className={`text-xs font-medium mt-2 ${bodyFatTrend.direction === 'down' ? 'text-green-600' : 'text-red-600'}`}>
                     {bodyFatTrend.direction === 'down' ? '↓' : '↑'} {bodyFatTrend.value.toFixed(1)}%
                   </p>
                 )}
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Right: Muscle Mass */}
-              <div className="text-right">
-                <p className="text-sm font-medium opacity-90 mb-1">肌肉量</p>
-                <p className="text-3xl md:text-4xl font-bold mb-2">
-                  {latestMetric?.muscleMassKg ?? '—'}
-                </p>
-                <p className="text-xs opacity-75 mb-3">kg</p>
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2">肌肉量</p>
+                <p className="text-2xl font-bold">{latestMetric.muscleMassKg ?? '—'}</p>
+                <p className="text-xs text-muted-foreground mt-1">kg</p>
                 {muscleMassTrend && (
-                  <p className={`text-sm font-medium ${muscleMassTrend.direction === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                  <p className={`text-xs font-medium mt-2 ${muscleMassTrend.direction === 'up' ? 'text-green-600' : 'text-red-600'}`}>
                     {muscleMassTrend.direction === 'up' ? '↑' : '↓'} {muscleMassTrend.value.toFixed(1)} kg
                   </p>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+
+            {bmiData && (
+              <Card className="rounded-2xl">
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-xs text-muted-foreground font-medium mb-2">BMI</p>
+                  <p className="text-2xl font-bold text-emerald-600">{bmiData.value.toFixed(1)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">kg/m²</p>
+                  <p className="text-xs text-emerald-600 font-medium mt-2">{bmiData.statusText}</p>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        ) : null}
+        )}
 
         {/* Trend Chart Card */}
         <Card className="rounded-2xl">
