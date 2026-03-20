@@ -34,8 +34,8 @@ export function PersonalitySelector({ value, onChange }: PersonalitySelectorProp
         <p className="text-xs text-gray-500">選擇你喜歡的人格風格，每個人格會以不同的方式提供建議</p>
       </div>
 
-      {/* Horizontal card layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Horizontal card layout - force 3 columns */}
+      <div className="grid grid-cols-3 gap-4">
         {personalities.map((personality) => (
           <button
             key={personality.id}

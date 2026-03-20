@@ -371,3 +371,5 @@
 - [x] Add check icon to selected cards
 - [x] Test responsive layout and scrolling behavior
 - [x] Verify selection functionality remains unchanged
+- [x] Fix layout structure to force grid-cols-3 (remove responsive breakpoints)
+- [x] Verify 3 cards display in one horizontal row
