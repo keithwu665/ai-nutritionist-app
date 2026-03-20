@@ -413,3 +413,17 @@
 - [x] Add debug logging for selected date, progress, and status
 - [ ] Test AI suggestions across different dates
 - [ ] Verify suggestions change when date/data changes
+
+
+## AI Suggestion Infinite Loading Fix
+- [x] Identify root cause: circular dependency in useEffect with generateAdvice
+- [x] Implement timeout protection (8 seconds)
+- [x] Add isPendingRef guard to prevent re-triggering
+- [x] Remove generateAdvice from useEffect dependencies
+- [x] Add explicit error state handling with AlertCircle display
+- [x] Update mutation callbacks to properly reset loading state
+- [x] Add comprehensive debug logging for all states
+- [ ] Test infinite loading is fixed
+- [ ] Test timeout error message displays correctly
+- [ ] Test network error message displays correctly
+- [ ] Test regenerate button works after error

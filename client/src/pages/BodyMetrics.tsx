@@ -19,6 +19,8 @@ export default function BodyMetrics() {
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [personality, setPersonality] = useState<'gentle' | 'strict' | 'hongkong'>('gentle');
   const [showHistory, setShowHistory] = useState(false);
+  const [adviceError, setAdviceError] = useState<string | null>(null);
+  const [isPendingRef, setIsPendingRef] = useState(false);
 
   const { data: metrics, isLoading } = trpc.bodyMetrics.list.useQuery({ days });
   const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
@@ -50,10 +52,17 @@ export default function BodyMetrics() {
       console.log('Progress:', data.actualProgress, '/', data.expectedProgress, '(', data.progressRatio, '%)');
       console.log('Setting coachAdvice state to:', data);
       setCoachAdvice(data);
+      setAdviceError(null);
+      setIsPendingRef(false);
+      setIsLoadingAdvice(false);
     },
     onError: (error) => {
       console.error('❌ Failed to generate advice:', error);
-      setCoachAdvice({ type: 'error', advice: '無法生成建議，請稍後重試' });
+      const errorMsg = error instanceof Error ? error.message : 'AI 建議載入失敗，請按重新生成建議再試';
+      setAdviceError(errorMsg);
+      setCoachAdvice(null);
+      setIsPendingRef(false);
+      setIsLoadingAdvice(false);
     },
   });
 
@@ -105,8 +114,14 @@ export default function BodyMetrics() {
   const bodyFatTrend = getTrend(selectedDayMetric?.bodyFatPercent, previousMetric?.bodyFatPercent);
   const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg, previousMetric?.muscleMassKg);
 
-  // Generate AI Coach Advice
+  // Generate AI Coach Advice with timeout protection
   const generateAdvice = useCallback(() => {
+    // Prevent re-triggering while a request is pending
+    if (isPendingRef) {
+      console.log('⏳ Request already pending, skipping...');
+      return;
+    }
+
     console.log('=== generateAdvice called ===');
     console.log('selectedDate:', selectedDate);
     console.log('selectedDayMetric:', selectedDayMetric);
@@ -118,14 +133,19 @@ export default function BodyMetrics() {
     if (!selectedDayMetric) {
       console.warn('❌ Missing selectedDayMetric - no data for selected date');
       setCoachAdvice({ type: 'no_data', advice: '此日期暫無記錄，請選擇有記錄的日期' });
+      setAdviceError(null);
+      setIsLoadingAdvice(false);
       return;
     }
     
     if (!bmiData) {
       console.warn('❌ Missing bmiData - cannot calculate BMI');
       setCoachAdvice({ type: 'no_data', advice: '無法計算 BMI，請確保已設定身高' });
+      setAdviceError(null);
+      setIsLoadingAdvice(false);
       return;
     }
+    
     console.log('✓ All required data available, triggering mutation...');
     console.log('Payload:', {
       weight: selectedWeight,
@@ -135,24 +155,47 @@ export default function BodyMetrics() {
       selectedDate,
     });
     
-    coachAdviceMutation.mutate({
-      weight: selectedWeight || 0,
-      bmi: bmiData.value,
-      bodyFatPercent: selectedDayMetric.bodyFatPercent ? Number(selectedDayMetric.bodyFatPercent) : null,
-      muscleMassKg: selectedDayMetric.muscleMassKg ? Number(selectedDayMetric.muscleMassKg) : null,
-      personality,
-      weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
-      selectedDate,
-    });
-  }, [selectedDate, selectedDayMetric, bmiData, selectedWeight, personality, weightTrend, coachAdviceMutation]);
+    // Set loading state and pending flag
+    setIsLoadingAdvice(true);
+    setIsPendingRef(true);
+    setAdviceError(null);
+    
+    // Set timeout protection (8 seconds)
+    const timeoutId = setTimeout(() => {
+      console.error('⏱️ AI suggestion request timeout (8s)');
+      setIsLoadingAdvice(false);
+      setIsPendingRef(false);
+      setAdviceError('AI 建議暫時未能載入，請再試一次');
+      setCoachAdvice(null);
+    }, 8000);
+    
+    // Trigger mutation and clear timeout on completion
+    coachAdviceMutation.mutate(
+      {
+        weight: selectedWeight || 0,
+        bmi: bmiData.value,
+        bodyFatPercent: selectedDayMetric.bodyFatPercent ? Number(selectedDayMetric.bodyFatPercent) : null,
+        muscleMassKg: selectedDayMetric.muscleMassKg ? Number(selectedDayMetric.muscleMassKg) : null,
+        personality,
+        weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
+        selectedDate,
+      },
+      {
+        onSettled: () => {
+          clearTimeout(timeoutId);
+        },
+      }
+    );
+  }, [selectedDate, selectedDayMetric, bmiData, selectedWeight, personality, weightTrend, coachAdviceMutation, isPendingRef]);
 
   // Regenerate advice when selected date changes (only when advice tab is active)
+  // IMPORTANT: Do NOT include generateAdvice in dependencies to avoid infinite loop
   useEffect(() => {
-    if (activeTab === 'advice' && selectedDayMetric && bmiData) {
+    if (activeTab === 'advice' && selectedDayMetric && bmiData && !isPendingRef) {
       console.log('📅 Selected date changed, regenerating advice...');
       generateAdvice();
     }
-  }, [selectedDate, activeTab, selectedDayMetric, bmiData, generateAdvice]);
+  }, [selectedDate, activeTab]);
 
   // Navigate to previous day
   const handlePrevDay = useCallback(() => {
@@ -385,7 +428,7 @@ export default function BodyMetrics() {
         {/* AI Advice Tab */}
         {activeTab === 'advice' && (
           <div className="space-y-4">
-            {coachAdviceMutation.isPending ? (
+            {isLoadingAdvice ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
@@ -396,9 +439,23 @@ export default function BodyMetrics() {
                     <Lightbulb className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                     <h3 className="font-semibold text-lg">AI 健身教練建議</h3>
                   </div>
-                  <p className="text-sm leading-relaxed text-foreground/90">
-                    {typeof coachAdvice === 'string' ? coachAdvice : (coachAdvice?.advice || '暫無建議')}
-                  </p>
+                  
+                  {/* Error State */}
+                  {adviceError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2">
+                      <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                      <p className="text-sm text-red-700">{adviceError}</p>
+                    </div>
+                  )}
+                  
+                  {/* Advice Text */}
+                  {!adviceError && (
+                    <p className="text-sm leading-relaxed text-foreground/90">
+                      {typeof coachAdvice === 'string' ? coachAdvice : (coachAdvice?.advice || '暫無建議')}
+                    </p>
+                  )}
+                  
+                  {/* Action Buttons */}
                   {coachAdvice?.type === 'no_goal' && (
                     <Link href={coachAdvice.actionUrl || '/settings'}>
                       <Button className="mt-4 w-full" variant="default">
@@ -406,16 +463,18 @@ export default function BodyMetrics() {
                       </Button>
                     </Link>
                   )}
-                  {(!coachAdvice || coachAdvice?.type !== 'no_goal') && (
+                  
+                  {/* Regenerate Button */}
+                  {(!coachAdvice || coachAdvice?.type !== 'no_goal' || adviceError) && (
                     <Button
                       onClick={() => {
                         console.log('🔘 重新生成建議 button clicked');
                         generateAdvice();
                       }}
-                      disabled={coachAdviceMutation.isPending}
+                      disabled={isLoadingAdvice}
                       className="mt-4 w-full"
                     >
-                      {coachAdviceMutation.isPending ? '生成中...' : '重新生成建議'}
+                      {isLoadingAdvice ? '生成中...' : '重新生成建議'}
                     </Button>
                   )}
                 </CardContent>
