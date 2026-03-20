@@ -484,8 +484,7 @@ export default function FoodLog() {
           </CardContent>
         </Card>
 
-        {/* Diet Inspiration Section */}
-        <DietInspirationCards />
+
 
         {/* Selected Day Summary */}
         <Card className="rounded-2xl border-2 border-emerald-200 bg-emerald-50">
@@ -580,6 +579,9 @@ export default function FoodLog() {
             </CardContent>
           </Card>
         )}
+
+        {/* Diet Inspiration Section - moved above Fitasty */}
+        <DietInspirationCards />
 
         {/* Fitasty Banner */}
         <div 

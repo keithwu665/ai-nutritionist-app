@@ -306,3 +306,9 @@
 - [x] Add icons and subtitles to each card
 - [x] Improve card styling with soft shadows and rounded corners
 - [x] Test responsive layout on mobile and desktop
+
+
+## Diet Page Section Reordering
+- [x] Move 飲食靈感 section above Fitasty 產品庫
+- [x] Verify section order in FoodLog page
+- [x] Test user flow and visual hierarchy
