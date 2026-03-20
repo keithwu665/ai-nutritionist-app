@@ -312,3 +312,11 @@
 - [x] Move 飲食靈感 section above Fitasty 產品庫
 - [x] Verify section order in FoodLog page
 - [x] Test user flow and visual hierarchy
+
+
+## Body Data Screen Refinement
+- [x] Consolidate all metrics into blue summary card
+- [x] Remove lower white metric cards (2x2 grid)
+- [x] Add trend display for each metric (↓ -0.2 kg, ↑ +0.1 kg)
+- [x] Organize metrics in two sections: top (weight, BMI) and bottom (body fat %, muscle mass)
+- [x] Test visual hierarchy and spacing

@@ -53,6 +53,27 @@ export default function BodyMetrics() {
     };
   }, [heightCm, latestWeight]);
 
+  // Calculate trend for each metric (compare latest with previous)
+  const getTrend = (currentValue: number | null | undefined, previousValue: number | null | undefined): { value: number; direction: 'up' | 'down' } | null => {
+    if (!currentValue || !previousValue) return null;
+    const diff = Number(currentValue) - Number(previousValue);
+    return {
+      value: Math.abs(diff),
+      direction: diff > 0 ? 'up' : 'down',
+    };
+  };
+
+  const previousMetric = metrics?.[1];
+  const weightTrend = getTrend(latestWeight, previousMetric ? Number(previousMetric.weightKg) : null);
+  const bodyFatTrend = getTrend(
+    latestMetric?.bodyFatPercent,
+    previousMetric?.bodyFatPercent
+  );
+  const muscleMassTrend = getTrend(
+    latestMetric?.muscleMassKg,
+    previousMetric?.muscleMassKg
+  );
+
   const getMetricDataKey = () => {
     switch (selectedMetric) {
       case 'bodyFat': return 'bodyFat';
@@ -103,7 +124,7 @@ export default function BodyMetrics() {
 
       <div className="p-4 md:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
         
-        {/* Hero Card - Dark Navy Background */}
+        {/* Hero Card - Dark Navy Background - CONSOLIDATED ALL METRICS */}
         {profileLoading || isLoading ? (
           <Card className="rounded-3xl">
             <CardContent className="py-8 flex justify-center">
@@ -140,92 +161,60 @@ export default function BodyMetrics() {
           </Card>
         ) : bmiData ? (
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 md:p-8 text-white shadow-lg">
-            <div className="grid grid-cols-2 gap-6 mb-6">
+            {/* Top Section: Weight & BMI */}
+            <div className="grid grid-cols-2 gap-6 mb-8 pb-8 border-b border-slate-700/50">
               {/* Left: Weight */}
               <div>
                 <p className="text-sm font-medium opacity-90 mb-1">今日體重</p>
                 <p className="text-4xl md:text-5xl font-bold mb-2">{latestWeight}</p>
-                <p className="text-xs opacity-75">kg</p>
+                <p className="text-xs opacity-75 mb-3">kg</p>
+                {weightTrend && (
+                  <p className={`text-sm font-medium ${weightTrend.direction === 'down' ? 'text-green-400' : 'text-red-400'}`}>
+                    {weightTrend.direction === 'down' ? '↓' : '↑'} {weightTrend.value.toFixed(1)} kg
+                  </p>
+                )}
               </div>
+              
               {/* Right: BMI */}
               <div className="text-right">
                 <p className="text-sm font-medium opacity-90 mb-1">BMI</p>
                 <p className="text-4xl md:text-5xl font-bold">{bmiData.value.toFixed(1)}</p>
-                <p className="text-xs opacity-75 mt-2">{bmiData.statusText}</p>
+                <p className="text-xs opacity-75 mt-3">{bmiData.statusText}</p>
               </div>
             </div>
 
-            {/* Metric Boxes */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
-                <p className="text-xs opacity-75 mb-2">脂肪重量</p>
-                <p className="text-lg font-bold">
-                  {latestMetric?.bodyFatPercent 
-                    ? (latestWeight * Number(latestMetric.bodyFatPercent) / 100).toFixed(1)
-                    : '—'}
+            {/* Bottom Section: Body Fat % & Muscle Mass */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* Left: Body Fat % */}
+              <div>
+                <p className="text-sm font-medium opacity-90 mb-1">體脂率</p>
+                <p className="text-3xl md:text-4xl font-bold mb-2">
+                  {latestMetric?.bodyFatPercent ?? '—'}
                 </p>
-                <p className="text-xs opacity-75">kg</p>
+                <p className="text-xs opacity-75 mb-3">%</p>
+                {bodyFatTrend && (
+                  <p className={`text-sm font-medium ${bodyFatTrend.direction === 'down' ? 'text-green-400' : 'text-red-400'}`}>
+                    {bodyFatTrend.direction === 'down' ? '↓' : '↑'} {bodyFatTrend.value.toFixed(1)}%
+                  </p>
+                )}
               </div>
-              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
-                <p className="text-xs opacity-75 mb-2">瘦體重</p>
-                <p className="text-lg font-bold">
-                  {latestMetric?.bodyFatPercent 
-                    ? (latestWeight * (100 - Number(latestMetric.bodyFatPercent)) / 100).toFixed(1)
-                    : '—'}
+
+              {/* Right: Muscle Mass */}
+              <div className="text-right">
+                <p className="text-sm font-medium opacity-90 mb-1">肌肉量</p>
+                <p className="text-3xl md:text-4xl font-bold mb-2">
+                  {latestMetric?.muscleMassKg ?? '—'}
                 </p>
-                <p className="text-xs opacity-75">kg</p>
-              </div>
-              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
-                <p className="text-xs opacity-75 mb-2">肌肉量</p>
-                <p className="text-lg font-bold">{latestMetric?.muscleMassKg ?? '—'}</p>
-                <p className="text-xs opacity-75">kg</p>
+                <p className="text-xs opacity-75 mb-3">kg</p>
+                {muscleMassTrend && (
+                  <p className={`text-sm font-medium ${muscleMassTrend.direction === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                    {muscleMassTrend.direction === 'up' ? '↑' : '↓'} {muscleMassTrend.value.toFixed(1)} kg
+                  </p>
+                )}
               </div>
             </div>
           </div>
         ) : null}
-
-        {/* Metric Cards Grid - 2x2 */}
-        {!isLoading && latestMetric && (
-          <div className="grid grid-cols-2 gap-3 md:gap-4">
-            <Card className="rounded-2xl">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
-                <p className="text-2xl font-bold">{latestMetric.weightKg}</p>
-                <p className="text-xs text-muted-foreground mt-1">kg</p>
-                <p className="text-xs text-green-600 mt-2">↓ -0.2 kg</p>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground font-medium mb-2">體脂率</p>
-                <p className="text-2xl font-bold text-red-500">{latestMetric.bodyFatPercent ?? '—'}</p>
-                <p className="text-xs text-muted-foreground mt-1">%</p>
-                <p className="text-xs text-green-600 mt-2">↓ -0.2%</p>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl">
-              <CardContent className="pt-4 pb-4">
-                <p className="text-xs text-muted-foreground font-medium mb-2">肌肉量</p>
-                <p className="text-2xl font-bold">{latestMetric.muscleMassKg ?? '—'}</p>
-                <p className="text-xs text-muted-foreground mt-1">kg</p>
-                <p className="text-xs text-green-600 mt-2">↑ +0.1 kg</p>
-              </CardContent>
-            </Card>
-
-            {bmiData && (
-              <Card className="rounded-2xl">
-                <CardContent className="pt-4 pb-4">
-                  <p className="text-xs text-muted-foreground font-medium mb-2">BMI</p>
-                  <p className="text-2xl font-bold text-emerald-600">{bmiData.value.toFixed(1)}</p>
-                  <p className="text-xs text-muted-foreground mt-1">kg/m²</p>
-                  <p className="text-xs text-green-600 mt-2">正常</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
 
         {/* Trend Chart Card */}
         <Card className="rounded-2xl">
@@ -259,7 +248,6 @@ export default function BodyMetrics() {
               {[
                 { value: 7, label: '7天' },
                 { value: 30, label: '30天' },
-                { value: 90, label: '90天' },
                 { value: 999, label: '全部' },
               ].map(tab => (
                 <button
@@ -350,27 +338,6 @@ export default function BodyMetrics() {
             )}
           </CardContent>
         </Card>
-
-        {/* Import Section */}
-        <div className="border-2 border-dashed border-primary/30 rounded-2xl p-6 md:p-8 text-center">
-          <div className="mb-4">
-            <p className="text-2xl mb-2">📊</p>
-            <h3 className="font-semibold text-lg mb-2">匯入 InBody / Boditrax 數據</h3>
-            <p className="text-sm text-muted-foreground">支援 CSV 匯入，或手動輸入量度結果</p>
-          </div>
-          <div className="flex gap-3 justify-center flex-wrap">
-            <Link href="/body/import-csv">
-              <Button className="bg-primary hover:bg-primary/90 rounded-full px-6">
-                匯入 CSV
-              </Button>
-            </Link>
-            <Link href="/body/add">
-              <Button variant="outline" className="rounded-full px-6">
-                手動輸入
-              </Button>
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );
