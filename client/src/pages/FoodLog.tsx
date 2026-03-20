@@ -15,7 +15,7 @@ export default function FoodLog() {
   const { user } = useAuth() || {};
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [showModal, setShowModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('photo');
+  const [activeTab, setActiveTab] = useState('manual');
 
   // Manual input form state
   const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
@@ -32,12 +32,6 @@ export default function FoodLog() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [photoFoodName, setPhotoFoodName] = useState('');
-  const [photoMealRating, setPhotoMealRating] = useState('');
-  const [photoNutritionSummary, setPhotoNutritionSummary] = useState('');
-  const [photoAiAdvice, setPhotoAiAdvice] = useState('');
-  const [photoFoodItems, setPhotoFoodItems] = useState<string[]>([]);
-  const [photoAnalysisComplete, setPhotoAnalysisComplete] = useState(false);
 
   // Queries
   const { data: items = [] } = trpc.foodLogs.getItems.useQuery({ date });
@@ -48,7 +42,6 @@ export default function FoodLog() {
   const addItemMutation = trpc.foodLogs.addItem.useMutation();
   const deleteItemMutation = trpc.foodLogs.deleteItem.useMutation();
   const photoUploadMutation = trpc.foodPhoto.createUploadUrl.useMutation();
-  const photoUploadDataMutation = trpc.foodPhoto.uploadPhotoData.useMutation();
   const photoAnalysisMutation = trpc.foodPhoto.extractFromPhoto.useMutation();
   
   // Utils hook - must be called at top level, not inside handlers
@@ -253,38 +246,18 @@ export default function FoodLog() {
         throw new Error('Failed to get upload URL');
       }
 
-      // Step 2: Upload file to the signed URL (skip for local storage paths)
-      const isLocalStorage = uploadResponse.uploadUrl.startsWith('file://');
-      if (!isLocalStorage) {
-        console.log('Step 2: Uploading to Supabase signed URL...');
-        const uploadResult = await fetch(uploadResponse.uploadUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': photoFile.type || 'image/jpeg',
-          },
-          body: photoFile,
-        });
+      // Step 2: Upload file to the signed URL
+      console.log('Step 2: Uploading to signed URL...');
+      const uploadResult = await fetch(uploadResponse.uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': photoFile.type || 'image/jpeg',
+        },
+        body: photoFile,
+      });
 
-        if (!uploadResult.ok) {
-          throw new Error(`Upload failed: ${uploadResult.statusText}`);
-        }
-      } else {
-        console.log('Step 2: Using local storage fallback (uploading file data directly)...');
-        // For local storage, send file data directly to backend
-        const fileData = await photoFile.arrayBuffer();
-        // Convert ArrayBuffer to base64 using browser API
-        const uint8Array = new Uint8Array(fileData);
-        let binaryString = '';
-        for (let i = 0; i < uint8Array.length; i++) {
-          binaryString += String.fromCharCode(uint8Array[i]);
-        }
-        const base64Data = btoa(binaryString);
-        
-        // Call uploadPhotoData to save file to local storage
-        await photoUploadDataMutation.mutateAsync({
-          objectPath: uploadResponse.objectPath,
-          fileData: base64Data,
-        });
+      if (!uploadResult.ok) {
+        throw new Error(`Upload failed: ${uploadResult.statusText}`);
       }
 
       // Step 3: Analyze the uploaded image
@@ -295,17 +268,11 @@ export default function FoodLog() {
 
       if (response.extraction && response.extraction.suggested) {
         const { kcal, protein_g, carbs_g, fat_g } = response.extraction.suggested;
-        setFoodName(response.foodName || '已分析食物');
+        setFoodName('已分析食物');
         setCalories(String(kcal || 0));
         setProteinG(String(protein_g || 0));
         setCarbsG(String(carbs_g || 0));
         setFatG(String(fat_g || 0));
-        setPhotoFoodName(response.foodName || '已分析食物');
-        setPhotoFoodItems(response.foodItems || [response.foodName || '已分析食物']);
-        setPhotoMealRating(response.mealQualityRating || '');
-        setPhotoNutritionSummary(response.nutritionSummary || '');
-        setPhotoAiAdvice(response.aiAdvice || '');
-        setPhotoAnalysisComplete(true);
         toast.success('食物分析完成');
       }
     } catch (error) {
@@ -317,7 +284,7 @@ export default function FoodLog() {
     }
   };
 
-  // BUG 2 FIX: Add food item - handle both manual and photo inputs
+  // Add food item
   const handleAddFood = async () => {
     if (!foodName || !calories) {
       toast.error('請填寫食物名稱和熱量');
@@ -325,13 +292,10 @@ export default function FoodLog() {
     }
 
     try {
-      // BUG 2 FIX: Ensure mealType is set (default to breakfast if not)
-      const finalMealType = mealType || 'breakfast';
-      console.log('[FoodLog] Adding food:', { foodName, calories, mealType: finalMealType });
       
       await addItemMutation.mutateAsync({
         date,
-        mealType: finalMealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
+        mealType: mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
         name: foodName,
         calories: calories || '0',
         proteinG: proteinG || '0',
@@ -343,8 +307,13 @@ export default function FoodLog() {
       await utils.foodLogs.getItems.invalidate({ date });
       await utils.foodLogs.getItemsForRange.invalidate();
 
-      // Show success toast only
-      toast.success('食物已新增');
+      // Check if exceeded goal
+      const newTotal = totals.kcal + (parseInt(calories || '0') || 0);
+      if (newTotal > dailyCalorieGoal) {
+        toast.warning(`超過目標 ${newTotal - dailyCalorieGoal} kcal`);
+      } else if (newTotal < dailyCalorieGoal * 0.8) {
+        toast.info(`還差 ${Math.round(dailyCalorieGoal - newTotal)} kcal`);
+      }
 
       // Reset form
       setFoodName('');
@@ -355,52 +324,19 @@ export default function FoodLog() {
       setFatG('');
       setPhotoFile(null);
       setPhotoPreview('');
-      setPhotoAnalysisComplete(false);
-      setPhotoFoodName('');
-      setPhotoFoodItems([]);
-      setPhotoMealRating('');
-      setPhotoNutritionSummary('');
-      setPhotoAiAdvice('');
       setShowModal(false);
       setActiveTab('manual');
     } catch (error) {
-      console.error('[FoodLog] Add food error:', error);
       toast.error('新增失敗');
     }
-  };
-
-  // ISSUE 1 FIX: Cancel photo analysis - completely clear ALL state including photo
-  const handleCancelAnalysis = () => {
-    console.log('[FoodLog] Canceling photo analysis - clearing all state');
-    // Reset photo analysis state
-    setPhotoAnalysisComplete(false);
-    setPhotoFoodName('');
-    setPhotoFoodItems([]);
-    setPhotoMealRating('');
-    setPhotoNutritionSummary('');
-    setPhotoAiAdvice('');
-    // Clear nutrition fields
-    setCalories('');
-    setProteinG('');
-    setCarbsG('');
-    setFatG('');
-    // ISSUE 1 FIX: Also clear the photo file and preview completely
-    setPhotoFile(null);
-    setPhotoPreview('');
-    toast.info('已取消分析');
   };
 
   // Delete food item
   const handleDeleteItem = async (id: string | number) => {
     try {
-      const idNum = typeof id === 'number' ? id : parseInt(id, 10);
+      const idStr = typeof id === 'string' ? id : String(id);
       
-      if (isNaN(idNum)) {
-        toast.error('無效的食物 ID');
-        return;
-      }
-      
-      await deleteItemMutation.mutateAsync({ id: idNum });
+      await deleteItemMutation.mutateAsync({ id: idStr as any });
       
       // Invalidate queries to refresh calendar and history
       await utils.foodLogs.getItems.invalidate({ date });
@@ -514,12 +450,6 @@ export default function FoodLog() {
                   <div className="text-xs text-gray-600">
                     目標 {dailyCalorieGoal} kcal · {percentage}%
                   </div>
-                  {/* Calorie Difference Message */}
-                  <div className="text-xs text-gray-500 mt-1">
-                    {totals.kcal > dailyCalorieGoal
-                      ? `超過目標 ${Math.round(totals.kcal - dailyCalorieGoal)} kcal`
-                      : `還差 ${Math.round(dailyCalorieGoal - totals.kcal)} kcal`}
-                  </div>
                 </div>
 
                 {/* Kcal Display */}
@@ -620,18 +550,7 @@ export default function FoodLog() {
         </div>
 
         {/* Fitasty Banner */}
-        <div 
-          onClick={() => {
-            setShowModal(true);
-            setActiveTab('manual');
-            // Focus search input after modal opens
-            setTimeout(() => {
-              const searchInput = document.querySelector('input[placeholder="搜尋食物"]') as HTMLInputElement;
-              if (searchInput) searchInput.focus();
-            }, 100);
-          }}
-          className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-200 active:scale-95"
-        >
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white rounded-lg flex-shrink-0" />
             <div>
@@ -644,16 +563,15 @@ export default function FoodLog() {
 
       {/* Add Food Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-md rounded-2xl max-h-[95vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle>新增飲食</DialogTitle>
           </DialogHeader>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1 overflow-hidden">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="photo">影相</TabsTrigger>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="manual">手動輸入</TabsTrigger>
-              <TabsTrigger value="fitasty">Fitasty 產品庫</TabsTrigger>
+              <TabsTrigger value="photo">影相</TabsTrigger>
             </TabsList>
 
             {/* Manual Input Tab */}
@@ -760,7 +678,7 @@ export default function FoodLog() {
             </TabsContent>
 
             {/* Photo Tab */}
-            <TabsContent value="photo" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2 pb-[320px]">
+            <TabsContent value="photo" className="space-y-4 mt-4">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>
@@ -812,177 +730,7 @@ export default function FoodLog() {
                 </Button>
               )}
 
-              {/* Analysis Result Card - Prominent Display */}
-              {photoAnalysisComplete && (
-                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-2 border-emerald-300 rounded-lg p-4 space-y-3">
-                  <h3 className="font-semibold text-emerald-900">✓ 分析完成</h3>
-                  
-                  {/* Nutrition Rating Scale */}
-                  <div>
-                    <p className="text-xs text-emerald-700 font-medium mb-2">營養評級</p>
-                    <div className="flex items-center justify-between gap-1 text-xs font-medium">
-                      <div className={`flex-1 text-center py-1 px-2 rounded ${
-                        photoMealRating === 'Limited' ? 'bg-red-100 text-red-700 border-2 border-red-500' : 'bg-gray-100 text-gray-500 border border-gray-300'
-                      }`}>
-                        Limited
-                      </div>
-                      <div className={`flex-1 text-center py-1 px-2 rounded ${
-                        photoMealRating === 'Fair' ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500' : 'bg-gray-100 text-gray-500 border border-gray-300'
-                      }`}>
-                        Fair
-                      </div>
-                      <div className={`flex-1 text-center py-1 px-2 rounded ${
-                        photoMealRating === 'Good' ? 'bg-green-100 text-green-700 border-2 border-green-500' : 'bg-gray-100 text-gray-500 border border-gray-300'
-                      }`}>
-                        Good
-                      </div>
-                      <div className={`flex-1 text-center py-1 px-2 rounded ${
-                        photoMealRating === 'Nutritious' ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-600' : 'bg-gray-100 text-gray-500 border border-gray-300'
-                      }`}>
-                        Nutritious
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Food Items */}
-                  {photoFoodItems.length > 0 && (
-                    <div>
-                      <p className="text-xs text-emerald-700 font-medium mb-2">食物項目</p>
-                      <div className="flex flex-wrap gap-2">
-                        {photoFoodItems.map((item, idx) => (
-                          <span key={idx} className="bg-white text-emerald-700 px-2 py-1 rounded text-sm border border-emerald-200">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* AI Diet Advice - Main Focus */}
-                  {photoAiAdvice && (
-                    <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-300 shadow-sm">
-                      <p className="text-sm text-emerald-700 font-semibold mb-3">💡 AI 飲食建議</p>
-                      <p className="text-base text-emerald-900 leading-relaxed font-medium">{photoAiAdvice}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Food Name (after analysis) - ISSUE 2 FIX: Show combined meal name */}
-              {photoAnalysisComplete && photoFoodName && (
-                <div>
-                  <label className="text-sm font-medium mb-2 block">食物名稱</label>
-                  <Input
-                    type="text"
-                    placeholder="食物名稱"
-                    value={photoFoodName}
-                    onChange={(e) => setPhotoFoodName(e.target.value)}
-                  />
-                  {photoFoodItems.length > 1 && (
-                    <p className="text-xs text-gray-500 mt-1">檢測到 {photoFoodItems.length} 項食物項目</p>
-                  )}
-                </div>
-              )}
-
               {/* Nutrition Info (after analysis) */}
-              {(calories || proteinG || carbsG || fatG) && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs text-gray-600 mb-1 block">熱量 (kcal)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={calories}
-                      onChange={(e) => setCalories(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600 mb-1 block">蛋白質 (g)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={proteinG}
-                      onChange={(e) => setProteinG(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600 mb-1 block">碳水 (g)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={carbsG}
-                      onChange={(e) => setCarbsG(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600 mb-1 block">脂肪 (g)</label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={fatG}
-                      onChange={(e) => setFatG(e.target.value)}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Removed duplicate Meal Quality Rating and AI Diet Advice - kept only in green result card above */}
-            </TabsContent>
-
-            {/* Fitasty Products Tab */}
-            <TabsContent value="fitasty" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2">
-              {/* Meal Type */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">餐次</label>
-                <Select value={mealType} onValueChange={(value) => setMealType(value as 'breakfast' | 'lunch' | 'dinner' | 'snack')}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="breakfast">早餐</SelectItem>
-                    <SelectItem value="lunch">午餐</SelectItem>
-                    <SelectItem value="dinner">晚餐</SelectItem>
-                    <SelectItem value="snack">零食</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Product Search */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">搜尋產品 *</label>
-                <div className="relative">
-                  <Input
-                    placeholder="輸入產品名稱 (中文/英文)"
-                    value={foodName}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    onFocus={() => foodName.length >= 2 && setShowSearchResults(true)}
-                  />
-                  {showSearchResults && (searchResults.length > 0 || isSearching) && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                      {isSearching ? (
-                        <div className="px-4 py-3 text-center text-sm text-gray-500">搜尋中...</div>
-                      ) : searchResults.length > 0 ? (
-                        searchResults.map((result, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => handleSelectFood(result)}
-                            className="w-full text-left px-4 py-3 hover:bg-emerald-50 border-b last:border-b-0 text-sm"
-                          >
-                            <div className="font-medium">{result.displayName || result.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {result.kcal_per_100g || result.kcal || 0} kcal · P:{result.proteinG || 0}g · C:{result.carbsG || 0}g · F:{result.fatG || 0}g
-                            </div>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-4 py-3 text-center text-sm text-gray-500">未找到結果</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Nutrition Info (auto-filled from product) */}
               {(calories || proteinG || carbsG || fatG) && (
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -1026,25 +774,14 @@ export default function FoodLog() {
             </TabsContent>
           </Tabs>
 
-          {/* ISSUE 2 FIX: Sticky action buttons with proper safe-area and padding support */}
-          <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3 z-50" style={{ paddingBottom: 'max(2rem, calc(1rem + env(safe-area-inset-bottom)))' }}>
-            {photoAnalysisComplete && (
-              <Button
-                onClick={handleCancelAnalysis}
-                variant="outline"
-                className="flex-1 h-12"
-              >
-                取消
-              </Button>
-            )}
-            <Button
-              onClick={handleAddFood}
-              disabled={addItemMutation.isPending}
-              className={`${photoAnalysisComplete ? 'flex-1' : 'w-full'} bg-emerald-500 hover:bg-emerald-600 h-12 text-base font-semibold`}
-            >
-              {addItemMutation.isPending ? '新增中...' : '新增'}
-            </Button>
-          </div>
+          {/* Add Button */}
+          <Button
+            onClick={handleAddFood}
+            disabled={addItemMutation.isPending}
+            className="w-full bg-emerald-500 hover:bg-emerald-600 mt-6"
+          >
+            {addItemMutation.isPending ? '新增中...' : '新增'}
+          </Button>
         </DialogContent>
       </Dialog>
     </div>

@@ -111,69 +111,20 @@ export function calculateTDEE(bmr: number, activity_level: ActivityLevel): numbe
 
 /**
  * Calculate daily calorie target based on fitness goal
- * @param tdee Total daily energy expenditure
- * @param fitness_goal The fitness goal (lose, maintain, gain)
- * @param goalKg Target weight change in kg (optional)
- * @param goalDays Target duration in days (optional)
- * @param gender Gender for minimum calorie safety check
- * @param calorieMode 'safe' (default) clamps to minimum, 'aggressive' uses original calculated value
- * @returns Object with dailyCalories, dailyDeficit, and isAggressive flag
+ * @param tdee Total Daily Energy Expenditure
+ * @param fitness_goal 'lose' | 'maintain' | 'gain'
+ * @returns Daily calorie target
  */
-export function calculateDailyCalorieTarget(
-  tdee: number,
-  fitness_goal: FitnessGoal,
-  goalKg?: number | null,
-  goalDays?: number | null,
-  gender: Gender = 'male',
-  calorieMode: 'safe' | 'aggressive' = 'safe'
-): { dailyCalories: number; originalCalories: number; dailyDeficit: number; isAggressive: boolean } {
-  const KCAL_PER_KG_FAT = 7700;
-  // Safe mode uses 1200 floor, aggressive mode uses lower floor
-  const MIN_CALORIES_SAFE = gender === 'female' ? 1200 : 1200;
-  const MIN_CALORIES_AGGRESSIVE = gender === 'female' ? 1000 : 1200;
-  const MIN_CALORIES = calorieMode === 'aggressive' ? MIN_CALORIES_AGGRESSIVE : MIN_CALORIES_SAFE;
-  
-  let dailyDeficit = 0;
-  let wasClamped = false;
-
+export function calculateDailyCalorieTarget(tdee: number, fitness_goal: FitnessGoal): number {
   switch (fitness_goal) {
-    case 'lose': {
-      if (goalKg && goalDays && goalKg > 0 && goalDays > 0) {
-        dailyDeficit = (goalKg * KCAL_PER_KG_FAT) / goalDays;
-      } else {
-        dailyDeficit = 400;
-      }
-      break;
-    }
-    case 'gain': {
-      if (goalKg && goalDays && goalKg > 0 && goalDays > 0) {
-        dailyDeficit = -(goalKg * KCAL_PER_KG_FAT) / goalDays;
-      } else {
-        dailyDeficit = -250;
-      }
-      break;
-    }
+    case 'lose':
+      return tdee - 400; // 400 calorie deficit
+    case 'gain':
+      return tdee + 250; // 250 calorie surplus
     case 'maintain':
     default:
-      dailyDeficit = 0;
+      return tdee;
   }
-
-  // Calculate original target before safety clamping
-  const originalCalories = tdee - dailyDeficit;
-  
-  // Apply safety minimum ONLY when calculated target is below the floor
-  let dailyCalories = originalCalories;
-  if (dailyCalories < MIN_CALORIES) {
-    wasClamped = true;
-    dailyCalories = MIN_CALORIES;
-  }
-
-  return {
-    dailyCalories: Math.round(dailyCalories),
-    originalCalories: Math.round(originalCalories),
-    dailyDeficit: Math.round(dailyDeficit),
-    isAggressive: wasClamped,
-  };
 }
 
 /**

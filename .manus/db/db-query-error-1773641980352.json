@@ -1,8 +1,0 @@
-{
-  "query": "SELECT id, ai_tone_style FROM user_profiles LIMIT 5;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, ai_tone_style FROM user_profiles LIMIT 5;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'ai_tone_style' in 'field list'"
-  ]
-}

@@ -56,7 +56,7 @@ async function searchFitasty(query: string): Promise<FoodSearchResult[]> {
       .where(
         and(
           eq(fitastyProducts.isActive, 1 as any),
-          like(fitastyProducts.productNameZh, `%${query}%`)
+          like(fitastyProducts.name, `%${query}%`)
         )
       )
       .limit(5);
@@ -64,8 +64,8 @@ async function searchFitasty(query: string): Promise<FoodSearchResult[]> {
     return products.map((p: any) => ({
       source: 'fitasty' as const,
       id: p.id,
-      displayName: p.productNameZh || p.productNameEn || 'Unknown',
-      brand: p.brandName || undefined,
+      displayName: p.name,
+      brand: p.category || undefined,
       badge: 'Fitasty' as const,
       kcal_per_100g: p.calories ? Math.round((p.calories * 100) / (p.servingSize || 100)) : null,
       protein_g_per_100g: p.proteinG ? Math.round((p.proteinG * 100) / (p.servingSize || 100) * 10) / 10 : null,
@@ -98,7 +98,7 @@ async function searchUSDA(query: string, locale: 'zh-HK' | 'en'): Promise<FoodSe
       .where(
         and(
           eq(generalFoodCache.source, 'usda'),
-          like(generalFoodCache.displayName, `%${query}%`)
+          like(generalFoodCache.display_name, `%${query}%`)
         )
       )
       .limit(5);
@@ -106,8 +106,8 @@ async function searchUSDA(query: string, locale: 'zh-HK' | 'en'): Promise<FoodSe
     if (cached.length > 0) {
       return cached.map((c: any) => ({
         source: 'usda' as const,
-        id: c.externalId,
-        displayName: c.displayName,
+        id: c.external_id,
+        displayName: c.display_name,
         brand: c.brand || undefined,
         badge: 'USDA' as const,
         kcal_per_100g: c.kcal_per_100g,

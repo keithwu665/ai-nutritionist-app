@@ -25,24 +25,15 @@ type InsertBodyPhoto = InferInsertModel<typeof bodyPhotos>;
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
-let _dbInitialized = false;
 
 export async function getDb() {
-  if (!_dbInitialized) {
-    if (!process.env.DATABASE_URL) {
-      console.error('[Database] DATABASE_URL not set');
+  if (!_db && process.env.DATABASE_URL) {
+    try {
+      _db = drizzle(process.env.DATABASE_URL);
+    } catch (error) {
+      console.warn("[Database] Failed to connect:", error);
       _db = null;
-    } else {
-      try {
-        console.log('[Database] Initializing connection...');
-        _db = drizzle(process.env.DATABASE_URL);
-        console.log('[Database] Connection initialized successfully');
-      } catch (error) {
-        console.error('[Database] Failed to connect:', error);
-        _db = null;
-      }
     }
-    _dbInitialized = true;
   }
   return _db;
 }
@@ -128,23 +119,7 @@ export async function getUserByOpenId(openId: string) {
 export async function getUserProfile(userId: number) {
   const db = await getDb();
   if (!db) return null;
-  const result = await db.select({
-    id: userProfiles.id,
-    userId: userProfiles.userId,
-    gender: userProfiles.gender,
-    age: userProfiles.age,
-    heightCm: userProfiles.heightCm,
-    weightKg: userProfiles.weightKg,
-    fitnessGoal: userProfiles.fitnessGoal,
-    activityLevel: userProfiles.activityLevel,
-    goalKg: userProfiles.goalKg,
-    goalDays: userProfiles.goalDays,
-    displayName: userProfiles.displayName,
-    calorieMode: userProfiles.calorieMode,
-    createdAt: userProfiles.createdAt,
-    updatedAt: userProfiles.updatedAt,
-    aiToneStyle: userProfiles.aiToneStyle,
-  }).from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
+  const result = await db.select().from(userProfiles).where(eq(userProfiles.userId, userId)).limit(1);
   return result.length > 0 ? result[0] : null;
 }
 
@@ -158,44 +133,8 @@ export async function createUserProfile(data: InsertUserProfile) {
 export async function updateUserProfile(userId: number, data: Partial<InsertUserProfile>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  console.log('[updateUserProfile] Updating user', userId, 'with data:', data);
-  
-  // Check if profile exists
-  const existing = await getUserProfile(userId);
-  if (!existing) {
-    console.log('[updateUserProfile] Profile does not exist, creating new one');
-    // If profile doesn't exist, create it with the provided data
-    const createData: InsertUserProfile = {
-      userId,
-      gender: data.gender || 'male',
-      age: data.age || 25,
-      heightCm: data.heightCm || '170',
-      weightKg: data.weightKg || '70',
-      fitnessGoal: data.fitnessGoal || 'maintain',
-      activityLevel: data.activityLevel || 'moderate',
-      aiToneStyle: data.aiToneStyle || 'gentle',
-      displayName: data.displayName,
-      calorieMode: data.calorieMode || 'safe',
-    };
-    await db.insert(userProfiles).values(createData);
-  } else {
-    // Profile exists, update it
-    const updateData: any = { ...data };
-    // Ensure displayName is always included, convert empty string to null
-    if ('displayName' in data) {
-      updateData.displayName = data.displayName && data.displayName.trim() ? data.displayName.trim() : null;
-    }
-    // Handle calorieMode
-    if ('calorieMode' in data && data.calorieMode) {
-      updateData.calorieMode = data.calorieMode;
-    }
-    console.log('[updateUserProfile] Update data:', updateData);
-    await db.update(userProfiles).set(updateData).where(eq(userProfiles.userId, userId));
-  }
-  
-  const updated = await getUserProfile(userId);
-  console.log('[updateUserProfile] Updated profile:', updated);
-  return updated;
+  await db.update(userProfiles).set(data).where(eq(userProfiles.userId, userId));
+  return getUserProfile(userId);
 }
 
 // ============================================================================
@@ -380,6 +319,7 @@ export async function getAllFitastyProducts() {
   if (!db) return [];
   try {
     const result = await db.select().from(fitastyProducts)
+      .where(eq(fitastyProducts.isActive, 1))
       .orderBy(fitastyProducts.category);
     return result;
   } catch (error) {
@@ -393,8 +333,8 @@ export async function getFitastyProductsByCategory(category: string) {
   if (!db) return [];
   try {
     const result = await db.select().from(fitastyProducts)
-      .where(eq(fitastyProducts.category, category))
-      .orderBy(fitastyProducts.product_name_zh);
+      .where(and(eq(fitastyProducts.category, category), eq(fitastyProducts.isActive, 1)))
+      .orderBy(fitastyProducts.name);
     return result;
   } catch (error) {
     console.error('Error fetching products by category:', error);
@@ -420,8 +360,7 @@ export async function updateFitastyProduct(id: number, data: Partial<InsertFitas
 export async function deleteFitastyProduct(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Delete the product
-  await db.delete(fitastyProducts).where(eq(fitastyProducts.id, id));
+  await db.update(fitastyProducts).set({ deletedAt: new Date().toISOString() }).where(eq(fitastyProducts.id, id));
   return true;
 }
 
@@ -431,8 +370,11 @@ export async function searchFitastyProducts(query: string) {
   try {
     const { like } = await import('drizzle-orm');
     const result = await db.select().from(fitastyProducts)
-      .where(like(fitastyProducts.product_name_zh, `%${query}%`))
-      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
+      .where(and(
+        eq(fitastyProducts.isActive, 1),
+        like(fitastyProducts.name, `%${query}%`)
+      ))
+      .orderBy(fitastyProducts.category, fitastyProducts.name)
       .limit(20);
     return result;
   } catch (error) {
@@ -446,38 +388,11 @@ export async function getFitastyProductById(id: number) {
   if (!db) return null;
   try {
     const result = await db.select().from(fitastyProducts)
-      .where(eq(fitastyProducts.id, id))
+      .where(and(eq(fitastyProducts.id, id), eq(fitastyProducts.isActive, 1)))
       .limit(1);
     return result.length > 0 ? result[0] : null;
   } catch (error) {
     console.error('Error fetching Fitasty product by ID:', error);
-    return null;
-  }
-}
-
-export async function listFitastyProducts(limit: number = 20, offset: number = 0) {
-  const db = await getDb();
-  if (!db) return [];
-  try {
-    const result = await db.select().from(fitastyProducts)
-      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
-      .limit(limit)
-      .offset(offset);
-    return result;
-  } catch (error) {
-    console.error('Error listing Fitasty products:', error);
-    return [];
-  }
-}
-
-export async function getUserById(userId: number) {
-  const db = await getDb();
-  if (!db) return null;
-  try {
-    const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-    return result.length > 0 ? result[0] : null;
-  } catch (error) {
-    console.error('Error fetching user by ID:', error);
     return null;
   }
 }

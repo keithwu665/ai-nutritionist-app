@@ -1,1 +1,0 @@
-ALTER TABLE `user_profiles` ADD `aiToneStyle` enum('gentle','coach','hk_style') DEFAULT 'gentle' NOT NULL;

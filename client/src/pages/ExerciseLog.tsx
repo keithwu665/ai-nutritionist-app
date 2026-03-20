@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
-  import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,13 +50,10 @@ const intensityLabels: Record<string, string> = {
 };
 
 export default function ExerciseLog() {
-  const auth = useAuth();
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'records' | 'suggestions'>('records');
-  const [exerciseAdvice, setExerciseAdvice] = useState<string>('');
-  const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [newExercise, setNewExercise] = useState({
     type: 'running',
     date: today,
@@ -69,32 +65,6 @@ export default function ExerciseLog() {
   });
   const [manualOverride, setManualOverride] = useState(false);
 
-  const [personality, setPersonality] = React.useState<'gentle' | 'strict' | 'hongkong'>('gentle');
-  const utils = trpc.useUtils();
-  
-  // Load personality from localStorage on mount and listen for changes
-  React.useEffect(() => {
-    const loadPersonality = () => {
-      const savedPersonality = localStorage.getItem('aiPersonality') as 'gentle' | 'strict' | 'hongkong' | null;
-      if (savedPersonality) {
-        console.log('Exercise personality loaded:', savedPersonality);
-        setPersonality(savedPersonality);
-      }
-    };
-    
-    loadPersonality();
-    
-    // Listen for storage changes from other tabs/windows
-    window.addEventListener('storage', loadPersonality);
-    // Also listen for custom events from settings changes
-    window.addEventListener('personalityChanged', loadPersonality);
-    
-    return () => {
-      window.removeEventListener('storage', loadPersonality);
-      window.removeEventListener('personalityChanged', loadPersonality);
-    };
-  }, []);
-  
   // Reset modal date when modal opens
   useEffect(() => {
     if (isAddOpen) {
@@ -104,13 +74,6 @@ export default function ExerciseLog() {
       }));
     }
   }, [isAddOpen, date]);
-  
-  // Refetch advice when personality changes
-  useEffect(() => {
-    if (activeTab === 'suggestions') {
-      utils.exercises.generateAdvice.invalidate();
-    }
-  }, [personality, utils.exercises.generateAdvice, activeTab]);
 
   // Get exercises for selected date
   const { data: exercises, isLoading } = trpc.exercises.list.useQuery({ date }, { staleTime: 0 });
@@ -119,6 +82,8 @@ export default function ExerciseLog() {
   const endDate = today;
   const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const { data: last7DaysExercises = [] } = trpc.exercises.listForRange.useQuery({ startDate, endDate }, { staleTime: 0 });
+  
+  const utils = trpc.useUtils();
 
   // Use tRPC to calculate calories
   const { data: calculatedCalories, isLoading: isCalculating } = trpc.exercises.calculateCalories.useQuery(
@@ -142,46 +107,6 @@ export default function ExerciseLog() {
       }));
     }
   }, [calculatedCalories, manualOverride]);
-
-  // Generate exercise advice when tab changes or exercises update
-  const shouldFetchAdvice = activeTab === 'suggestions' && exercises && personality;
-  const { data: adviceData, isLoading: isAdviceLoading, refetch } = trpc.exercises.generateAdvice.useQuery(
-    {
-      caloriesBurned: shouldFetchAdvice ? exercises.reduce((s: number, e: any) => s + Number(e.caloriesBurned), 0) : 0,
-      workoutCount: shouldFetchAdvice ? exercises.length : 0,
-      totalDuration: shouldFetchAdvice ? exercises.reduce((s: number, e: any) => s + e.durationMinutes, 0) : 0,
-      lastWorkoutType: shouldFetchAdvice && exercises.length > 0 ? exercises[exercises.length - 1]?.type : undefined,
-      personality: personality,
-    },
-    { enabled: !!shouldFetchAdvice }
-  );
-  
-  // Invalidate and refetch when personality changes
-  useEffect(() => {
-    if (shouldFetchAdvice) {
-      utils.exercises.generateAdvice.invalidate();
-      refetch();
-    }
-  }, [personality, shouldFetchAdvice, utils, refetch]);
-  
-  // Debug log
-  useEffect(() => {
-    console.log('Exercise personality:', personality);
-  }, [personality]);
-
-  useEffect(() => {
-    if (adviceData?.success) {
-      console.log('Exercise advice updated with personality:', personality);
-      setExerciseAdvice(adviceData.advice);
-    }
-  }, [adviceData, personality]);
-
-  useEffect(() => {
-    setIsLoadingAdvice(isAdviceLoading);
-  }, [isAdviceLoading]);
-  
-
-
 
   // Handle exercise type change
   const handleTypeChange = (value: string) => {
@@ -555,15 +480,23 @@ export default function ExerciseLog() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {isAdviceLoading ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <p className="text-sm text-gray-600">生成建議中...</p>
-                </div>
-              ) : exerciseAdvice ? (
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{exerciseAdvice}</p>
+              {todayTotals.calories > 0 ? (
+                <>
+                  <div className="flex items-start gap-2">
+                    <div className="text-emerald-600 font-bold">•</div>
+                    <p className="text-sm text-gray-700">今日運動量良好，已消耗 {Math.round(todayTotals.calories)} kcal</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="text-emerald-600 font-bold">•</div>
+                    <p className="text-sm text-gray-700">建議補充 20g 蛋白質以促進肌肉恢復</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="text-emerald-600 font-bold">•</div>
+                    <p className="text-sm text-gray-700">明日建議進行核心訓練以增強穩定性</p>
+                  </div>
+                </>
               ) : (
-                <p className="text-sm text-gray-600">暫無運動記錄</p>
+                <p className="text-sm text-gray-600">今日暫無運動記錄。建議進行 30 分鐘的中等強度運動。</p>
               )}
             </CardContent>
           </Card>
@@ -573,7 +506,7 @@ export default function ExerciseLog() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-blue-700">
                 <Users className="h-5 w-5" />
-                運動建議 💪
+                教練建議 👨‍🏫
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">

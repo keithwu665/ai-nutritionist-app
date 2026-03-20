@@ -1,5 +1,5 @@
+import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
-import { COOKIE_NAME } from "../shared/const";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
@@ -8,7 +8,7 @@ import { bodyMetricsImportRouter } from "./routers/bodyMetricsImport";
 import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
-import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
+import { generateAllRecommendations, type AnalysisData } from "./utils/recommendationEngine";
 
 export const appRouter = router({
   system: systemRouter,
@@ -39,18 +39,11 @@ export const appRouter = router({
         weightKg: z.string(),
         fitnessGoal: z.enum(["lose", "maintain", "gain"]),
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]),
-        aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
-        displayName: z.string().nullable().optional(),
-        goalKg: z.string().optional(),
-        goalDays: z.number().optional(),
-        calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.createUserProfile({
           userId: ctx.user.id,
           ...input,
-          aiToneStyle: input.aiToneStyle || 'gentle',
-          calorieMode: input.calorieMode || 'safe',
         });
       }),
 
@@ -62,11 +55,6 @@ export const appRouter = router({
         weightKg: z.string().optional(),
         fitnessGoal: z.enum(["lose", "maintain", "gain"]).optional(),
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]).optional(),
-        aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
-        displayName: z.string().nullable().optional(),
-        goalKg: z.string().optional(),
-        goalDays: z.number().optional(),
-        calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);
@@ -497,15 +485,9 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         try {
-          return db.updateExercise(input.id, ctx.user.id, {
-            type: input.type,
-            durationMinutes: input.durationMinutes,
-            caloriesBurned: input.caloriesBurned,
-            intensity: input.intensity,
-            note: input.note,
-          });
+          return db.deleteFoodLogItem(input.id, ctx.user.id);
         } catch (error) {
-          console.error('[Exercise] update error:', error instanceof Error ? error.message : String(error));
+          console.error('[FoodLogs] deleteItem error:', error instanceof Error ? error.message : String(error));
           throw error;
         }
       }),
@@ -514,33 +496,6 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
         return db.deleteExercise(input.id, ctx.user.id);
-      }),
-
-    generateAdvice: protectedProcedure
-      .input(z.object({
-        caloriesBurned: z.number(),
-        workoutCount: z.number(),
-        totalDuration: z.number(),
-        lastWorkoutType: z.string().optional(),
-        personality: z.enum(['gentle', 'strict', 'hongkong']),
-      }))
-      .query(async ({ ctx, input }) => {
-        const { generateExerciseAdviceWithFallback } = await import('./exerciseAdviceEngine');
-        try {
-          const advice = await generateExerciseAdviceWithFallback(
-            {
-              caloriesBurned: input.caloriesBurned,
-              workoutCount: input.workoutCount,
-              totalDuration: input.totalDuration,
-              lastWorkoutType: input.lastWorkoutType,
-            },
-            input.personality
-          );
-          return { advice, success: true };
-        } catch (error) {
-          console.error('Error generating exercise advice:', error);
-          return { advice: 'Unable to generate advice', success: false };
-        }
       }),
   }),
 
@@ -631,7 +586,7 @@ export const appRouter = router({
 
       const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
       const tdee = calculateTDEE(bmr, profile.activityLevel);
-      const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, profile.calorieMode || 'safe');
+      const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal);
 
       // Use enhanced recommendation engine
       const analysisData: AnalysisData = {
@@ -656,18 +611,12 @@ export const appRouter = router({
         profile: {
           heightCm: Number(profile.heightCm),
           currentWeight: Number(profile.weightKg),
-          tdee: calcResult.dailyCalories,
+          tdee: target,
           bmr: bmr,
         },
       };
 
-      let recommendations = generateAllRecommendations(analysisData);
-
-      // Apply personality transformation for all personalities (including gentle)
-      // Default to 'gentle' if aiToneStyle is not set
-      const aiToneStyle = profile.aiToneStyle || 'gentle';
-      const personality = aiToneStyle === 'coach' ? 'coach' : aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
-      recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality);
+      const recommendations = generateAllRecommendations(analysisData);
 
       return {
         diet: recommendations.diet.slice(0, 3).map(r => ({
@@ -975,7 +924,7 @@ export const appRouter = router({
         }
         return db.createFitastyProduct({
           ...input,
-          is_active: 1,
+          isActive: 1,
         } as any);
       }),
 
@@ -1031,100 +980,12 @@ export const appRouter = router({
           foodLogId: log.id,
           userId: ctx.user.id,
           mealType: input.mealType,
-          name: product.productNameZh || product.productNameEn || 'Unknown',
-          calories: String(calories),
-          proteinG: proteinG !== null ? String(proteinG) : null,
-          carbsG: carbsG !== null ? String(carbsG) : null,
-          fatG: fatG !== null ? String(fatG) : null,
-        } as any);
-      }),
-  }),
-
-  // ========================================================================
-  // Fitasty Products
-  // ========================================================================
-  fitasty: router({
-    search: publicProcedure
-      .input(z.object({ query: z.string().min(1) }))
-      .query(async ({ input }) => {
-        return db.searchFitastyProducts(input.query);
-      }),
-
-    getById: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return db.getFitastyProductById(input.id);
-      }),
-
-    list: publicProcedure
-      .input(z.object({ limit: z.number().default(20), offset: z.number().default(0) }))
-      .query(async ({ input }) => {
-        return db.listFitastyProducts(input.limit, input.offset);
-      }),
-
-    create: protectedProcedure
-      .input(z.object({
-        name: z.string().min(1),
-        category: z.string().min(1),
-        servingSize: z.string().optional(),
-        calories: z.number().positive(),
-        proteinG: z.number().nonnegative().optional(),
-        carbsG: z.number().nonnegative().optional(),
-        fatG: z.number().nonnegative().optional(),
-        description: z.string().optional(),
-        imageUrl: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        // Only allow admin to create products
-        const user = await db.getUserById(ctx.user.id);
-        if (user?.role !== 'admin') throw new Error('Only admins can create Fitasty products');
-        // Keep numbers as-is for new schema
-        const dbData = {
-          ...input,
-          calories: input.calories,
-          protein_g: input.proteinG,
-          carbs_g: input.carbsG,
-          fat_g: input.fatG,
-        };
-        return db.createFitastyProduct(dbData as any);
-      }),
-
-    update: protectedProcedure
-      .input(z.object({
-        id: z.number(),
-        name: z.string().optional(),
-        category: z.string().optional(),
-        servingSize: z.string().optional(),
-        calories: z.number().positive().optional(),
-        proteinG: z.number().nonnegative().optional(),
-        carbsG: z.number().nonnegative().optional(),
-        fatG: z.number().nonnegative().optional(),
-        description: z.string().optional(),
-        imageUrl: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        // Only allow admin to update products
-        const user = await db.getUserById(ctx.user.id);
-        if (user?.role !== 'admin') throw new Error('Only admins can update Fitasty products');
-        const { id, ...updateData } = input;
-        // Keep numbers as-is for new schema
-        const dbData = {
-          ...updateData,
-          calories: updateData.calories,
-          protein_g: updateData.proteinG,
-          carbs_g: updateData.carbsG,
-          fat_g: updateData.fatG,
-        };
-        return db.updateFitastyProduct(id, dbData as any);
-      }),
-
-    delete: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        // Only allow admin to delete products
-        const user = await db.getUserById(ctx.user.id);
-        if (user?.role !== 'admin') throw new Error('Only admins can delete Fitasty products');
-        return db.deleteFitastyProduct(input.id);
+          name: product.name,
+          calories: calories.toString(),
+          proteinG: proteinG ? proteinG.toString() : null,
+          carbsG: carbsG ? carbsG.toString() : null,
+          fatG: fatG ? fatG.toString() : null,
+        });
       }),
   }),
 });

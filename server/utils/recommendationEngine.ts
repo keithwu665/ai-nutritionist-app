@@ -259,25 +259,3 @@ export function generateAllRecommendations(data: AnalysisData): {
     encouragement: generateEncouragementRecommendations(data),
   };
 }
-
-/**
- * Transform all recommendations with personality
- */
-export async function transformAllRecommendationsWithPersonality(
-  recommendations: ReturnType<typeof generateAllRecommendations>,
-  personality: 'gentle' | 'coach' | 'hongkong'
-): Promise<ReturnType<typeof generateAllRecommendations>> {
-  const { transformRecommendationMessage, transformActionText } = await import('./personalityTransformer');
-
-  const transformRec = async (rec: Recommendation): Promise<Recommendation> => ({
-    ...rec,
-    message: await transformRecommendationMessage(rec.message, personality),
-    action: await transformActionText(rec.action, personality),
-  });
-
-  return {
-    diet: await Promise.all(recommendations.diet.map(transformRec)),
-    exercise: await Promise.all(recommendations.exercise.map(transformRec)),
-    encouragement: await Promise.all(recommendations.encouragement.map(transformRec)),
-  };
-}
