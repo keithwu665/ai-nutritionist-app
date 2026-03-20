@@ -129,14 +129,6 @@ export default function BodyMetrics() {
       weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
     });
     
-    // TEMPORARY TEST: Set hardcoded suggestion to verify end-to-end flow
-    console.log('\ud83e\udde8 TEMPORARY TEST: Setting hardcoded suggestion');
-    setCoachAdvice({
-      type: 'test',
-      advice: '\u6e2c\u8a66\u6210\u529f\uff1aAI \u5efa\u8b70\u529f\u80fd\u5df2\u89f8\u767c \u2713 \u6b64\u70ba\u81e8\u6642\u6e2c\u8a66\u5efa\u8b70\uff0c\u7528\u65bc\u9a57\u8b49\u6d41\u7a0b\u662f\u5426\u6b63\u5e38\u904b\u4f5c\u3002'
-    });
-    return;
-    
     coachAdviceMutation.mutate({
       weight: selectedWeight || 0,
       bmi: bmiData.value,
