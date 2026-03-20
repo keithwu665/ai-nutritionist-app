@@ -335,3 +335,12 @@
 - [x] Restore 2x2 white metric cards grid (體重, 體脂率, 肌肉量, BMI)
 - [x] Add trend indicators to white cards only (small and subtle)
 - [x] Verify layout matches reference image exactly
+
+
+## Body Data Measurement Record Redesign - Daily Focus
+- [x] Examine Exercise screen daily-focused UX pattern
+- [x] Add date navigation header (previous/next day arrows)
+- [x] Implement daily view showing only selected day's data
+- [x] Add AI Coach Advice section based on goal and progress
+- [x] Add "查看歷史記錄" button to view full history
+- [x] Test daily navigation and data filtering
