@@ -120,11 +120,23 @@ export function GoalSummaryCard({
               👉 建議進度：{weeklyTarget}
             </p>
           )}
-          {dailyDeficit > 0 && (
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              👉 每日建議赤字：{dailyDeficit} kcal
-            </p>
-          )}
+          {dailyDeficit > 0 && (() => {
+            const KCAL_PER_KG_FAT = 7700;
+            const weeklyDeficit = dailyDeficit * 7;
+            const weeklyWeightLoss = weeklyDeficit / KCAL_PER_KG_FAT;
+            const lowerBound = Math.floor(weeklyWeightLoss * 10) / 10;
+            const upperBound = Math.ceil(weeklyWeightLoss * 10) / 10;
+            return (
+              <div className="space-y-2">
+                <p className="text-sm text-slate-700 dark:text-slate-300">
+                  👉 每日少食約 {dailyDeficit} kcal
+                </p>
+                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                  👉 預計每週減重約 {lowerBound}–{upperBound} kg
+                </p>
+              </div>
+            );
+          })()}
           {(fitnessGoal === 'lose' || fitnessGoal === 'gain') && (
             <div className="space-y-2">
               <p className="text-sm text-slate-700 dark:text-slate-300">

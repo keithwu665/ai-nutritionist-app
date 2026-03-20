@@ -224,3 +224,10 @@
 - [x] Show final adjusted calorie target (after safety clamp)
 - [x] Display warning when safety minimum is applied
 - [x] Test with different goal scenarios (-5kg, -10kg, etc.)
+
+
+## User-Friendly Deficit Display
+- [x] Replace "每日建議赤字" with "每日少食約 {deficit} kcal"
+- [x] Add estimated weekly weight loss display
+- [x] Calculate and display weight loss range (e.g., 0.3–0.4 kg)
+- [x] Test with various deficit values
