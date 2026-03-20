@@ -598,7 +598,8 @@ export default function Settings() {
       {/* ================================================================== */}
       <AggressiveCalorieModal
         isOpen={showAggressiveModal}
-        originalCalories={metabolicData?.originalTarget || 0}
+        userTarget={metabolicData?.target || 0}
+        safetyMinimum={metabolicData?.target || 1200}
         onConfirm={() => {
           setGoalSettings(prev => ({ ...prev, calorieMode: 'aggressive' }));
           setAggressiveModeConfirmed(true);

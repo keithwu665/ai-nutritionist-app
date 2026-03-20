@@ -239,3 +239,11 @@
 - [x] Ensure Settings and modal use same calculation source
 - [x] Verify both display positive values only
 - [x] Test with different goal scenarios
+
+
+## Aggressive Mode Modal Logic Fix
+- [x] Fix calculation logic to ensure safety minimum never exceeds TDEE
+- [x] Change label from "每日目標" to "建議最低攝取"
+- [x] Show both user target and safety minimum in modal
+- [x] Ensure safety minimum follows formula: max(1200, BMR, TDEE - 500)
+- [x] Test with various TDEE and goal scenarios
