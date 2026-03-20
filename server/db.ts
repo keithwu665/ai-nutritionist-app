@@ -205,13 +205,28 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
 export async function getBodyMetrics(userId: number, days: number = 30) {
   const db = await getDb();
   if (!db) return [];
-  const startDate = new Date();
+  
+  // Calculate start date using local date (not UTC) to match database storage
+  const now = new Date();
+  const startDate = new Date(now);
   startDate.setDate(startDate.getDate() - days);
-  const startDateStr = startDate.toISOString().split('T')[0];
+  
+  // Format as local date string (YYYY-MM-DD)
+  const year = startDate.getFullYear();
+  const month = String(startDate.getMonth() + 1).padStart(2, '0');
+  const day = String(startDate.getDate()).padStart(2, '0');
+  const startDateStr = `${year}-${month}-${day}`;
+  
+  console.log('[getBodyMetrics] userId:', userId, 'days:', days, 'startDateStr:', startDateStr);
 
   const result = await db.select().from(bodyMetrics)
     .where(and(eq(bodyMetrics.userId, userId), gte(bodyMetrics.date, startDateStr)))
     .orderBy(desc(bodyMetrics.date));
+  
+  console.log('[getBodyMetrics] Found', result.length, 'records');
+  if (result.length > 0) {
+    console.log('[getBodyMetrics] Date range:', result[result.length - 1].date, 'to', result[0].date);
+  }
   return result;
 }
 

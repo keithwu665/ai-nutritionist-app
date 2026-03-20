@@ -427,3 +427,11 @@
 - [ ] Test timeout error message displays correctly
 - [ ] Test network error message displays correctly
 - [ ] Test regenerate button works after error
+
+
+## Missing Body-Weight Record Bug Fix
+- [x] Fix timezone issue in frontend date initialization (use local date, not UTC)
+- [x] Fix timezone issue in backend getBodyMetrics (use local date for date range calculation)
+- [x] Fix date navigation functions to use local date parsing
+- [x] Fix date formatting to use local date parsing
+- [x] Add debug logging to getBodyMetrics function

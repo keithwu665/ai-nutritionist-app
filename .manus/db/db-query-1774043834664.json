@@ -1,0 +1,108 @@
+{
+  "query": "SELECT id, userId, date, weightKg, createdAt FROM body_metrics ORDER BY date DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, userId, date, weightKg, createdAt FROM body_metrics ORDER BY date DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "480001",
+      "userId": "6",
+      "date": "2026-03-20",
+      "weightKg": "45.0",
+      "createdAt": "2026-03-20 16:57:02"
+    },
+    {
+      "id": "420007",
+      "userId": "6",
+      "date": "2026-03-19",
+      "weightKg": "56.0",
+      "createdAt": "2026-03-20 11:14:01"
+    },
+    {
+      "id": "420005",
+      "userId": "6",
+      "date": "2026-03-18",
+      "weightKg": "56.0",
+      "createdAt": "2026-03-20 11:12:18"
+    },
+    {
+      "id": "390003",
+      "userId": "6",
+      "date": "2026-03-17",
+      "weightKg": "57.0",
+      "createdAt": "2026-03-18 16:08:30"
+    },
+    {
+      "id": "270001",
+      "userId": "60001",
+      "date": "2026-03-10",
+      "weightKg": "69.0",
+      "createdAt": "2026-03-10 23:52:56"
+    },
+    {
+      "id": "420003",
+      "userId": "6",
+      "date": "2026-03-09",
+      "weightKg": "54.0",
+      "createdAt": "2026-03-20 10:33:27"
+    },
+    {
+      "id": "420002",
+      "userId": "6",
+      "date": "2026-03-05",
+      "weightKg": "54.0",
+      "createdAt": "2026-03-20 10:21:20"
+    },
+    {
+      "id": "420004",
+      "userId": "6",
+      "date": "2026-03-05",
+      "weightKg": "56.0",
+      "createdAt": "2026-03-20 10:33:41"
+    },
+    {
+      "id": "450001",
+      "userId": "6",
+      "date": "2026-03-02",
+      "weightKg": "57.0",
+      "createdAt": "2026-03-20 15:13:56"
+    },
+    {
+      "id": "150001",
+      "userId": "1",
+      "date": "2026-02-21",
+      "weightKg": "75.5",
+      "createdAt": "2026-02-21 19:45:20"
+    },
+    {
+      "id": "90001",
+      "userId": "1",
+      "date": "2026-02-18",
+      "weightKg": "75.0",
+      "createdAt": "2026-02-19 22:58:56"
+    },
+    {
+      "id": "120001",
+      "userId": "330001",
+      "date": "2026-02-18",
+      "weightKg": "55.0",
+      "createdAt": "2026-02-20 02:21:30"
+    },
+    {
+      "id": "30001",
+      "userId": "330001",
+      "date": "2026-02-17",
+      "weightKg": "53.0",
+      "createdAt": "2026-02-17 17:23:49"
+    },
+    {
+      "id": "1",
+      "userId": "6",
+      "date": "2026-02-15",
+      "weightKg": "55.0",
+      "createdAt": "2026-02-15 13:27:18"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tdate\tweightKg\tcreatedAt\n480001\t6\t2026-03-20\t45.0\t2026-03-20 16:57:02\n420007\t6\t2026-03-19\t56.0\t2026-03-20 11:14:01\n420005\t6\t2026-03-18\t56.0\t2026-03-20 11:12:18\n390003\t6\t2026-03-17\t57.0\t2026-03-18 16:08:30\n270001\t60001\t2026-03-10\t69.0\t2026-03-10 23:52:56\n420003\t6\t2026-03-09\t54.0\t2026-03-20 10:33:27\n420002\t6\t2026-03-05\t54.0\t2026-03-20 10:21:20\n420004\t6\t2026-03-05\t56.0\t2026-03-20 10:33:41\n450001\t6\t2026-03-02\t57.0\t2026-03-20 15:13:56\n150001\t1\t2026-02-21\t75.5\t2026-02-21 19:45:20\n90001\t1\t2026-02-18\t75.0\t2026-02-19 22:58:56\n120001\t330001\t2026-02-18\t55.0\t2026-02-20 02:21:30\n30001\t330001\t2026-02-17\t53.0\t2026-02-17 17:23:49\n1\t6\t2026-02-15\t55.0\t2026-02-15 13:27:18\n",
+  "stderr": "",
+  "execution_time_ms": 1574
+}

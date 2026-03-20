@@ -10,7 +10,15 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { calculateBMI, getBMIStatus, getBMIStatusText, getBMIStatusColor } from '@shared/calculations';
 
 export default function BodyMetrics() {
-  const today = new Date().toISOString().split('T')[0];
+  // Use local date, not UTC (fixes timezone mismatch with database)
+  const getLocalDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const today = getLocalDateString();
   const [selectedDate, setSelectedDate] = useState(today);
   const [days, setDays] = useState(30);
   const [selectedMetric, setSelectedMetric] = useState('weight');
@@ -79,7 +87,22 @@ export default function BodyMetrics() {
   // Get data for selected date
   const selectedDayMetric = useMemo(() => {
     if (!metrics) return null;
-    return metrics.find(m => m.date === selectedDate) || null;
+    
+    // Debug: Log all available dates and selected date
+    console.log('🔍 DEBUG: Date lookup');
+    console.log('selectedDate:', selectedDate, 'type:', typeof selectedDate);
+    console.log('Available record dates:', metrics.map(m => `"${m.date}" (type: ${typeof m.date})`));
+    
+    const found = metrics.find(m => {
+      const match = m.date === selectedDate;
+      if (!match) {
+        console.log(`  Comparing "${m.date}" === "${selectedDate}" => ${match}`);
+      }
+      return match;
+    });
+    
+    console.log('Found record:', found ? `Yes (weight: ${found.weightKg})` : 'No');
+    return found || null;
   }, [metrics, selectedDate]);
 
   // Calculate BMI using profile height + selected day weight
@@ -108,7 +131,13 @@ export default function BodyMetrics() {
     };
   };
 
-  const selectedIndex = metrics?.findIndex(m => m.date === selectedDate) ?? -1;
+  const selectedIndex = metrics?.findIndex(m => {
+    const match = m.date === selectedDate;
+    if (!match && metrics) {
+      console.log(`  Index search: "${m.date}" === "${selectedDate}" => ${match}`);
+    }
+    return match;
+  }) ?? -1;
   const previousMetric = selectedIndex > 0 && metrics ? metrics[selectedIndex + 1] : null;
   const weightTrend = getTrend(selectedWeight, previousMetric ? Number(previousMetric.weightKg) : null);
   const bodyFatTrend = getTrend(selectedDayMetric?.bodyFatPercent, previousMetric?.bodyFatPercent);
@@ -199,23 +228,31 @@ export default function BodyMetrics() {
 
   // Navigate to previous day
   const handlePrevDay = useCallback(() => {
-    const prevDate = new Date(selectedDate);
-    prevDate.setDate(prevDate.getDate() - 1);
-    setSelectedDate(prevDate.toISOString().split('T')[0]);
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const prevDate = new Date(year, month - 1, day - 1);
+    const y = prevDate.getFullYear();
+    const m = String(prevDate.getMonth() + 1).padStart(2, '0');
+    const d = String(prevDate.getDate()).padStart(2, '0');
+    setSelectedDate(`${y}-${m}-${d}`);
   }, [selectedDate]);
 
   // Navigate to next day
   const handleNextDay = useCallback(() => {
-    const nextDate = new Date(selectedDate);
-    nextDate.setDate(nextDate.getDate() + 1);
-    if (nextDate.toISOString().split('T')[0] <= today) {
-      setSelectedDate(nextDate.toISOString().split('T')[0]);
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const nextDate = new Date(year, month - 1, day + 1);
+    const y = nextDate.getFullYear();
+    const m = String(nextDate.getMonth() + 1).padStart(2, '0');
+    const d = String(nextDate.getDate()).padStart(2, '0');
+    const nextDateStr = `${y}-${m}-${d}`;
+    if (nextDateStr <= today) {
+      setSelectedDate(nextDateStr);
     }
   }, [selectedDate, today]);
 
-  // Format date for display
+  // Format date for display (use local date parsing to avoid timezone issues)
   const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr + 'T00:00:00');
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
     return d.toLocaleDateString('zh-HK', { month: 'numeric', day: 'numeric', year: 'numeric' });
   };
 
