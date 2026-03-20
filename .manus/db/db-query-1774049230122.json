@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO body_metrics (userId, date, weightKg) VALUES \n(1, '2026-03-16', '58.0'),\n(1, '2026-03-17', '57.0'),\n(1, '2026-03-18', '56.0');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute INSERT INTO body_metrics (userId, date, weightKg) VALUES \n(1, '2026-03-16', '58.0'),\n(1, '2026-03-17', '57.0'),\n(1, '2026-03-18', '56.0');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1679
+}
