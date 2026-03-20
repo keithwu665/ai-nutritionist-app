@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -25,12 +25,12 @@ export default function BodyMetrics() {
   const utils = trpc.useUtils();
 
   // Load personality from localStorage
-  useState(() => {
+  useEffect(() => {
     const savedPersonality = localStorage.getItem('aiPersonality') as 'gentle' | 'strict' | 'hongkong' | null;
     if (savedPersonality) {
       setPersonality(savedPersonality);
     }
-  });
+  }, []);
 
   const deleteMutation = trpc.bodyMetrics.delete.useMutation({
     onSuccess: () => {
@@ -43,11 +43,12 @@ export default function BodyMetrics() {
 
   const coachAdviceMutation = trpc.bodyMetrics.getCoachAdvice.useMutation({
     onSuccess: (data) => {
-      console.log('AI suggestion generated:', data);
+      console.log('✓ AI suggestion received from backend:', data);
+      console.log('Setting coachAdvice state to:', data);
       setCoachAdvice(data);
     },
     onError: (error) => {
-      console.error('Failed to generate advice:', error);
+      console.error('❌ Failed to generate advice:', error);
       setCoachAdvice({ type: 'error', advice: '無法生成建議，請稍後重試' });
     },
   });
@@ -102,18 +103,39 @@ export default function BodyMetrics() {
 
   // Generate AI Coach Advice
   const generateAdvice = () => {
-    console.log('generateAdvice called, selectedDayMetric:', !!selectedDayMetric, 'bmiData:', !!bmiData);
-    if (!selectedDayMetric || !bmiData) {
-      console.warn('Missing selectedDayMetric or bmiData');
+    console.log('=== generateAdvice called ===');
+    console.log('selectedDayMetric:', selectedDayMetric);
+    console.log('bmiData:', bmiData);
+    console.log('selectedWeight:', selectedWeight);
+    console.log('personality:', personality);
+    console.log('metrics available:', !!metrics, 'count:', metrics?.length);
+    
+    if (!selectedDayMetric) {
+      console.warn('❌ Missing selectedDayMetric - no data for selected date');
+      setCoachAdvice({ type: 'no_data', advice: '此日期暫無記錄，請選擇有記錄的日期' });
       return;
     }
     
-    console.log('Triggering coachAdviceMutation with:', {
+    if (!bmiData) {
+      console.warn('❌ Missing bmiData - cannot calculate BMI');
+      setCoachAdvice({ type: 'no_data', advice: '無法計算 BMI，請確保已設定身高' });
+      return;
+    }
+    console.log('\u2713 All required data available, triggering mutation...');
+    console.log('Payload:', {
       weight: selectedWeight,
       bmi: bmiData.value,
       personality,
       weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
     });
+    
+    // TEMPORARY TEST: Set hardcoded suggestion to verify end-to-end flow
+    console.log('\ud83e\udde8 TEMPORARY TEST: Setting hardcoded suggestion');
+    setCoachAdvice({
+      type: 'test',
+      advice: '\u6e2c\u8a66\u6210\u529f\uff1aAI \u5efa\u8b70\u529f\u80fd\u5df2\u89f8\u767c \u2713 \u6b64\u70ba\u81e8\u6642\u6e2c\u8a66\u5efa\u8b70\uff0c\u7528\u65bc\u9a57\u8b49\u6d41\u7a0b\u662f\u5426\u6b63\u5e38\u904b\u4f5c\u3002'
+    });
+    return;
     
     coachAdviceMutation.mutate({
       weight: selectedWeight || 0,
@@ -321,7 +343,11 @@ export default function BodyMetrics() {
           <Button
             variant={activeTab === 'advice' ? 'default' : 'outline'}
             className={`flex-1 rounded-full ${activeTab === 'advice' ? 'bg-primary hover:bg-primary/90' : ''}`}
-            onClick={() => { setActiveTab('advice'); generateAdvice(); }}
+            onClick={() => {
+              console.log('🔘 AI 建議 tab button clicked');
+              setActiveTab('advice');
+              generateAdvice();
+            }}
           >
             AI 建議
           </Button>
@@ -373,9 +399,12 @@ export default function BodyMetrics() {
                       </Button>
                     </Link>
                   )}
-                  {coachAdvice?.type !== 'no_goal' && (
+                  {(!coachAdvice || coachAdvice?.type !== 'no_goal') && (
                     <Button
-                      onClick={generateAdvice}
+                      onClick={() => {
+                        console.log('🔘 重新生成建議 button clicked');
+                        generateAdvice();
+                      }}
                       disabled={coachAdviceMutation.isPending}
                       className="mt-4 w-full"
                     >
