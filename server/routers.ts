@@ -9,6 +9,7 @@ import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
 import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
+import { dataExportRouter } from "./routers/dataExport";
 
 export const appRouter = router({
   system: systemRouter,
@@ -136,6 +137,11 @@ export const appRouter = router({
   // Body Metrics Import (Photo)
   // ========================================================================
   bodyMetricsPhotoImport: bodyMetricsPhotoImportRouter,
+
+  // ========================================================================
+  // Data Export
+  // ========================================================================
+  dataExport: dataExportRouter,
 
   // ========================================================================
   // Food Logs

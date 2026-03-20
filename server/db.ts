@@ -1,4 +1,4 @@
-import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
+import { eq, and, desc, gte, lte, asc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
@@ -223,6 +223,19 @@ export async function getLatestBodyMetric(userId: number) {
     .orderBy(desc(bodyMetrics.date))
     .limit(1);
   return result.length > 0 ? result[0] : null;
+}
+
+export async function getBodyMetricsForDateRange(userId: number, startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select().from(bodyMetrics)
+    .where(and(
+      eq(bodyMetrics.userId, userId),
+      gte(bodyMetrics.date, startDate),
+      lte(bodyMetrics.date, endDate)
+    ))
+    .orderBy(asc(bodyMetrics.date));
+  return result;
 }
 
 export async function createBodyMetric(data: InsertBodyMetric) {

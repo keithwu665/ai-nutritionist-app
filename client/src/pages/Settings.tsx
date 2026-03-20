@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { PersonalitySelector } from '@/components/PersonalitySelector';
 import { AggressiveCalorieModal } from '@/components/AggressiveCalorieModal';
+import { DataExport } from '@/components/DataExport';
 import { Loader2, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
@@ -578,6 +579,13 @@ export default function Settings() {
           <a href="#" className="text-sm text-gray-600 hover:text-gray-900">使用條款</a>
           <a href="#" className="text-sm text-gray-600 hover:text-gray-900">聯絡我們</a>
         </div>
+      </div>
+
+      {/* ================================================================== */}
+      {/* DATA EXPORT SECTION */}
+      {/* ================================================================== */}
+      <div className="mt-8">
+        <DataExport />
       </div>
 
       <Button onClick={logout} variant="outline" className="w-full mt-8">
