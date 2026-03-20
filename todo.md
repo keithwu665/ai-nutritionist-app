@@ -361,3 +361,13 @@
 - [x] Ensure back button appears only on sub-pages, not root pages
 - [x] Test navigation flow and verify hierarchy
 - [x] Verify tabs remain for main sections (身體, 飲食, 運動, 儀錶板, 設定)
+
+
+## AI Coach Personality Selection - Horizontal Layout Redesign
+- [x] Examine current vertical personality selection UI
+- [x] Design horizontal card layout with 3 cards in a row
+- [x] Create card component with icon, title, description
+- [x] Implement selected/unselected visual states (green/white)
+- [x] Add check icon to selected cards
+- [x] Test responsive layout and scrolling behavior
+- [x] Verify selection functionality remains unchanged
