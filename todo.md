@@ -344,3 +344,11 @@
 - [x] Add AI Coach Advice section based on goal and progress
 - [x] Add "查看歷史記錄" button to view full history
 - [x] Test daily navigation and data filtering
+
+
+## Body Data UI Simplification - Remove Duplicates
+- [x] Expand blue card to include all metrics (weight, BMI, body fat %, muscle mass)
+- [x] Add trend indicators to all metrics in blue card
+- [x] Remove 4 white metric cards (體重, 體脂率, 肌肉量, BMI)
+- [x] Verify all data is visible and accessible in blue card only
+- [x] Test simplified layout

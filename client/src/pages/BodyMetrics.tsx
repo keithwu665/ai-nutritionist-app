@@ -240,32 +240,39 @@ export default function BodyMetrics() {
               </div>
             </div>
 
-            {/* Metric Boxes - 3 columns */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
-                <p className="text-xs opacity-75 mb-2">脂肪重量</p>
-                <p className="text-lg font-bold">
-                  {selectedDayMetric?.bodyFatPercent 
-                    ? (selectedWeight * Number(selectedDayMetric.bodyFatPercent) / 100).toFixed(1)
-                    : '—'}
-                </p>
-                <p className="text-xs opacity-75">kg</p>
+            {/* Body Fat % and Muscle Mass - 2 columns */}
+            <div className="grid grid-cols-2 gap-6 mt-6 pt-6 border-t border-slate-700">
+              <div>
+                <p className="text-sm font-medium opacity-90 mb-1">體脂率</p>
+                <p className="text-3xl font-bold mb-2">{selectedDayMetric?.bodyFatPercent ?? '—'}</p>
+                <p className="text-xs opacity-75">%</p>
+                {bodyFatTrend && (
+                  <p className={`text-xs font-medium mt-2 ${bodyFatTrend.direction === 'down' ? 'text-green-400' : 'text-red-400'}`}>
+                    {bodyFatTrend.direction === 'down' ? '↓' : '↑'} {bodyFatTrend.value.toFixed(1)}%
+                  </p>
+                )}
               </div>
-              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
-                <p className="text-xs opacity-75 mb-2">瘦體重</p>
-                <p className="text-lg font-bold">
-                  {selectedDayMetric?.bodyFatPercent 
-                    ? (selectedWeight * (100 - Number(selectedDayMetric.bodyFatPercent)) / 100).toFixed(1)
-                    : '—'}
-                </p>
+              
+              <div className="text-right">
+                <p className="text-sm font-medium opacity-90 mb-1">肌肉量</p>
+                <p className="text-3xl font-bold mb-2">{selectedDayMetric?.muscleMassKg ?? '—'}</p>
                 <p className="text-xs opacity-75">kg</p>
-              </div>
-              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
-                <p className="text-xs opacity-75 mb-2">肌肉量</p>
-                <p className="text-lg font-bold">{selectedDayMetric?.muscleMassKg ?? '—'}</p>
-                <p className="text-xs opacity-75">kg</p>
+                {muscleMassTrend && (
+                  <p className={`text-xs font-medium mt-2 ${muscleMassTrend.direction === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+                    {muscleMassTrend.direction === 'up' ? '↑' : '↓'} {muscleMassTrend.value.toFixed(1)} kg
+                  </p>
+                )}
               </div>
             </div>
+
+            {/* Weight Trend */}
+            {weightTrend && (
+              <div className="mt-6 pt-6 border-t border-slate-700">
+                <p className={`text-sm font-medium ${weightTrend.direction === 'down' ? 'text-green-400' : 'text-red-400'}`}>
+                  {weightTrend.direction === 'down' ? '↓' : '↑'} {weightTrend.value.toFixed(1)} kg
+                </p>
+              </div>
+            )}
           </div>
         ) : null}
 
@@ -317,59 +324,6 @@ export default function BodyMetrics() {
           <div className="space-y-4">
             {!isLoading && selectedDayMetric ? (
               <div className="space-y-3">
-                {/* Metric Cards Grid - 2x2 */}
-                <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  <Card className="rounded-2xl">
-                    <CardContent className="pt-4 pb-4">
-                      <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
-                      <p className="text-2xl font-bold">{selectedDayMetric.weightKg}</p>
-                      <p className="text-xs text-muted-foreground mt-1">kg</p>
-                      {weightTrend && (
-                        <p className={`text-xs font-medium mt-2 ${weightTrend.direction === 'down' ? 'text-green-600' : 'text-red-600'}`}>
-                          {weightTrend.direction === 'down' ? '↓' : '↑'} {weightTrend.value.toFixed(1)} kg
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card className="rounded-2xl">
-                    <CardContent className="pt-4 pb-4">
-                      <p className="text-xs text-muted-foreground font-medium mb-2">體脂率</p>
-                      <p className="text-2xl font-bold text-red-500">{selectedDayMetric.bodyFatPercent ?? '—'}</p>
-                      <p className="text-xs text-muted-foreground mt-1">%</p>
-                      {bodyFatTrend && (
-                        <p className={`text-xs font-medium mt-2 ${bodyFatTrend.direction === 'down' ? 'text-green-600' : 'text-red-600'}`}>
-                          {bodyFatTrend.direction === 'down' ? '↓' : '↑'} {bodyFatTrend.value.toFixed(1)}%
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  <Card className="rounded-2xl">
-                    <CardContent className="pt-4 pb-4">
-                      <p className="text-xs text-muted-foreground font-medium mb-2">肌肉量</p>
-                      <p className="text-2xl font-bold">{selectedDayMetric.muscleMassKg ?? '—'}</p>
-                      <p className="text-xs text-muted-foreground mt-1">kg</p>
-                      {muscleMassTrend && (
-                        <p className={`text-xs font-medium mt-2 ${muscleMassTrend.direction === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                          {muscleMassTrend.direction === 'up' ? '↑' : '↓'} {muscleMassTrend.value.toFixed(1)} kg
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-
-                  {bmiData && (
-                    <Card className="rounded-2xl">
-                      <CardContent className="pt-4 pb-4">
-                        <p className="text-xs text-muted-foreground font-medium mb-2">BMI</p>
-                        <p className="text-2xl font-bold text-emerald-600">{bmiData.value.toFixed(1)}</p>
-                        <p className="text-xs text-muted-foreground mt-1">kg/m²</p>
-                        <p className="text-xs text-emerald-600 font-medium mt-2">{bmiData.statusText}</p>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-
                 {/* Delete Button */}
                 <Button
                   variant="outline"
