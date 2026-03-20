@@ -328,3 +328,10 @@
 - [x] Restore lower metric cards grid (2x2 layout)
 - [x] Add trend indicators to all metric cards
 - [x] Test UI clarity and readability
+
+
+## Body Data UI Restore - Match Reference Image
+- [x] Restore blue card with weight/BMI at top and 3 metric boxes below
+- [x] Restore 2x2 white metric cards grid (體重, 體脂率, 肌肉量, BMI)
+- [x] Add trend indicators to white cards only (small and subtle)
+- [x] Verify layout matches reference image exactly

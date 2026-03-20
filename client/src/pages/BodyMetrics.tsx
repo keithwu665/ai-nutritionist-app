@@ -124,7 +124,7 @@ export default function BodyMetrics() {
 
       <div className="p-4 md:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
         
-        {/* Hero Card - Dark Navy Background - SIMPLIFIED */}
+        {/* Hero Card - Dark Navy Background - REFERENCE IMAGE LAYOUT */}
         {profileLoading || isLoading ? (
           <Card className="rounded-3xl">
             <CardContent className="py-8 flex justify-center">
@@ -161,30 +161,53 @@ export default function BodyMetrics() {
           </Card>
         ) : bmiData ? (
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 md:p-8 text-white shadow-lg">
-            <div className="grid grid-cols-2 gap-6">
+            {/* Top Section: Weight & BMI */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
               {/* Left: Weight */}
               <div>
                 <p className="text-sm font-medium opacity-90 mb-1">今日體重</p>
                 <p className="text-4xl md:text-5xl font-bold mb-2">{latestWeight}</p>
-                <p className="text-xs opacity-75 mb-3">kg</p>
-                {weightTrend && (
-                  <p className={`text-sm font-medium ${weightTrend.direction === 'down' ? 'text-green-400' : 'text-red-400'}`}>
-                    {weightTrend.direction === 'down' ? '↓' : '↑'} {weightTrend.value.toFixed(1)} kg
-                  </p>
-                )}
+                <p className="text-xs opacity-75">kg</p>
               </div>
               
               {/* Right: BMI */}
               <div className="text-right">
                 <p className="text-sm font-medium opacity-90 mb-1">BMI</p>
                 <p className="text-4xl md:text-5xl font-bold">{bmiData.value.toFixed(1)}</p>
-                <p className="text-xs opacity-75 mt-3">{bmiData.statusText}</p>
+                <p className="text-xs opacity-75 mt-2">{bmiData.statusText}</p>
+              </div>
+            </div>
+
+            {/* Metric Boxes - 3 columns */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
+                <p className="text-xs opacity-75 mb-2">脂肪重量</p>
+                <p className="text-lg font-bold">
+                  {latestMetric?.bodyFatPercent 
+                    ? (latestWeight * Number(latestMetric.bodyFatPercent) / 100).toFixed(1)
+                    : '—'}
+                </p>
+                <p className="text-xs opacity-75">kg</p>
+              </div>
+              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
+                <p className="text-xs opacity-75 mb-2">瘦體重</p>
+                <p className="text-lg font-bold">
+                  {latestMetric?.bodyFatPercent 
+                    ? (latestWeight * (100 - Number(latestMetric.bodyFatPercent)) / 100).toFixed(1)
+                    : '—'}
+                </p>
+                <p className="text-xs opacity-75">kg</p>
+              </div>
+              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
+                <p className="text-xs opacity-75 mb-2">肌肉量</p>
+                <p className="text-lg font-bold">{latestMetric?.muscleMassKg ?? '—'}</p>
+                <p className="text-xs opacity-75">kg</p>
               </div>
             </div>
           </div>
         ) : null}
 
-        {/* Metric Cards Grid - 2x2 */}
+        {/* Metric Cards Grid - 2x2 with trends */}
         {!isLoading && latestMetric && (
           <div className="grid grid-cols-2 gap-3 md:gap-4">
             <Card className="rounded-2xl">
