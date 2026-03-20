@@ -262,3 +262,9 @@
 - [x] Ensure safe mode produces higher calorie targets than aggressive mode
 - [x] Test with various TDEE values to verify different results
 - [x] Update UI to display mode-specific targets correctly
+
+
+## Dashboard Simplification
+- [x] Remove redundant "我的目標" card from dashboard (not needed - GoalSummaryCard already serves this purpose)
+- [x] Add weekly weight loss helper line under "目標進度"
+- [x] Verify dashboard is cleaner and displays correct information

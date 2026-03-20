@@ -259,6 +259,11 @@ export default function Dashboard() {
                       <p className="font-bold text-primary">{goalDaysNum}</p>
                     </div>
                   </div>
+                  {goalDaysNum > 0 && goalKgNum > 0 && (
+                    <div className="mt-3 pt-3 border-t border-muted">
+                      <p className="text-xs text-muted-foreground">👉 每週約減 {((goalKgNum * 7) / goalDaysNum).toFixed(1)}–{((goalKgNum * 7) / goalDaysNum + 0.1).toFixed(1)} kg</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
