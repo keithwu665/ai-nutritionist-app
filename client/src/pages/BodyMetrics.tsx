@@ -1,60 +1,20 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Loader2, AlertCircle, Scale, Upload, ChevronRight, ChevronLeft, Lightbulb } from 'lucide-react';
+import { Plus, Trash2, Loader2, AlertCircle, Scale, Upload, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { calculateBMI, getBMIStatus, getBMIStatusText, getBMIStatusColor } from '@shared/calculations';
 
 export default function BodyMetrics() {
-  // Use local date, not UTC (fixes timezone mismatch with database)
-  const getLocalDateString = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-  const today = getLocalDateString();
-  const [selectedDate, setSelectedDate] = useState(today);
   const [days, setDays] = useState(30);
   const [selectedMetric, setSelectedMetric] = useState('weight');
-  const [activeTab, setActiveTab] = useState<'records' | 'advice'>('records');
-  const [coachAdvice, setCoachAdvice] = useState<any>(null);
-  const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
-  const [personality, setPersonality] = useState<'gentle' | 'strict' | 'hongkong'>('gentle');
-  const [showHistory, setShowHistory] = useState(false);
-  const [adviceError, setAdviceError] = useState<string | null>(null);
-  const [isPendingRef, setIsPendingRef] = useState(false);
-
   const { data: metrics, isLoading } = trpc.bodyMetrics.list.useQuery({ days });
   const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
   const utils = trpc.useUtils();
-
-  // Load personality from localStorage (Settings saves it as 'aiPersonality')
-  // Also listen to personalityChanged event when user updates it in Settings
-  useEffect(() => {
-    const loadPersonality = () => {
-      const savedPersonality = localStorage.getItem('aiPersonality');
-      if (savedPersonality) {
-        const newPersonality = savedPersonality as 'gentle' | 'strict' | 'hongkong';
-        console.log('🎭 Loaded coach personality from Settings:', newPersonality);
-        setPersonality(newPersonality);
-      }
-    };
-    
-    // Load on mount
-    loadPersonality();
-    
-    // Listen for personality changes from Settings page
-    window.addEventListener('personalityChanged', loadPersonality);
-    return () => window.removeEventListener('personalityChanged', loadPersonality);
-  }, []); // Only run on mount
-
-
 
   const deleteMutation = trpc.bodyMetrics.delete.useMutation({
     onSuccess: () => {
@@ -65,61 +25,25 @@ export default function BodyMetrics() {
     onError: () => toast.error('刪除失敗'),
   });
 
-  const coachAdviceMutation = trpc.bodyMetrics.getCoachAdvice.useMutation({
-    onSuccess: (data) => {
-      console.log('✓ AI suggestion received from backend:', data);
-      console.log('Status:', data.status);
-      console.log('Progress:', data.actualProgress, '/', data.expectedProgress, '(', data.progressRatio, '%)');
-      console.log('Setting coachAdvice state to:', data);
-      setCoachAdvice(data);
-      setAdviceError(null);
-      setIsPendingRef(false);
-      setIsLoadingAdvice(false);
-    },
-    onError: (error) => {
-      console.error('❌ Failed to generate advice:', error);
-      setAdviceError(error instanceof Error ? error.message : '未知錯誤');
-      setIsPendingRef(false);
-      setIsLoadingAdvice(false);
-    },
-    onSettled: () => {
-      // Clear timeout on completion
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    },
-  });
+  const chartData = useMemo(() => {
+    if (!metrics) return [];
+    return [...metrics].reverse().map((m) => ({
+      date: m.date.slice(5), // MM-DD
+      weight: Number(m.weightKg),
+      bodyFat: m.bodyFatPercent ? Number(m.bodyFatPercent) : undefined,
+      muscleMass: m.muscleMassKg ? Number(m.muscleMassKg) : undefined,
+      // waist: m.waistCm ? Number(m.waistCm) : undefined,
+    }));
+  }, [metrics]);
 
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const selectedDayMetric = useMemo(() => {
-    if (!metrics) return null;
-    
-    // Debug: Log all available dates and selected date
-    console.log('🔍 DEBUG: Date lookup');
-    console.log('selectedDate:', selectedDate, 'type:', typeof selectedDate);
-    console.log('Available record dates:', metrics.map(m => `"${m.date}" (type: ${typeof m.date})`));
-    
-    const found = metrics.find(m => {
-      const match = m.date === selectedDate;
-      if (!match) {
-        console.log(`  Comparing "${m.date}" === "${selectedDate}" => ${match}`);
-      }
-      return match;
-    });
-    
-    console.log('Found record:', found ? `Yes (weight: ${found.weightKg})` : 'No');
-    return found || null;
-  }, [metrics, selectedDate]);
-
-  // Calculate BMI using profile height + selected day weight
+  // Calculate BMI using profile height + latest body metric weight
+  const latestMetric = metrics?.[0];
   const heightCm = profile ? Number(profile.heightCm) : null;
-  const selectedWeight = selectedDayMetric ? Number(selectedDayMetric.weightKg) : null;
+  const latestWeight = latestMetric ? Number(latestMetric.weightKg) : null;
 
   const bmiData = useMemo(() => {
-    if (!heightCm || !selectedWeight || heightCm <= 0) return null;
-    const bmi = calculateBMI(selectedWeight, heightCm);
+    if (!heightCm || !latestWeight || heightCm <= 0) return null;
+    const bmi = calculateBMI(latestWeight, heightCm);
     const status = getBMIStatus(bmi);
     return {
       value: bmi,
@@ -127,415 +51,302 @@ export default function BodyMetrics() {
       statusText: getBMIStatusText(status),
       colorClass: getBMIStatusColor(status),
     };
-  }, [heightCm, selectedWeight]);
+  }, [heightCm, latestWeight]);
 
-  // Calculate trend (compare selected day with previous day chronologically)
-  // Note: metrics array is in reverse chronological order, so we need to compare correctly
-  const getTrend = (currentValue: number | null | undefined, previousValue: number | null | undefined): { value: number; direction: 'up' | 'down' } | null => {
-    if (!currentValue || !previousValue) return null;
-    // previousValue is actually the OLDER value (previous day)
-    // So: diff = newer - older
-    // If diff > 0: weight went UP (gained weight)
-    // If diff < 0: weight went DOWN (lost weight)
-    const diff = Number(currentValue) - Number(previousValue);
-    console.log(`📊 Trend calculation: current=${currentValue}, previous=${previousValue}, diff=${diff}, direction=${diff > 0 ? 'up' : 'down'}`);
-    return {
-      value: Math.abs(diff),
-      direction: diff > 0 ? 'up' : 'down',
-    };
+  const getMetricDataKey = () => {
+    switch (selectedMetric) {
+      case 'bodyFat': return 'bodyFat';
+      case 'muscleMass': return 'muscleMass';
+      case 'waist': return 'waist';
+      default: return 'weight';
+    }
   };
-
-  const selectedIndex = metrics?.findIndex(m => {
-    const match = m.date === selectedDate;
-    if (!match && metrics) {
-      console.log(`  Index search: "${m.date}" === "${selectedDate}" => ${match}`);
-    }
-    return match;
-  }) ?? -1;
-  
-  // Find the actual previous recorded date (not just next array item)
-  // Metrics are in DESC order (newest first), so look for the first metric after selectedIndex
-  const previousMetric = (() => {
-    if (selectedIndex < 0 || !metrics) return null;
-    // The next item in DESC-sorted array is chronologically earlier
-    if (selectedIndex + 1 < metrics.length) {
-      const prev = metrics[selectedIndex + 1];
-      console.log(`📅 Found previous metric: date=${prev.date}, weight=${prev.weightKg}`);
-      return prev;
-    }
-    return null;
-  })();
-  
-  console.log(`📅 Selected index: ${selectedIndex}, has previous: ${!!previousMetric}`);
-  if (previousMetric) {
-    console.log(`   Current date: ${selectedDate}, Previous date: ${previousMetric.date}`);
-    console.log(`   Weight comparison: current=${selectedWeight} vs previous=${previousMetric.weightKg}`);
-  }
-  
-  const weightTrend = getTrend(selectedWeight, previousMetric ? Number(previousMetric.weightKg) : null);
-  const bodyFatTrend = getTrend(selectedDayMetric?.bodyFatPercent, previousMetric?.bodyFatPercent);
-  const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg, previousMetric?.muscleMassKg);
-
-  // Generate AI Coach Advice with timeout protection
-  const generateAdvice = useCallback(() => {
-    // Prevent re-triggering while a request is pending
-    if (isPendingRef) {
-      console.log('⏳ Request already pending, skipping...');
-      return;
-    }
-
-    console.log('=== generateAdvice called ===');
-    console.log('selectedDate:', selectedDate);
-    console.log('selectedDayMetric:', selectedDayMetric);
-    console.log('bmiData:', bmiData);
-    console.log('selectedWeight:', selectedWeight);
-    console.log('personality:', personality);
-    console.log('metrics available:', !!metrics, 'count:', metrics?.length);
-    console.log('weightTrend:', weightTrend?.direction);
-    
-    if (!selectedDayMetric) {
-      console.warn('❌ Missing selectedDayMetric - no data for selected date');
-      setCoachAdvice({ type: 'no_data', advice: '此日期暫無記錄，請選擇有記錄的日期' });
-      setAdviceError(null);
-      setIsLoadingAdvice(false);
-      return;
-    }
-    
-    if (!bmiData) {
-      console.warn('❌ Missing bmiData - cannot calculate BMI');
-      setCoachAdvice({ type: 'no_data', advice: '無法計算 BMI，請確保已設定身高' });
-      setAdviceError(null);
-      setIsLoadingAdvice(false);
-      return;
-    }
-    
-    console.log('✓ All required data available, triggering mutation...');
-    console.log('Payload:', {
-      weight: selectedWeight,
-      bmi: bmiData.value,
-      personality,
-      weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
-      selectedDate,
-    });
-    
-    // Set loading state and pending flag
-    setIsLoadingAdvice(true);
-    setIsPendingRef(true);
-    setAdviceError(null);
-    
-    // Set timeout (8 seconds)
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      console.log('⏱️ AI suggestion request timeout (8s)');
-      setAdviceError('AI 建議暫時未能載入，請再試一次');
-      setIsLoadingAdvice(false);
-      setIsPendingRef(false);
-      timeoutRef.current = null;
-    }, 8000);
-
-    coachAdviceMutation.mutate({
-      weight: selectedWeight,
-      bmi: bmiData.value,
-      bodyFatPercent: selectedDayMetric.bodyFatPercent ? Number(selectedDayMetric.bodyFatPercent) : null,
-      muscleMassKg: selectedDayMetric.muscleMassKg ? Number(selectedDayMetric.muscleMassKg) : null,
-      personality,
-      weightTrend: weightTrend?.direction === 'down' ? 'decreasing' : 'increasing',
-      selectedDate,
-    });
-  }, [selectedDate, selectedDayMetric, bmiData, selectedWeight, personality, weightTrend, metrics]);
-
-  // Trigger advice generation when tab is clicked or date changes
-  useEffect(() => {
-    if (activeTab === 'advice') {
-      generateAdvice();
-    }
-  }, [selectedDate, activeTab]);
-
-  const handlePrevDay = useCallback(() => {
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() - 1);
-    const year = current.getFullYear();
-    const month = String(current.getMonth() + 1).padStart(2, '0');
-    const day = String(current.getDate()).padStart(2, '0');
-    setSelectedDate(`${year}-${month}-${day}`);
-  }, [selectedDate]);
-
-  const handleNextDay = useCallback(() => {
-    const current = new Date(selectedDate);
-    current.setDate(current.getDate() + 1);
-    const year = current.getFullYear();
-    const month = String(current.getMonth() + 1).padStart(2, '0');
-    const day = String(current.getDate()).padStart(2, '0');
-    setSelectedDate(`${year}-${month}-${day}`);
-  }, [selectedDate]);
-
-  const handleAddMetric = () => {
-    // Navigate to add metric page or open modal
-  };
-
-  const handleDeleteMetric = (id: string) => {
-    deleteMutation.mutate({ id });
-  };
-
-  const chartData = useMemo(() => {
-    if (!metrics) return [];
-    return metrics
-      .slice()
-      .reverse()
-      .map(m => ({
-        date: m.date,
-        weight: m.weightKg ? Number(m.weightKg) : null,
-        bodyFat: m.bodyFatPercent ? Number(m.bodyFatPercent) : null,
-        muscleMass: m.muscleMassKg ? Number(m.muscleMassKg) : null,
-      }));
-  }, [metrics]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">身體數據</h1>
-        <div className="flex gap-2">
+    <div className="pb-32 md:pb-8">
+      {/* Header */}
+      <div className="sticky top-0 bg-background z-10 p-4 md:p-8 border-b border-border">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <h1 className="text-2xl md:text-3xl font-bold">身體數據</h1>
           <Link href="/body/add">
-            <Button size="sm" variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              新增量度
+            <Button className="bg-primary hover:bg-primary/90 rounded-full px-6">
+              <Plus className="h-4 w-4 mr-2" /> 新增量度
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Date Navigation */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" size="sm" onClick={handlePrevDay}>
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <div className="text-center">
-              <div className="text-2xl font-bold">{selectedDate}</div>
-              {selectedDate === today && <div className="text-sm text-muted-foreground">今日</div>}
-            </div>
-            <Button variant="ghost" size="sm" onClick={handleNextDay}>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'records' | 'advice')}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="records">量度記錄</TabsTrigger>
-          <TabsTrigger value="advice">AI 建議</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="records" className="space-y-4">
-          {!selectedDayMetric ? (
-            <Card>
-              <CardContent className="pt-6 text-center text-muted-foreground">
-                此日期暫無記錄
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium">體重</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{selectedDayMetric.weightKg} kg</div>
-                  {bmiData && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      BMI: {bmiData.value.toFixed(1)} ({bmiData.statusText})
-                    </div>
-                  )}
-                  {weightTrend && (
-                    <div className="text-xs mt-2">
-                      {weightTrend.direction === 'down' ? '↓' : '↑'} {weightTrend.value.toFixed(1)} kg
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {selectedDayMetric.bodyFatPercent && (
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">體脂%</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{selectedDayMetric.bodyFatPercent}%</div>
-                    {bodyFatTrend && (
-                      <div className="text-xs mt-2">
-                        {bodyFatTrend.direction === 'down' ? '↓' : '↑'} {bodyFatTrend.value.toFixed(1)}%
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-
-              {selectedDayMetric.muscleMassKg && (
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">肌肉量</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{selectedDayMetric.muscleMassKg} kg</div>
-                    {muscleMassTrend && (
-                      <div className="text-xs mt-2">
-                        {muscleMassTrend.direction === 'down' ? '↓' : '↑'} {muscleMassTrend.value.toFixed(1)} kg
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          )}
-
-          {/* Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>趨勢圖表</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2 mb-4">
-                <Button
-                  variant={selectedMetric === 'weight' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedMetric('weight')}
-                >
-                  體重
-                </Button>
-                <Button
-                  variant={selectedMetric === 'bodyFat' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedMetric('bodyFat')}
-                >
-                  體脂%
-                </Button>
-                <Button
-                  variant={selectedMetric === 'muscleMass' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedMetric('muscleMass')}
-                >
-                  肌肉量
-                </Button>
-              </div>
-
-              <div className="flex gap-2 mb-4">
-                <Button
-                  variant={days === 7 ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setDays(7)}
-                >
-                  7天
-                </Button>
-                <Button
-                  variant={days === 30 ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setDays(30)}
-                >
-                  30天
-                </Button>
-                <Button
-                  variant={days === 365 ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setDays(365)}
-                >
-                  全部
-                </Button>
-              </div>
-
-              {chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    {selectedMetric === 'weight' && <Line type="monotone" dataKey="weight" stroke="#8884d8" />}
-                    {selectedMetric === 'bodyFat' && <Line type="monotone" dataKey="bodyFat" stroke="#82ca9d" />}
-                    {selectedMetric === 'muscleMass' && <Line type="monotone" dataKey="muscleMass" stroke="#ffc658" />}
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                  暫無數據
-                </div>
-              )}
+      <div className="p-4 md:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
+        
+        {/* Hero Card - Dark Navy Background */}
+        {profileLoading || isLoading ? (
+          <Card className="rounded-3xl">
+            <CardContent className="py-8 flex justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </CardContent>
           </Card>
-        </TabsContent>
+        ) : !heightCm || heightCm <= 0 ? (
+          <Card className="border-orange-200 bg-orange-50 rounded-3xl">
+            <CardContent className="py-6">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-orange-500 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-orange-700">未設定身高</p>
+                  <p className="text-xs text-orange-600 mt-0.5">
+                    請到<Link href="/settings" className="underline font-semibold">設定頁面</Link>填寫身高，以計算 BMI。
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : !latestWeight ? (
+          <Card className="border-amber-200 bg-amber-50 rounded-3xl">
+            <CardContent className="py-6">
+              <div className="flex items-center gap-3">
+                <Scale className="h-5 w-5 text-amber-500 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-amber-700">暫無體重記錄</p>
+                  <p className="text-xs text-amber-600 mt-0.5">
+                    請<Link href="/body/add" className="underline font-semibold">新增身體數據</Link>以計算 BMI。
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : bmiData ? (
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 md:p-8 text-white shadow-lg">
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              {/* Left: Weight */}
+              <div>
+                <p className="text-sm font-medium opacity-90 mb-1">今日體重</p>
+                <p className="text-4xl md:text-5xl font-bold mb-2">{latestWeight}</p>
+                <p className="text-xs opacity-75">kg</p>
+              </div>
+              {/* Right: BMI */}
+              <div className="text-right">
+                <p className="text-sm font-medium opacity-90 mb-1">BMI</p>
+                <p className="text-4xl md:text-5xl font-bold">{bmiData.value.toFixed(1)}</p>
+                <p className="text-xs opacity-75 mt-2">{bmiData.statusText}</p>
+              </div>
+            </div>
 
-        <TabsContent value="advice" className="space-y-4">
-          {isLoadingAdvice ? (
-            <Card>
-              <CardContent className="pt-6 flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>正在生成建議...</span>
+            {/* Metric Boxes */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
+                <p className="text-xs opacity-75 mb-2">脂肪重量</p>
+                <p className="text-lg font-bold">
+                  {latestMetric?.bodyFatPercent 
+                    ? (latestWeight * Number(latestMetric.bodyFatPercent) / 100).toFixed(1)
+                    : '—'}
+                </p>
+                <p className="text-xs opacity-75">kg</p>
+              </div>
+              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
+                <p className="text-xs opacity-75 mb-2">瘦體重</p>
+                <p className="text-lg font-bold">
+                  {latestMetric?.bodyFatPercent 
+                    ? (latestWeight * (100 - Number(latestMetric.bodyFatPercent)) / 100).toFixed(1)
+                    : '—'}
+                </p>
+                <p className="text-xs opacity-75">kg</p>
+              </div>
+              <div className="bg-slate-700/50 rounded-2xl p-4 text-center">
+                <p className="text-xs opacity-75 mb-2">肌肉量</p>
+                <p className="text-lg font-bold">{latestMetric?.muscleMassKg ?? '—'}</p>
+                <p className="text-xs opacity-75">kg</p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Metric Cards Grid - 2x2 */}
+        {!isLoading && latestMetric && (
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
+                <p className="text-2xl font-bold">{latestMetric.weightKg}</p>
+                <p className="text-xs text-muted-foreground mt-1">kg</p>
+                <p className="text-xs text-green-600 mt-2">↓ -0.2 kg</p>
               </CardContent>
             </Card>
-          ) : adviceError ? (
-            <Card className="border-red-200 bg-red-50">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium text-red-900">{adviceError}</div>
+
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2">體脂率</p>
+                <p className="text-2xl font-bold text-red-500">{latestMetric.bodyFatPercent ?? '—'}</p>
+                <p className="text-xs text-muted-foreground mt-1">%</p>
+                <p className="text-xs text-green-600 mt-2">↓ -0.2%</p>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2">肌肉量</p>
+                <p className="text-2xl font-bold">{latestMetric.muscleMassKg ?? '—'}</p>
+                <p className="text-xs text-muted-foreground mt-1">kg</p>
+                <p className="text-xs text-green-600 mt-2">↑ +0.1 kg</p>
+              </CardContent>
+            </Card>
+
+            {bmiData && (
+              <Card className="rounded-2xl">
+                <CardContent className="pt-4 pb-4">
+                  <p className="text-xs text-muted-foreground font-medium mb-2">BMI</p>
+                  <p className="text-2xl font-bold text-emerald-600">{bmiData.value.toFixed(1)}</p>
+                  <p className="text-xs text-muted-foreground mt-1">kg/m²</p>
+                  <p className="text-xs text-green-600 mt-2">正常</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* Trend Chart Card */}
+        <Card className="rounded-2xl">
+          <CardContent className="pt-6 pb-6">
+            <h3 className="font-semibold mb-4">趨勢圖表</h3>
+            
+            {/* Metric Tabs */}
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+              {[
+                { value: 'weight', label: '體重' },
+                { value: 'bodyFat', label: '體脂%' },
+                { value: 'muscleMass', label: '肌肉量' },
+                // { value: 'waist', label: '腰圍' },
+              ].map(tab => (
+                <button
+                  key={tab.value}
+                  onClick={() => setSelectedMetric(tab.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                    selectedMetric === tab.value
+                      ? 'bg-primary text-white'
+                      : 'bg-primary/10 text-primary hover:bg-primary/20'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Time Range Tabs */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+              {[
+                { value: 7, label: '7天' },
+                { value: 30, label: '30天' },
+                { value: 90, label: '90天' },
+                { value: 999, label: '全部' },
+              ].map(tab => (
+                <button
+                  key={tab.value}
+                  onClick={() => setDays(tab.value)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                    days === tab.value
+                      ? 'bg-primary/20 text-primary'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Chart */}
+            {isLoading ? (
+              <div className="h-64 flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Line 
+                    type="monotone" 
+                    dataKey={getMetricDataKey()} 
+                    stroke="#10b981" 
+                    strokeWidth={2} 
+                    dot={{ fill: '#10b981', r: 3 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-64 flex items-center justify-center text-muted-foreground">
+                暫無數據
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Measurement History */}
+        <Card className="rounded-2xl">
+          <CardContent className="pt-6 pb-6">
+            <h3 className="font-semibold mb-4">量度記錄</h3>
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : metrics && metrics.length > 0 ? (
+              <div className="space-y-3">
+                {metrics.slice(0, 5).map((m) => (
+                  <div key={m.id} className="flex items-center justify-between p-4 border border-border rounded-2xl hover:bg-muted/50 transition-colors">
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm">{m.date}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {m.bodyFatPercent && `體脂 ${m.bodyFatPercent}% · `}
+                        {m.muscleMassKg && `肌肉 ${m.muscleMassKg}kg`}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-lg">{m.weightKg}</p>
+                      <p className="text-xs text-muted-foreground">kg</p>
+                    </div>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
-                      className="mt-3"
-                      onClick={() => generateAdvice()}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 ml-2"
+                      onClick={() => deleteMutation.mutate({ id: m.id })}
+                      disabled={deleteMutation.isPending}
                     >
-                      重新生成建議
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : coachAdvice ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5" />
-                  AI 健身教練建議
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {coachAdvice.type === 'no_data' ? (
-                  <div className="text-muted-foreground">{coachAdvice.advice}</div>
-                ) : (
-                  <>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <p className="text-blue-900">{coachAdvice.advice}</p>
-                    </div>
-                    {coachAdvice.status && (
-                      <div className="text-sm text-muted-foreground">
-                        <div>狀態: {coachAdvice.status}</div>
-                        {coachAdvice.progressRatio && (
-                          <div>進度: {(coachAdvice.progressRatio * 100).toFixed(0)}%</div>
-                        )}
-                      </div>
-                    )}
-                  </>
+                ))}
+                {metrics.length > 5 && (
+                  <button className="w-full text-primary text-sm font-medium py-2 hover:opacity-80">
+                    查看全部記錄 <ChevronRight className="h-4 w-4 inline ml-1" />
+                  </button>
                 )}
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="pt-6 text-center text-muted-foreground">
-                按下方按鈕生成建議
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">暫無記錄</p>
+            )}
+          </CardContent>
+        </Card>
 
-          <Button className="w-full" onClick={() => generateAdvice()}>
-            重新生成建議
-          </Button>
-        </TabsContent>
-      </Tabs>
+        {/* Import Section */}
+        <div className="border-2 border-dashed border-primary/30 rounded-2xl p-6 md:p-8 text-center">
+          <div className="mb-4">
+            <p className="text-2xl mb-2">📊</p>
+            <h3 className="font-semibold text-lg mb-2">匯入 InBody / Boditrax 數據</h3>
+            <p className="text-sm text-muted-foreground">支援 CSV 匯入，或手動輸入量度結果</p>
+          </div>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <Link href="/body/import-csv">
+              <Button className="bg-primary hover:bg-primary/90 rounded-full px-6">
+                匯入 CSV
+              </Button>
+            </Link>
+            <Link href="/body/add">
+              <Button variant="outline" className="rounded-full px-6">
+                手動輸入
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
