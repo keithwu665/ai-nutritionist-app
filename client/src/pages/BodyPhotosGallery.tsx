@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { BodyPhotosUpload } from '@/components/BodyPhotosUpload';
 import { AIGoalPhotoModal } from '@/components/AIGoalPhotoModal';
 import { Checkbox } from '@/components/ui/checkbox';
+import BackButton from '@/components/BackButton';
 import {
   Dialog,
   DialogContent,
@@ -316,7 +317,10 @@ export default function BodyPhotosGallery() {
   return (
     <div className="p-4 md:p-8 space-y-6">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h1 className="text-2xl font-bold">進度照片</h1>
+        <div className="flex items-center gap-3">
+          <BackButton label="返回" />
+          <h1 className="text-2xl font-bold">進度照片</h1>
+        </div>
         <div className="flex gap-2 flex-wrap">
           <Button
             onClick={() => setAiModalOpen(true)}

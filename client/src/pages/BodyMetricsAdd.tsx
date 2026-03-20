@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
+import BackButton from '@/components/BackButton';
 
 export default function BodyMetricsAdd() {
   const [, setLocation] = useLocation();
@@ -46,11 +47,7 @@ export default function BodyMetricsAdd() {
   return (
     <div className="p-4 md:p-8 max-w-lg mx-auto">
       <div className="mb-6">
-        <Link href="/body">
-          <span className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 cursor-pointer">
-            <ArrowLeft className="h-4 w-4" /> 返回
-          </span>
-        </Link>
+        <BackButton label="返回" />
       </div>
 
       <Card>

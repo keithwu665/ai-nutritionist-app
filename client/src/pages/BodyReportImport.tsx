@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 import { Loader2, Upload, CheckCircle2 } from 'lucide-react';
+import BackButton from '@/components/BackButton';
 
 type Provider = 'inbody' | 'boditrax';
 type Step = 'upload' | 'roi-select' | 'provider' | 'confirmation' | 'success';
@@ -270,7 +271,8 @@ export default function BodyReportImport() {
   // Render steps
   if (step === 'upload') {
     return (
-      <div className="container max-w-2xl py-8">
+      <div className="container max-w-2xl py-8 space-y-4">
+        <BackButton label="返回" />
         <Card>
           <CardHeader>
             <CardTitle>Import Body Report</CardTitle>

@@ -352,3 +352,12 @@
 - [x] Remove 4 white metric cards (體重, 體脂率, 肌肉量, BMI)
 - [x] Verify all data is visible and accessible in blue card only
 - [x] Test simplified layout
+
+
+## Navigation Improvement - Back Button Implementation
+- [x] Examine current routing structure and identify root vs sub-pages
+- [x] Create back button component for sub-pages
+- [x] Add back navigation to all sub-pages (新增量度, 匯入 CSV, 進度照片, 相片匯入)
+- [x] Ensure back button appears only on sub-pages, not root pages
+- [x] Test navigation flow and verify hierarchy
+- [x] Verify tabs remain for main sections (身體, 飲食, 運動, 儀錶板, 設定)

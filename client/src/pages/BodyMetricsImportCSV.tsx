@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Upload, AlertCircle, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
+import BackButton from '@/components/BackButton';
 
 interface CSVRow {
   [key: string]: string;
@@ -167,14 +168,9 @@ export default function BodyMetricsImportCSV() {
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white p-4 md:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setLocation('/body')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-2xl font-bold">匯入身體數據</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">匹入身體數據</h1>
+          <BackButton label="返回" />
         </div>
 
         {/* Upload Section */}
