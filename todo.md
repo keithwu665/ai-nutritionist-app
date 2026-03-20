@@ -395,3 +395,10 @@
 - [x] Ensure "重新生成建議" button always triggers valid logic
 - [x] Test all scenarios (no goal, insufficient data, valid data)
 - [x] Verify no empty/null states are shown to user
+
+
+## Profile Icon Navigation
+- [x] Add click handler to profile icon in header
+- [x] Navigate to settings page when profile icon is tapped
+- [x] Verify settings page displays user info, weight goal, AI coach personality
+- [x] Test navigation on different screen sizes
