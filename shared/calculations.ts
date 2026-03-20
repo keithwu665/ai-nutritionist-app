@@ -159,6 +159,9 @@ export function calculateDailyCalorieTarget(
   }
 
   // Calculate original target before safety clamping
+  // For lose goals: originalCalories = tdee - deficit (positive deficit)
+  // For gain goals: originalCalories = tdee - (-deficit) = tdee + deficit (negative deficit becomes addition)
+  // Result is always the calorie intake target (positive number)
   const originalCalories = tdee - dailyDeficit;
   
   // Apply safety minimum ONLY when calculated target is below the floor

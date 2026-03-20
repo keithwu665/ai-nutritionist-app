@@ -231,3 +231,11 @@
 - [x] Add estimated weekly weight loss display
 - [x] Calculate and display weight loss range (e.g., 0.3–0.4 kg)
 - [x] Test with various deficit values
+
+
+## Critical Bug: Calorie Display Inconsistency
+- [x] Find confirmation modal showing -1830 kcal
+- [x] Fix negative calorie value calculation
+- [x] Ensure Settings and modal use same calculation source
+- [x] Verify both display positive values only
+- [x] Test with different goal scenarios

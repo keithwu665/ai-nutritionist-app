@@ -14,6 +14,9 @@ export function AggressiveCalorieModal({
   onConfirm,
   onCancel,
 }: AggressiveCalorieModalProps) {
+  // Ensure originalCalories is always positive (it represents calorie intake, not deficit)
+  const displayCalories = Math.abs(Math.round(originalCalories));
+  
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="max-w-md">
@@ -33,7 +36,7 @@ export function AggressiveCalorieModal({
             <p className="text-sm text-amber-900">
               <span className="font-semibold">每日目標：</span>
               <span className="text-lg font-bold text-amber-700 ml-2">
-                {Math.round(originalCalories)} kcal
+                {displayCalories} kcal
               </span>
             </p>
             <p className="text-xs text-amber-700 mt-2">
