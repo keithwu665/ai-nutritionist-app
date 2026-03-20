@@ -15,7 +15,7 @@ export default function BodyMetrics() {
   const [days, setDays] = useState(30);
   const [selectedMetric, setSelectedMetric] = useState('weight');
   const [activeTab, setActiveTab] = useState<'records' | 'advice'>('records');
-  const [coachAdvice, setCoachAdvice] = useState<string>('');
+  const [coachAdvice, setCoachAdvice] = useState<any>(null);
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
   const [personality, setPersonality] = useState<'gentle' | 'strict' | 'hongkong'>('gentle');
   const [showHistory, setShowHistory] = useState(false);
@@ -108,10 +108,10 @@ export default function BodyMetrics() {
         }),
       });
       const data = await response.json();
-      setCoachAdvice(data.result?.advice || '暫無建議');
+      setCoachAdvice(data.result || { type: 'empty', advice: '暫無建議' });
     } catch (error) {
       console.error('Failed to generate advice:', error);
-      setCoachAdvice('無法生成建議，請稍後重試');
+      setCoachAdvice({ type: 'error', advice: '無法生成建議，請稍後重試' });
     } finally {
       setIsLoadingAdvice(false);
     }
@@ -356,15 +356,24 @@ export default function BodyMetrics() {
                     <h3 className="font-semibold text-lg">AI 健身教練建議</h3>
                   </div>
                   <p className="text-sm leading-relaxed text-foreground/90">
-                    {coachAdvice || '暫無建議'}
+                    {typeof coachAdvice === 'string' ? coachAdvice : (coachAdvice?.advice || '暫無建議')}
                   </p>
-                  <Button
-                    onClick={generateAdvice}
-                    disabled={isLoadingAdvice}
-                    className="mt-4 w-full"
-                  >
-                    {isLoadingAdvice ? '生成中...' : '重新生成建議'}
-                  </Button>
+                  {coachAdvice?.type === 'no_goal' && (
+                    <Link href={coachAdvice.actionUrl || '/settings'}>
+                      <Button className="mt-4 w-full" variant="default">
+                        {coachAdvice.actionLabel || '前往設定'}
+                      </Button>
+                    </Link>
+                  )}
+                  {coachAdvice?.type !== 'no_goal' && (
+                    <Button
+                      onClick={generateAdvice}
+                      disabled={isLoadingAdvice}
+                      className="mt-4 w-full"
+                    >
+                      {isLoadingAdvice ? '生成中...' : '重新生成建議'}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}

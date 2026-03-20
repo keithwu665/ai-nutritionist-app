@@ -384,3 +384,14 @@
 - [x] Add optional prediction (estimated completion time)
 - [x] Test with all three personalities
 - [x] Verify UI layout and button design unchanged
+
+
+## AI Suggestion Fix - Always Return Meaningful Output
+- [x] Examine why AI suggestion shows "暫無建議"
+- [x] Update getCoachAdvice to return guidance message when no goal is set
+- [x] Add "前往設定" button link in guidance message
+- [x] Update getCoachAdvice to return guidance message when insufficient data
+- [x] Update frontend to display guidance messages with action buttons
+- [x] Ensure "重新生成建議" button always triggers valid logic
+- [x] Test all scenarios (no goal, insufficient data, valid data)
+- [x] Verify no empty/null states are shown to user

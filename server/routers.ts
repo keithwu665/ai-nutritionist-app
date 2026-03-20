@@ -144,7 +144,12 @@ export const appRouter = router({
         const goalDays = profile.goalDays ? Number(profile.goalDays) : null;
 
         if (!goalKg || !goalDays) {
-          return { advice: '請先設定體重目標和目標期限' };
+          return {
+            type: 'no_goal',
+            advice: '請先設定你的減重目標',
+            actionLabel: '前往設定',
+            actionUrl: '/settings'
+          };
         }
 
         const dailyDeficit = (Math.abs(goalKg) * 7700) / goalDays;
@@ -183,6 +188,7 @@ export const appRouter = router({
         }
 
         return {
+          type: 'advice',
           advice,
           status,
           dailyDeficit: Math.round(dailyDeficit),
