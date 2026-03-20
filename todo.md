@@ -217,3 +217,10 @@
 - [x] Action buttons fully visible on mobile
 - [x] Daily kcal difference shown under target
 - [ ] Live site reflects all fixes (READY FOR PUBLISH)
+
+
+## Calorie Target Display Improvement
+- [x] Show calculated calorie target (before safety clamp)
+- [x] Show final adjusted calorie target (after safety clamp)
+- [x] Display warning when safety minimum is applied
+- [x] Test with different goal scenarios (-5kg, -10kg, etc.)

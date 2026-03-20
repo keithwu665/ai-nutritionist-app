@@ -55,17 +55,19 @@ export function GoalSummaryCard({
 
   // Calculate daily deficit and safety
   const KCAL_PER_KG_FAT = 7700;
-  const MIN_CALORIES_SAFE = genderStr === 'female' ? 1200 : 1500;
+  const MIN_CALORIES_SAFE = genderStr === 'female' ? 1200 : 1200;
   const MIN_CALORIES_AGGRESSIVE = genderStr === 'female' ? 1000 : 1200;
   const MIN_CALORIES = calorieMode === 'aggressive' ? MIN_CALORIES_AGGRESSIVE : MIN_CALORIES_SAFE;
   
   let dailyDeficit = 0;
-  let dailyCalories = tdeeNum || 2000; // Use default if TDEE not provided
+  let calculatedCalories = tdeeNum || 2000; // Calculated value before clamping
+  let dailyCalories = tdeeNum || 2000; // Final value after clamping
   let wasClamped = false; // Track if clamping occurred
   
   if (fitnessGoal === 'lose' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
-    dailyCalories = tdeeNum ? tdeeNum - dailyDeficit : 2000 - dailyDeficit;
+    calculatedCalories = tdeeNum ? tdeeNum - dailyDeficit : 2000 - dailyDeficit;
+    dailyCalories = calculatedCalories;
     if (calorieMode === 'safe' && dailyCalories < MIN_CALORIES_SAFE) {
       dailyCalories = MIN_CALORIES_SAFE;
       wasClamped = true;
@@ -75,8 +77,10 @@ export function GoalSummaryCard({
     }
   } else if (fitnessGoal === 'gain' && goalKgNum > 0 && goalDaysNum > 0) {
     dailyDeficit = Math.round((goalKgNum * KCAL_PER_KG_FAT) / goalDaysNum);
-    dailyCalories = tdeeNum ? tdeeNum + dailyDeficit : 2000 + dailyDeficit;
+    calculatedCalories = tdeeNum ? tdeeNum + dailyDeficit : 2000 + dailyDeficit;
+    dailyCalories = calculatedCalories;
   } else if (fitnessGoal === 'maintain') {
+    calculatedCalories = tdeeNum || 2000;
     dailyCalories = tdeeNum || 2000;
   }
 
@@ -122,9 +126,14 @@ export function GoalSummaryCard({
             </p>
           )}
           {(fitnessGoal === 'lose' || fitnessGoal === 'gain') && (
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              👉 每日目標熱量：{Math.round(dailyCalories)} kcal
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-slate-700 dark:text-slate-300">
+                👉 理論熱量（未調整）：{Math.round(calculatedCalories)} kcal
+              </p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                👉 最終熱量（安全調整後）：{Math.round(dailyCalories)} kcal
+              </p>
+            </div>
           )}
         </div>
 
@@ -132,7 +141,7 @@ export function GoalSummaryCard({
         {wasClamped && (
           <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded p-3 mt-2">
             <p className="text-sm text-amber-800 dark:text-amber-200">
-              ⚠️ 目標過於進取，已調整至安全範圍
+              ⚠️ 目標過於進取，已調整至安全最低攝取（{MIN_CALORIES} kcal）
             </p>
           </div>
         )}
