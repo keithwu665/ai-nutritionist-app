@@ -126,6 +126,70 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         return db.deleteBodyMetric(input.id, ctx.user.id);
       }),
+
+    getCoachAdvice: protectedProcedure
+      .input(z.object({
+        weight: z.number(),
+        bmi: z.number(),
+        bodyFatPercent: z.number().nullable(),
+        muscleMassKg: z.number().nullable(),
+        personality: z.enum(['gentle', 'strict', 'hongkong']),
+        weightTrend: z.enum(['increasing', 'decreasing']).nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const profile = await db.getUserProfile(ctx.user.id);
+        if (!profile) throw new Error('Profile not found');
+
+        const goalKg = profile.goalKg ? Number(profile.goalKg) : null;
+        const goalDays = profile.goalDays ? Number(profile.goalDays) : null;
+
+        if (!goalKg || !goalDays) {
+          return { advice: '請先設定體重目標和目標期限' };
+        }
+
+        const dailyDeficit = (Math.abs(goalKg) * 7700) / goalDays;
+        let status = 'on_track';
+        if (input.weightTrend === 'increasing' && goalKg < 0) {
+          status = 'off_track';
+        } else if (input.weightTrend === 'increasing' && goalKg > 0) {
+          status = 'slightly_behind';
+        }
+
+        let advice = '';
+        if (input.personality === 'gentle') {
+          if (status === 'on_track') {
+            advice = `你嘅進度好好！每日需要減少約 ${Math.round(dailyDeficit)} kcal，你而家做得好好，繼續加油 🤍`;
+          } else if (status === 'slightly_behind') {
+            advice = `你而家進度有少少慢，但唔緊要，我哋可以慢慢調整。每日減少約 ${Math.round(dailyDeficit)} kcal 就得，你可以做到嘅 💪`;
+          } else {
+            advice = `體重有上升嘅跡象，但唔洗擔心。我哋一齊調整策略，每日減少約 ${Math.round(dailyDeficit)} kcal，你會慢慢回到正軌 🌟`;
+          }
+        } else if (input.personality === 'strict') {
+          if (status === 'on_track') {
+            advice = `進度達標。保持每日 ${Math.round(dailyDeficit)} kcal 赤字。繼續。`;
+          } else if (status === 'slightly_behind') {
+            advice = `進度未達標。立即調整。每日需要減少 ${Math.round(dailyDeficit)} kcal。無藉口。`;
+          } else {
+            advice = `體重上升。計劃失敗。立即行動。每日赤字必須達到 ${Math.round(dailyDeficit)} kcal。`;
+          }
+        } else if (input.personality === 'hongkong') {
+          if (status === 'on_track') {
+            advice = `你而家呢個進度…幾好喎 😏 保持每日減少 ${Math.round(dailyDeficit)} kcal，咁就冇問題啦。`;
+          } else if (status === 'slightly_behind') {
+            advice = `你而家呢個進度…有啲慢喎 😏 每日要減少約 ${Math.round(dailyDeficit)} kcal，唔係咁難啦，加油啦你。`;
+          } else {
+            advice = `呀，體重升咗？咁就有啲麻煩喎 🤔 每日減少 ${Math.round(dailyDeficit)} kcal，咁先至得啦。`;
+          }
+        }
+
+        return {
+          advice,
+          status,
+          dailyDeficit: Math.round(dailyDeficit),
+          goalKg,
+          goalDays,
+        };
+      }),
   }),
 
   // ========================================================================

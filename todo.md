@@ -373,3 +373,14 @@
 - [x] Verify selection functionality remains unchanged
 - [x] Fix layout structure to force grid-cols-3 (remove responsive breakpoints)
 - [x] Verify 3 cards display in one horizontal row
+
+
+## AI Suggestion Enhancement - Body Data Section
+- [x] Examine current AI suggestion implementation
+- [x] Implement calorie deficit calculation (target_kg × 7700 / target_days)
+- [x] Create progress status determination (on track / slightly behind / off track)
+- [x] Implement personality-based tone generation (溫柔貼身教練 / 魔鬼教練 / 香港寸嘴教練)
+- [x] Integrate with current body data and weight trends
+- [x] Add optional prediction (estimated completion time)
+- [x] Test with all three personalities
+- [x] Verify UI layout and button design unchanged
