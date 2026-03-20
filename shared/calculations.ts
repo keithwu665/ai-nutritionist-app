@@ -128,10 +128,13 @@ export function calculateDailyCalorieTarget(
   calorieMode: 'safe' | 'aggressive' = 'safe'
 ): { dailyCalories: number; originalCalories: number; dailyDeficit: number; isAggressive: boolean } {
   const KCAL_PER_KG_FAT = 7700;
-  const MIN_CALORIES = gender === 'female' ? 1200 : 1500;
+  // Safe mode uses 1200 floor, aggressive mode uses lower floor
+  const MIN_CALORIES_SAFE = gender === 'female' ? 1200 : 1200;
+  const MIN_CALORIES_AGGRESSIVE = gender === 'female' ? 1000 : 1200;
+  const MIN_CALORIES = calorieMode === 'aggressive' ? MIN_CALORIES_AGGRESSIVE : MIN_CALORIES_SAFE;
   
   let dailyDeficit = 0;
-  let isAggressive = false;
+  let wasClamped = false;
 
   switch (fitness_goal) {
     case 'lose': {
@@ -158,21 +161,18 @@ export function calculateDailyCalorieTarget(
   // Calculate original target before safety clamping
   const originalCalories = tdee - dailyDeficit;
   
-  // Apply safety minimum
+  // Apply safety minimum ONLY when calculated target is below the floor
   let dailyCalories = originalCalories;
   if (dailyCalories < MIN_CALORIES) {
-    isAggressive = true;
-    // If in aggressive mode, use original calories; otherwise clamp to safe minimum
-    if (calorieMode !== 'aggressive') {
-      dailyCalories = MIN_CALORIES;
-    }
+    wasClamped = true;
+    dailyCalories = MIN_CALORIES;
   }
 
   return {
     dailyCalories: Math.round(dailyCalories),
     originalCalories: Math.round(originalCalories),
     dailyDeficit: Math.round(dailyDeficit),
-    isAggressive,
+    isAggressive: wasClamped,
   };
 }
 
