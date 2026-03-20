@@ -84,14 +84,20 @@ export async function searchFitastyProducts(query: string) {
   const db = await getDb();
   if (!db) return [];
 
-  const result = await db
-    .select()
-    .from(fitastyProducts)
-    .where(eq(fitastyProducts.isActive, 1))
-    .limit(10);
-
-  // Simple client-side filtering for now
-  return result.filter((p) =>
-    p.name.toLowerCase().includes(query.toLowerCase())
-  );
+  try {
+    const { like } = await import('drizzle-orm');
+    const result = await db
+      .select()
+      .from(fitastyProducts)
+      .where(and(
+        eq(fitastyProducts.is_active, 1),
+        like(fitastyProducts.product_name_zh, `%${query}%`)
+      ))
+      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
+      .limit(10);
+    return result;
+  } catch (error) {
+    console.error('Error searching Fitasty products:', error);
+    return [];
+  }
 }

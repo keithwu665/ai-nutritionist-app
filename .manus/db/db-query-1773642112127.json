@@ -1,0 +1,30 @@
+{
+  "query": "SELECT id, userId, aiToneStyle FROM user_profiles LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, userId, aiToneStyle FROM user_profiles LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "6",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "30001",
+      "userId": "180014",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "30002",
+      "userId": "330001",
+      "aiToneStyle": "gentle"
+    },
+    {
+      "id": "60001",
+      "userId": "60001",
+      "aiToneStyle": "gentle"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\taiToneStyle\n1\t6\tgentle\n30001\t180014\tgentle\n30002\t330001\tgentle\n60001\t60001\tgentle\n",
+  "stderr": "",
+  "execution_time_ms": 1634
+}

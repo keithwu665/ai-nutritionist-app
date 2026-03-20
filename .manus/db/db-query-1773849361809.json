@@ -1,0 +1,14 @@
+{
+  "query": "SELECT userId, displayName FROM user_profiles WHERE userId = 6;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT userId, displayName FROM user_profiles WHERE userId = 6;",
+  "rows": [
+    {
+      "userId": "6",
+      "displayName": "Yoyo"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tdisplayName\n6\tYoyo\n",
+  "stderr": "",
+  "execution_time_ms": 1595
+}

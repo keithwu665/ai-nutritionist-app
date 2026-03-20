@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
+import { GoalSummaryCard } from '@/components/GoalSummaryCard';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -20,7 +21,7 @@ export default function Dashboard() {
     }
   }, [profileLoading, profile, setLocation]);
 
-  const isLoading = profileLoading || dashLoading;
+  const isLoading = (!profile && profileLoading) || (!dashData && dashLoading) || (!recs && recsLoading);
 
   if (isLoading) {
     return (
@@ -34,7 +35,13 @@ export default function Dashboard() {
 
   const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
   const tdee = calculateTDEE(bmr, profile.activityLevel);
-  const target = calculateDailyCalorieTarget(tdee, profile.fitnessGoal);
+  const goalKg = profile.goalKg ? Number(profile.goalKg) : 0;
+  const goalDays = profile.goalDays ? Number(profile.goalDays) : 0;
+  const calorieCalc = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, goalKg, goalDays, profile.gender, profile.calorieMode || 'safe');
+  let target = Number(calorieCalc?.dailyCalories) || 2000;
+  if (!isFinite(target) || target <= 0) {
+    target = 2000;
+  }
 
   const todayCalories = dashData?.today.calories ?? 0;
   const todayExercise = dashData?.today.exerciseCalories ?? 0;
@@ -59,30 +66,32 @@ export default function Dashboard() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return '早晨，美怡！👋';
-    if (hour < 18) return '午安，美怡！☀️';
-    return '晚安，美怡！🌙';
+    const name = profile?.displayName || '';
+    const greeting = hour < 12 ? '早晨' : hour < 18 ? '午安' : '晚安';
+    const emoji = hour < 12 ? '🌤️' : hour < 18 ? '☀️' : '🌙';
+    
+    if (name) {
+      return `${greeting}，${name}！${emoji}`;
+    }
+    return `${greeting}！${emoji}`;
   };
 
   return (
     <div className="pb-32 md:pb-8">
-      {/* Top Header with Date, Greeting, Notifications */}
-      <div className="sticky top-0 bg-background z-10 p-4 md:p-8 border-b border-border">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-xs text-muted-foreground mb-2">{getDateString()}</p>
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl md:text-3xl font-bold">{getGreeting()}</h1>
-            <div className="flex items-center gap-3">
-              <button className="p-2 hover:bg-muted rounded-full transition-colors">
-                <Bell className="h-5 w-5 text-foreground" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              <button className="p-2 hover:bg-muted rounded-full transition-colors">
-                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary" />
-                </div>
-              </button>
-            </div>
+      {/* Greeting Section - Rebuilt from Screenshot */}
+      <div className="p-4">
+        <p className="text-xs text-muted-foreground mb-4">{getDateString()}</p>
+        <div className="flex items-center justify-between">
+          <h1 className="text-4xl font-bold">{getGreeting()}</h1>
+          <div className="flex items-center gap-3">
+            <button className="p-2 hover:bg-muted rounded-full transition-colors">
+              <Bell className="h-5 w-5 text-foreground" />
+            </button>
+            <button className="p-2 hover:bg-muted rounded-full transition-colors">
+              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                <User className="h-4 w-4 text-primary" />
+              </div>
+            </button>
           </div>
         </div>
       </div>
@@ -155,12 +164,23 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Goal Summary Card */}
+        <GoalSummaryCard
+          fitnessGoal={profile.fitnessGoal}
+          goalKg={profile.goalKg ? Number(profile.goalKg) : null}
+          goalDays={profile.goalDays ? Number(profile.goalDays) : null}
+          currentWeight={Number(profile.weightKg)}
+          gender={profile.gender}
+          tdee={tdee}
+          calorieMode={profile.calorieMode || 'safe'}
+        />
+
         {/* Body Metrics Cards - 3 Column */}
         <div className="grid grid-cols-3 gap-3 md:gap-4">
           <Card className="rounded-2xl">
             <CardContent className="pt-4 pb-4">
               <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
-              <p className="text-2xl font-bold">{bodyMetrics?.weightKg ?? profile.weightKg}</p>
+              <p className="text-2xl font-bold">{profile.weightKg}</p>
               <p className="text-xs text-muted-foreground mt-1">kg</p>
               {bodyMetrics && (
                 <p className="text-xs text-green-600 mt-1">-0.2 kg</p>
@@ -190,45 +210,60 @@ export default function Dashboard() {
         </div>
 
         {/* Goal Progress Card */}
-        <Card className="rounded-2xl">
-          <CardContent className="pt-5 pb-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">目標進度</h3>
-              <button 
-              onClick={() => setLocation('/body')}
-              className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
-            >
-                詳情 <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="space-y-3">
-              <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-                <div 
-                  className="bg-primary h-full rounded-full transition-all duration-300"
-                  style={{ width: '35%' }}
-                ></div>
-              </div>
-              <div className="grid grid-cols-4 text-center text-xs">
-                <div>
-                  <p className="text-muted-foreground">起點</p>
-                  <p className="font-bold">62.5kg</p>
+        {(() => {
+          const goalKgNum = profile.goalKg ? Number(profile.goalKg) : 0;
+          const goalDaysNum = profile.goalDays ? Number(profile.goalDays) : 0;
+          const currentWt = Number(profile.weightKg) || 0;
+          let targetWeight = currentWt;
+          if (profile.fitnessGoal === 'lose' && goalKgNum > 0) {
+            targetWeight = currentWt - goalKgNum;
+          } else if (profile.fitnessGoal === 'gain' && goalKgNum > 0) {
+            targetWeight = currentWt + goalKgNum;
+          }
+          const remainingKg = Math.max(0, Math.abs(targetWeight - currentWt));
+          const progressPercent = goalKgNum > 0 ? Math.min(100, ((goalKgNum - remainingKg) / goalKgNum) * 100) : 0;
+          return (
+            <Card className="rounded-2xl">
+              <CardContent className="pt-5 pb-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold">目標進度</h3>
+                  <button 
+                  onClick={() => setLocation('/body')}
+                  className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
+                >
+                    詳情 <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">目標</p>
-                  <p className="font-bold">57kg</p>
+                <div className="space-y-3">
+                  <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+                    <div 
+                      className="bg-primary h-full rounded-full transition-all duration-300"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                  <div className="grid grid-cols-4 text-center text-xs">
+                    <div>
+                      <p className="text-muted-foreground">起點</p>
+                      <p className="font-bold">{currentWt.toFixed(1)}kg</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">目標</p>
+                      <p className="font-bold">{targetWeight.toFixed(1)}kg</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">還差</p>
+                      <p className="font-bold">{remainingKg.toFixed(1)}kg</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">天後</p>
+                      <p className="font-bold text-primary">{goalDaysNum}</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-muted-foreground">還差</p>
-                  <p className="font-bold">3.6kg</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">天後</p>
-                  <p className="font-bold text-primary">92</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* Weight Trend Card */}
         <Card className="rounded-2xl">

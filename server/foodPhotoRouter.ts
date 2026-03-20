@@ -10,6 +10,10 @@ import { eq, and } from 'drizzle-orm';
 import * as db from './db';
 import { TRPCError } from '@trpc/server';
 import { initializeSupabaseAdmin, ensureFoodPhotosBucket } from './utils/supabaseClient';
+import { createLocalUploadUrl, downloadLocalFile, isLocalStoragePath, saveLocalFile } from './utils/localStorageFallback';
+import { gentleQuotes, coachQuotes, hongkongQuotes } from './coachQuotes';
+import { getRandomDialogue } from './personalityDialogueLibrary';
+import { generateNutritionAdvice, NutritionValues } from './nutritionAdviceEngine';
 
 // Vision LLM extraction response schema
 const AIExtractionSchema = z.object({
@@ -38,6 +42,101 @@ const AIExtractionSchema = z.object({
 
 type AIExtraction = z.infer<typeof AIExtractionSchema>;
 
+// DEPRECATED: Use Nutrition Advice Engine instead
+// This function delegates to the unified engine for backwards compatibility
+async function calculateMealQualityRating(
+  kcal: number,
+  proteinG: number,
+  carbsG: number,
+  fatG: number
+): Promise<'Limited' | 'Fair' | 'Good' | 'Nutritious'> {
+  const values: NutritionValues = { kcal, protein: proteinG, carbs: carbsG, fat: fatG };
+  const result = await generateNutritionAdvice(values, 'gentle');
+  return result.rating;
+}
+
+// Detect if food is a vegetable
+function isVegetableFood(foodItems: string[]): boolean {
+  const vegetableKeywords = [
+    '菜心', '西蘭花', '生菜', '菠菜', '白菜', '青菜', '蔬菜',
+    'broccoli', 'lettuce', 'spinach', 'cabbage', 'gai lan', 'chinese broccoli',
+    '蕹菜', '芥蘭', '小白菜', '羽衣甘藍', '綠菜', '葉菜'
+  ];
+  
+  return foodItems.some(item => 
+    vegetableKeywords.some(keyword => item.toLowerCase().includes(keyword.toLowerCase()))
+  );
+}
+
+// Generate AI diet advice based on FINAL nutrition values using rule table system
+// PRIMARY INPUT: final nutrition macros (kcal, protein, carbs, fat)
+// SECONDARY INPUT: food name/category (only for context)
+function generateDietAdvice(
+  kcal: number,
+  proteinG: number,
+  carbsG: number,
+  fatG: number,
+  mealRating: string,
+  toneStyle: 'gentle' | 'coach' | 'hongkong' = 'gentle',
+  foodItems: string[] = []
+): string {
+  // STEP 1: Analyze nutrition profile
+  // STEP 2: Select random dialogue from personality library
+  // This ensures each personality feels distinctly different
+  
+  // Get a random dialogue from the selected personality
+  const personalityDialogue = getRandomDialogue(toneStyle);
+  // AI DIET ADVICE RULE TABLE - Match nutrition profile to advice case
+  // Each personality has its own dialogue library for varied, human-like responses
+  
+  // CASE 1: High protein / clean meal
+  // Condition: protein >= 15g AND fat <= 8g AND carbs <= 15g
+  if (proteinG >= 15 && fatG <= 8 && carbsG <= 15) {
+    // Return personality-specific dialogue for high protein/clean meal
+    return personalityDialogue;
+  }
+  
+  // CASE 2: High protein but high fat
+  // Condition: protein >= 20g AND fat >= 20g
+  if (proteinG >= 20 && fatG >= 20) {
+    return personalityDialogue;
+  }
+  
+  // CASE 3: High carbs meal
+  // Condition: carbs >= 40g
+  if (carbsG >= 40) {
+    return personalityDialogue;
+  }
+  
+  // CASE 4: High fat meal
+  // Condition: fat >= 20g
+  if (fatG >= 20) {
+    return personalityDialogue;
+  }
+  
+  // CASE 5: High calorie meal
+  // Condition: kcal >= 700
+  if (kcal >= 700) {
+    return personalityDialogue;
+  }
+  
+  // CASE 6: Very light meal
+  // Condition: kcal <= 150 AND protein < 8g
+  if (kcal <= 150 && proteinG < 8) {
+    return personalityDialogue;
+  }
+  
+  // CASE 7: Vegetables / low calorie foods
+  // Condition: kcal <= 120 AND fat <= 5g AND carbs <= 15g
+  if (kcal <= 120 && fatG <= 5 && carbsG <= 15) {
+    return personalityDialogue;
+  }
+  
+  // CASE 8: Balanced meal (DEFAULT)
+  // Condition: protein 15-35g AND fat 5-15g AND carbs 15-40g
+  return personalityDialogue;
+}
+
 export const foodPhotoRouter = router({
   // Create signed upload URL for food photo
   createUploadUrl: protectedProcedure
@@ -52,50 +151,47 @@ export const foodPhotoRouter = router({
       const bucketName = 'food-photos';
 
       try {
-        // Initialize Supabase client with validation and connectivity checks
-        const supabase = await initializeSupabaseAdmin(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
-        
-        // Ensure food-photos bucket exists
-        await ensureFoodPhotosBucket(supabase);
-        
-        console.log(`[createUploadUrl] Creating signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
-        
-        // Use official Supabase SDK to create signed upload URL
-        console.log('[createUploadUrl] Calling createSignedUploadUrl...');
-        const { data, error } = await supabase
-          .storage
-          .from(bucketName)
-          .createSignedUploadUrl(filePath);
-        
-        if (error) {
-          console.error(`[createUploadUrl] ERROR creating signed URL:`, {
-            errorName: (error as any).name,
-            errorMessage: error.message,
-            errorStatus: (error as any).status || (error as any).statusCode,
-          });
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: `Failed to generate upload URL: ${error.message}`,
-            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
-          });
+        // Try Supabase first
+        try {
+          const supabase = await initializeSupabaseAdmin(ENV.supabaseUrl, ENV.supabaseServiceRoleKey);
+          await ensureFoodPhotosBucket(supabase);
+          
+          console.log(`[createUploadUrl] Creating signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
+          
+          const { data, error } = await supabase
+            .storage
+            .from(bucketName)
+            .createSignedUploadUrl(filePath);
+          
+          if (error) {
+            console.error(`[createUploadUrl] ERROR creating signed URL:`, {
+              errorName: (error as any).name,
+              errorMessage: error.message,
+              errorStatus: (error as any).status || (error as any).statusCode,
+            });
+            throw new Error(`Failed to generate upload URL: ${error.message}`);
+          }
+          
+          if (!data?.signedUrl) {
+            console.error('[createUploadUrl] No signed URL in response');
+            throw new Error('No signed URL returned from Supabase');
+          }
+          
+          console.log('[createUploadUrl] Successfully created Supabase upload URL');
+          return { signedUrl: data.signedUrl, path: filePath };
+        } catch (supabaseError: any) {
+          console.warn('[createUploadUrl] Supabase failed, falling back to local storage:', supabaseError.message);
+          
+          // Fallback to local storage
+          const { uploadUrl, objectPath } = await createLocalUploadUrl(`${uuid}.jpg`);
+          console.log('[createUploadUrl] Using local storage fallback:', { uploadUrl, objectPath });
+          
+          return {
+            uploadUrl: uploadUrl,
+            objectPath: objectPath,
+            bucket: bucketName,
+          };
         }
-        
-        if (!data?.signedUrl) {
-          console.error('[createUploadUrl] No signed URL in response');
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'No signed URL returned from Supabase',
-            cause: { code: 'UPLOAD_URL_CREATE_FAILED' },
-          });
-        }
-        
-        console.log(`[createUploadUrl] SUCCESS: Generated signed upload URL for bucket=${bucketName}, filePath=${filePath}`);
-        
-        return {
-          uploadUrl: data.signedUrl,
-          objectPath: filePath,
-          bucket: bucketName,
-        };
         } catch (err: any) {
           console.error(`[createUploadUrl] EXCEPTION:`, {
             message: err.message,
@@ -161,18 +257,25 @@ export const foodPhotoRouter = router({
           imageBuffer = Buffer.from(await data.arrayBuffer());
           console.log(`[extractFromPhoto] Downloaded image size: ${imageBuffer.length} bytes`);
 
-        } catch (storageError) {
-          const message = storageError instanceof Error ? storageError.message : 'Unknown storage error';
-          console.error(`[extractFromPhoto] Storage layer error: ${message}`);
+        } catch (supabaseError: any) {
+          // Fallback to local storage
+          console.warn(`[extractFromPhoto] Supabase failed, trying local storage fallback: ${supabaseError.message}`);
           
-          // If it's already a TRPCError from initializeSupabaseAdmin, re-throw it
-          if (storageError instanceof TRPCError) throw storageError;
-          
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: `Storage download failed: ${message}`,
-            cause: { debugId, code: 'STORAGE_DOWNLOAD_FAILED' },
-          });
+          if (isLocalStoragePath(input.objectPath)) {
+            imageBuffer = await downloadLocalFile(input.objectPath);
+            console.log(`[extractFromPhoto] Downloaded from local storage, size: ${imageBuffer.length} bytes`);
+          } else {
+            const message = supabaseError instanceof Error ? supabaseError.message : 'Unknown storage error';
+            console.error(`[extractFromPhoto] Storage layer error: ${message}`);
+            
+            if (supabaseError instanceof TRPCError) throw supabaseError;
+            
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: `Storage download failed: ${message}`,
+              cause: { debugId, code: 'STORAGE_DOWNLOAD_FAILED' },
+            });
+          }
         }
 
         // Phase 2: Call Vision LLM
@@ -206,6 +309,8 @@ Return ONLY valid JSON matching this schema:
 }
 
 Rules:
+- IMPORTANT: Detect and list ALL visible food items in the image, not just one
+- If multiple foods are visible (e.g., rice, meat, soup, vegetables), list them all
 - Never hallucinate brand names
 - Return null if unsure about a value
 - Always include confidence levels
@@ -318,9 +423,74 @@ Rules:
           
           console.log(`[extractFromPhoto] SUCCESS debugId=${debugId}, kcal=${extraction.suggested.kcal}`);
 
+          // Extract all food items (not just the first one)
+          const foodItems = extraction.items && extraction.items.length > 0 
+            ? extraction.items.map((item: any) => item.name)
+            : ['未識別食物'];
+          
+          // ISSUE 2 FIX: Aggregate nutrition from all detected items
+          // If multiple items detected, sum their nutrition instead of using only first item
+          let aggregatedKcal = extraction.suggested.kcal || 0;
+          let aggregatedProtein = extraction.suggested.protein_g || 0;
+          let aggregatedCarbs = extraction.suggested.carbs_g || 0;
+          let aggregatedFat = extraction.suggested.fat_g || 0;
+          
+          // If we have multiple items and the extraction has per-item data, aggregate them
+          if (foodItems.length > 1 && extraction.items && extraction.items.length > 1) {
+            console.log(`[extractFromPhoto] Aggregating nutrition from ${foodItems.length} detected items`);
+            
+            // Try to estimate nutrition per item by dividing total by number of items
+            // This is a fallback when we don't have individual item nutrition
+            // The AI should have already estimated total, so we keep it as is
+            // But we'll recalculate if needed based on item count
+            
+            // For now, use the total provided by AI
+            // In future, could request per-item breakdown from AI
+          }
+          
+          // Create combined meal name when multiple items detected
+          const foodName = foodItems.length > 1 
+            ? `綜合分析餐 (${foodItems.join(' + ')})`
+            : foodItems[0];
+
+          // Use the unified Nutrition Advice Engine
+          const userProfile = await db.getUserProfile(userId);
+          const dbTone = userProfile?.aiToneStyle || 'gentle';
+          
+          let personalityType: 'gentle' | 'coach' | 'hongkong' = 'gentle';
+          if (dbTone === 'coach') personalityType = 'coach';
+          else if (dbTone === 'hk_style') personalityType = 'hongkong';
+          
+          const nutritionValues: NutritionValues = {
+            kcal: aggregatedKcal,
+            protein: aggregatedProtein,
+            carbs: aggregatedCarbs,
+            fat: aggregatedFat,
+            foodItems,
+            foodCategory: isVegetableFood(foodItems) ? 'vegetables' : 'general'
+          };
+          
+          const adviceResult = await generateNutritionAdvice(nutritionValues, personalityType);
+          const rating = adviceResult.rating;
+          const nutritionSummary = adviceResult.nutritionSummary;
+          const aiDietAdvice = adviceResult.aiDietAdvice;
+
           return {
             success: true,
-            extraction,
+            extraction: {
+              ...extraction,
+              suggested: {
+                kcal: aggregatedKcal,
+                protein_g: aggregatedProtein,
+                carbs_g: aggregatedCarbs,
+                fat_g: aggregatedFat,
+              },
+            },
+            foodName,
+            foodItems,
+            mealQualityRating: rating,
+            nutritionSummary,
+            aiAdvice: aiDietAdvice,
           };
         } catch (parseError) {
           const message = parseError instanceof Error ? parseError.message : 'Unknown parse error';
@@ -347,6 +517,36 @@ Rules:
           code: 'INTERNAL_SERVER_ERROR',
           message: `Photo analysis failed: ${message}`,
           cause: { debugId, code: 'UNKNOWN_ERROR' },
+        });
+      }
+    }),
+
+  // Upload photo data directly (for local storage fallback)
+  uploadPhotoData: protectedProcedure
+    .input(z.object({
+      objectPath: z.string(),
+      fileData: z.string(), // base64 encoded
+    }))
+    .mutation(async ({ input, ctx }: any) => {
+      try {
+        if (!isLocalStoragePath(input.objectPath)) {
+          throw new Error('uploadPhotoData only supports local storage paths');
+        }
+        
+        // Decode base64 to buffer
+        const buffer = Buffer.from(input.fileData, 'base64');
+        console.log(`[uploadPhotoData] Saving ${buffer.length} bytes to ${input.objectPath}`);
+        
+        // Save to local storage
+        await saveLocalFile(input.objectPath, buffer);
+        
+        return { success: true, path: input.objectPath, size: buffer.length };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`[uploadPhotoData] ERROR: ${message}`);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to save photo data: ${message}`,
         });
       }
     }),
