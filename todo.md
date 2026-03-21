@@ -447,3 +447,11 @@
 - [x] Navigate to /settings page on click
 - [x] Verify no UI changes to profile icon
 - [x] Test navigation works correctly
+
+
+## Calorie Target Update - Use Aggressive Mode
+- [x] Find where daily calorie target is set (Dashboard.tsx line 41)
+- [x] Update target to use aggressive mode kcal value (changed from dailyCalories to originalCalories)
+- [x] Verify no UI changes (layout and styling unchanged)
+- [x] Verify no logic changes (only target value source updated)
+- [x] Test and verify functionality (dashboard shows 1978 kcal aggressive mode target)
