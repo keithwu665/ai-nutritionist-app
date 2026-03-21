@@ -17,6 +17,8 @@ import FoodLog from "./pages/FoodLog";
 import ExerciseLog from "./pages/ExerciseLog";
 import Settings from "./pages/Settings";
 import SharePermissions from "./pages/SharePermissions";
+import InviteCoach from "./pages/InviteCoach";
+import InviteFriend from "./pages/InviteFriend";
 import Onboarding from "./pages/Onboarding";
 import AdminProducts from "./pages/AdminProducts";
 import BodyReportImport from "./pages/BodyReportImport";
@@ -86,6 +88,16 @@ function Router() {
       <Route path={"/share-permissions"}>
         <AppLayout>
           <SharePermissions />
+        </AppLayout>
+      </Route>
+      <Route path={"/invite-coach"}>
+        <AppLayout>
+          <InviteCoach />
+        </AppLayout>
+      </Route>
+      <Route path={"/invite-friend"}>
+        <AppLayout>
+          <InviteFriend />
         </AppLayout>
       </Route>
       <Route path={"/admin/products"}>

@@ -12,6 +12,19 @@ interface SharePermissions {
   friendCanViewExercise: boolean;
 }
 
+interface SharedUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'coach' | 'friend';
+  status: 'connected' | 'pending';
+  permissions: {
+    body?: boolean;
+    diet?: boolean;
+    workout?: boolean;
+  };
+}
+
 export default function SharePermissions() {
   const router = useRouter();
   const [permissions, setPermissions] = useState<SharePermissions>({
@@ -20,8 +33,9 @@ export default function SharePermissions() {
     friendCanViewFood: false,
     friendCanViewExercise: false,
   });
+  const [sharedUsers, setSharedUsers] = useState<SharedUser[]>([]);
 
-  // Load permissions from localStorage on mount
+  // Load permissions and shared users from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('sharePermissions');
     if (saved) {
@@ -32,6 +46,16 @@ export default function SharePermissions() {
         console.error('Failed to parse share permissions:', err);
       }
     }
+
+    const savedUsers = localStorage.getItem('sharedUsers');
+    if (savedUsers) {
+      try {
+        const parsed = JSON.parse(savedUsers);
+        setSharedUsers(parsed);
+      } catch (err) {
+        console.error('Failed to parse shared users:', err);
+      }
+    }
   }, []);
 
   // Save permissions to localStorage whenever they change
@@ -39,6 +63,12 @@ export default function SharePermissions() {
     const updated = { ...permissions, [key]: value };
     setPermissions(updated);
     localStorage.setItem('sharePermissions', JSON.stringify(updated));
+  };
+
+  const handleRemoveSharedUser = (userId: string) => {
+    const updated = sharedUsers.filter(u => u.id !== userId);
+    setSharedUsers(updated);
+    localStorage.setItem('sharedUsers', JSON.stringify(updated));
   };
 
   return (
@@ -164,6 +194,71 @@ export default function SharePermissions() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Invite Buttons */}
+        <div className="space-y-3">
+          <h2 className="text-base font-semibold text-gray-800">邀請</h2>
+          <div className="space-y-2">
+            <Button
+              onClick={() => router.push('/invite-coach')}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              邀請教練
+            </Button>
+            <Button
+              onClick={() => router.push('/invite-friend')}
+              variant="outline"
+              className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+            >
+              邀請朋友
+            </Button>
+          </div>
+        </div>
+
+        {/* Shared Users List */}
+        {sharedUsers.length > 0 && (
+          <div className="space-y-3">
+            <h2 className="text-base font-semibold text-gray-800">已分享對象</h2>
+            <div className="space-y-2">
+              {sharedUsers.map((user) => (
+                <Card key={user.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800">{user.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">
+                            {user.role === 'coach' ? '教練' : '朋友'}
+                          </span>
+                          <span className="text-xs text-gray-600">{user.status === 'connected' ? '已連接' : '待確認'}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => router.push(`/share-permissions/view/${user.id}`)}
+                          className="text-xs text-emerald-600 hover:bg-emerald-50"
+                        >
+                          查看權限
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveSharedUser(user.id)}
+                          className="text-xs text-red-600 hover:bg-red-50"
+                        >
+                          移除
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Info */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

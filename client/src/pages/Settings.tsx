@@ -1,5 +1,5 @@
-import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
+import { useAuth } from '@/_core/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,6 @@ import { Loader2, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/_core/hooks/useAuth';
 
 export default function Settings() {
   const { user, logout } = useAuth();
