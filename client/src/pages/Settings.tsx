@@ -72,6 +72,14 @@ export default function Settings() {
     return { bmr, tdee, target: calcResult.originalCalories, originalTarget: calcResult.originalCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
   })() : null;
 
+  // Calculate AGGRESSIVE mode target separately for the modal (always use 'aggressive' regardless of current mode)
+  const aggressiveModalTarget = profile ? (() => {
+    const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
+    const tdee = calculateTDEE(bmr, profile.activityLevel);
+    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, 'aggressive');
+    return calcResult.originalCalories;
+  })() : 0;
+
   // ========================================================================
   // INITIALIZE FORM DATA FROM PROFILE
   // ========================================================================
@@ -598,8 +606,8 @@ export default function Settings() {
       {/* ================================================================== */}
       <AggressiveCalorieModal
         isOpen={showAggressiveModal}
-        userTarget={metabolicData?.target || 0}
-        safetyMinimum={metabolicData?.target || 1200}
+        userTarget={aggressiveModalTarget}
+        safetyMinimum={aggressiveModalTarget}
         onConfirm={() => {
           setGoalSettings(prev => ({ ...prev, calorieMode: 'aggressive' }));
           setAggressiveModeConfirmed(true);
