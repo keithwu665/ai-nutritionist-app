@@ -440,12 +440,3 @@
 ## AI Suggestion Coach Personality & Weight Trend Bugs
 - [x] BUG 1: Coach personality not synced - AI suggestion tone doesn't match Settings selection (FIXED: Changed localStorage key from 'coachPersonality' to 'aiPersonality' and added event listener)
 - [x] BUG 2: Weight trend direction wrong - UI shows DOWN but AI says UP (FIXED: Corrected trend calculation logic in getTrend function)
-
-
-## AI Suggestion Weight Trend Logic Bug - FIXED
-- [x] Fix weight trend calculation - downward weight (58→57→56) incorrectly shown as UP
-- [x] Enhanced previousMetric lookup to find actual previous recorded date
-- [x] Added comprehensive debug logging for trend calculation
-- [x] Verified trend direction is correct in AI suggestion (2026-03-18: 56kg shows ↓ 1.0 kg)
-- [x] Verified AI suggestion correctly identifies downward trend as positive progress (on_track status)
-- [x] Tested with sample data (16/3=58, 17/3=57, 18/3=56) - all showing correct downward trend
