@@ -87,7 +87,7 @@ export default function Dashboard() {
             <button className="p-2 hover:bg-muted rounded-full transition-colors">
               <Bell className="h-5 w-5 text-foreground" />
             </button>
-            <button className="p-2 hover:bg-muted rounded-full transition-colors">
+            <button className="p-2 hover:bg-muted rounded-full transition-colors" onClick={() => setLocation('/settings')}>
               <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
                 <User className="h-4 w-4 text-primary" />
               </div>
