@@ -12,6 +12,7 @@ import { Loader2, LogOut, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/_core/hooks/useAuth';
 
 export default function Settings() {
   const { user, logout } = useAuth();
@@ -574,6 +575,30 @@ export default function Settings() {
                 />
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ================================================================== */}
+      {/* SECTION 5: PRIVACY & SECURITY */}
+      {/* ================================================================== */}
+      <div className="space-y-4 mb-8">
+        <h3 className="text-lg font-bold">私隱與安全</h3>
+
+        <Card>
+          <CardContent className="p-4">
+            <button
+              onClick={() => window.location.href = '/share-permissions'}
+              className="w-full text-left hover:bg-gray-50 p-3 rounded-lg transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-gray-800">分享權限管理</p>
+                  <p className="text-sm text-gray-600">管理教練 / 朋友的查看權限</p>
+                </div>
+                <span className="text-gray-400">›</span>
+              </div>
+            </button>
           </CardContent>
         </Card>
       </div>

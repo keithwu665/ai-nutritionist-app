@@ -594,7 +594,7 @@ export default function ExerciseLog() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="text-emerald-700">運動動作教學庫</CardTitle>
               <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 text-xs">
-                查看全部 &gt;
+                查看全部 ›
               </Button>
             </CardHeader>
             <CardContent>

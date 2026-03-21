@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
 import { BarChart3, Utensils, Activity, Settings, Dumbbell, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,12 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const { user, loading, isAuthenticated } = useAuth();
   const [location] = useLocation();
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      window.location.href = getLoginUrl();
+    }
+  }, [loading, isAuthenticated]);
 
   if (loading) {
     return (
@@ -20,8 +27,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   if (!isAuthenticated) {
-    window.location.href = getLoginUrl();
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-600 mx-auto" />
+          <p className="mt-4 text-gray-600">Redirecting to login...</p>
+        </div>
+      </div>
+    );
   }
 
   const navItems = [
