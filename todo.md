@@ -455,3 +455,13 @@
 - [x] Verify no UI changes (layout and styling unchanged)
 - [x] Verify no logic changes (only target value source updated)
 - [x] Test and verify functionality (dashboard shows 1978 kcal aggressive mode target)
+
+
+## Calorie Target Display Fix - Show Aggressive Mode Value
+- [ ] Find all UI places displaying dailyCalories
+- [ ] Replace dailyCalories with originalCalories in dashboard
+- [ ] Replace dailyCalories with originalCalories in settings page
+- [ ] Replace dailyCalories with originalCalories in summary cards
+- [ ] Verify dashboard shows 1978 kcal (aggressive mode)
+- [ ] Verify settings page shows 1978 kcal
+- [ ] Verify no fallback to safe mode values
