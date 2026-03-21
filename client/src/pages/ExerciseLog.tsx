@@ -588,6 +588,53 @@ export default function ExerciseLog() {
               <p className="text-xs text-gray-500 mt-4">💡 提示：根據您的運動歷史和目標自動生成</p>
             </CardContent>
           </Card>
+
+          {/* Exercise Movement Library Section */}
+          <Card className="border-emerald-200 bg-emerald-50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-emerald-700">運動動作教學庫</CardTitle>
+              <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 text-xs">
+                查看全部 &gt;
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {/* 2-row grid of exercise cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {/* Row 1 */}
+                <div className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-3xl mb-2">🦵</div>
+                  <p className="font-semibold text-gray-800 text-sm">深蹲</p>
+                  <p className="text-xs text-gray-600">初級</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-3xl mb-2">💪</div>
+                  <p className="font-semibold text-gray-800 text-sm">俯卧撐</p>
+                  <p className="text-xs text-gray-600">初級</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-3xl mb-2">📍</div>
+                  <p className="font-semibold text-gray-800 text-sm">平板支撐</p>
+                  <p className="text-xs text-gray-600">中級</p>
+                </div>
+                {/* Row 2 */}
+                <div className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-3xl mb-2">🏃</div>
+                  <p className="font-semibold text-gray-800 text-sm">弓步蹲</p>
+                  <p className="text-xs text-gray-600">初級</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-3xl mb-2">🤸</div>
+                  <p className="font-semibold text-gray-800 text-sm">引體向上</p>
+                  <p className="text-xs text-gray-600">高級</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="text-3xl mb-2">⚡</div>
+                  <p className="font-semibold text-gray-800 text-sm">硬拉</p>
+                  <p className="text-xs text-gray-600">中級</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

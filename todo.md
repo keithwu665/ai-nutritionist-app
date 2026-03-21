@@ -465,3 +465,13 @@
 - [ ] Verify dashboard shows 1978 kcal (aggressive mode)
 - [ ] Verify settings page shows 1978 kcal
 - [ ] Verify no fallback to safe mode values
+
+
+## Add Exercise Movement Library Section (運動動作教學庫)
+- [ ] Examine current Exercise page structure
+- [ ] Create exercise library section component with 2-row grid
+- [ ] Add 6 exercise cards (深蹲, 俯卧撐, 平板支撐, 弓步蹲, 引體向上, 硬拉)
+- [ ] Add "查看全部 >" action button
+- [ ] Style to match app design (soft green background, rounded corners)
+- [ ] Verify section displays below AI suggestion content
+- [ ] Test and verify no existing functionality is affected
