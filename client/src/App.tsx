@@ -25,6 +25,8 @@ import BodyReportImport from "./pages/BodyReportImport";
 import AIRecommendations from "./pages/AIRecommendations";
 import MoodLog from "./pages/MoodLog";
 import HomeRecipes from "./pages/HomeRecipes";
+import ProteinSelection from "./pages/ProteinSelection";
+import RecipeList from "./pages/RecipeList";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -82,6 +84,20 @@ function Router() {
         <AppLayout>
           <HomeRecipes />
         </AppLayout>
+      </Route>
+      <Route path={"/diet/inspiration/home-cooking/:category"}>
+        {({ category }) => (
+          <AppLayout>
+            <ProteinSelection category={category} />
+          </AppLayout>
+        )}
+      </Route>
+      <Route path={"/diet/inspiration/home-cooking/:category/recipes/:protein"}>
+        {({ category, protein }) => (
+          <AppLayout>
+            <RecipeList category={category} protein={protein} />
+          </AppLayout>
+        )}
       </Route>
       <Route path={"/exercise"}>
         <AppLayout>

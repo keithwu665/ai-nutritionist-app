@@ -2,33 +2,36 @@ import { useLocation } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft } from 'lucide-react';
-import { useState } from 'react';
 
-interface RecipeCategory {
+interface ProteinOption {
   id: string;
   name: string;
   emoji: string;
-  label: string;
 }
 
-const categories: RecipeCategory[] = [
-  { id: 'breakfast', name: '早餐', emoji: '🍳', label: 'Breakfast' },
-  { id: 'main', name: '正餐', emoji: '🍱', label: 'Main Course' },
-  { id: 'salad', name: '沙律', emoji: '🥗', label: 'Salad' },
-  { id: 'snack', name: '小食', emoji: '🍪', label: 'Snack' },
-  { id: 'soup', name: '湯類', emoji: '🍲', label: 'Soup' },
-  { id: 'other', name: '其他', emoji: '🍽', label: 'Other' },
+const proteins: ProteinOption[] = [
+  { id: 'chicken', name: '雞肉', emoji: '🐔' },
+  { id: 'pork', name: '豬肉', emoji: '🐷' },
+  { id: 'beef', name: '牛肉', emoji: '🐮' },
+  { id: 'seafood', name: '海鮮', emoji: '🐟' },
+  { id: 'eggs', name: '蛋類', emoji: '🥚' },
+  { id: 'vegetarian', name: '素食', emoji: '🌱' },
 ];
 
-export default function HomeRecipes() {
+interface ProteinSelectionProps {
+  category?: string;
+}
+
+export default function ProteinSelection({ category }: ProteinSelectionProps) {
   const [, navigate] = useLocation();
 
-  const handleCategoryClick = (categoryId: string) => {
-    navigate(`/diet/inspiration/home-cooking/${categoryId}`);
+  const handleProteinClick = (proteinId: string) => {
+    // Navigate to recipe list page with category and protein
+    navigate(`/diet/inspiration/home-cooking/${category}/recipes/${proteinId}`);
   };
 
   const handleBack = () => {
-    navigate('/food');
+    navigate('/diet/inspiration/home-cooking');
   };
 
   return (
@@ -43,23 +46,23 @@ export default function HomeRecipes() {
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-3xl font-bold">在家料理</h1>
+        <h1 className="text-3xl font-bold">選擇主要食材</h1>
       </div>
 
-      {/* Category Grid */}
+      {/* Protein Grid */}
       <div className="grid grid-cols-3 gap-4 md:gap-6">
-        {categories.map((category) => (
+        {proteins.map((protein) => (
           <button
-            key={category.id}
-            onClick={() => handleCategoryClick(category.id)}
+            key={protein.id}
+            onClick={() => handleProteinClick(protein.id)}
             className="focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-lg"
           >
             <Card className="cursor-pointer hover:shadow-lg transition-all hover:border-emerald-400 h-full border border-gray-200 rounded-xl">
               <CardContent className="p-6 flex flex-col items-center text-center space-y-3">
-                <div className="text-5xl">{category.emoji}</div>
+                <div className="text-5xl">{protein.emoji}</div>
                 <div className="space-y-1">
                   <h3 className="text-base font-semibold text-foreground">
-                    {category.name}
+                    {protein.name}
                   </h3>
                 </div>
               </CardContent>
@@ -70,7 +73,7 @@ export default function HomeRecipes() {
 
       {/* Placeholder Message */}
       <div className="text-center py-8 text-gray-500">
-        <p className="text-sm">選擇一個類別查看食譜</p>
+        <p className="text-sm">選擇主要食材查看食譜</p>
       </div>
     </div>
   );
