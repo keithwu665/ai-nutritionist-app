@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { getExerciseDisplay } from '@/lib/exerciseMapping';
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
+  const aiRecommendationsRef = useRef<HTMLDivElement>(null);
   const profileQuery = trpc.profile.get.useQuery();
   const { data: profile, isLoading: profileLoading, error: profileError } = profileQuery;
   const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
@@ -80,6 +81,13 @@ export default function Dashboard() {
   const carbs = 113;
   const totalMacros = protein + fat + carbs;
 
+  // Notification badge logic
+  const hasNegativeMood = todayMood === 'sad' || todayMood === 'angry' || todayMood === 'tired';
+  const hasProteinDeficit = protein < 30;
+  const noExerciseToday = todayExercise === 0;
+  const hasCalorieGap = remaining > 100;
+  const shouldShowNotification = hasNegativeMood || hasProteinDeficit || noExerciseToday || hasCalorieGap;
+
   const getDateString = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -109,8 +117,18 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">{getGreeting()}</h1>
           <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-muted rounded-full transition-colors">
+            <button 
+              className="p-2 hover:bg-muted rounded-full transition-colors relative"
+              onClick={() => {
+                aiRecommendationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              title="View AI recommendations"
+            >
               <Bell className="h-5 w-5 text-foreground" />
+              {/* Notification badge */}
+              {shouldShowNotification && (
+                <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+              )}
             </button>
             <button className="p-2 hover:bg-muted rounded-full transition-colors" onClick={() => setLocation('/settings')}>
               <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
@@ -293,7 +311,7 @@ export default function Dashboard() {
 
         {/* AI Recommendations Section */}
         {recs && (
-          <div className="space-y-3">
+          <div className="space-y-3" ref={aiRecommendationsRef}>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">AI 建議</h2>
               <button 

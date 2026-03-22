@@ -134,6 +134,14 @@
 - [x] Add 7-day mood statistics section
 - [x] Verified working with date selection and mood changes
 
+## Notification Bell Feature - COMPLETE
+- [x] Add scroll/navigation to bell icon
+- [x] Link bell to AI 建議 section
+- [x] Implement notification badge logic
+- [x] Show badge for: negative mood, protein deficit, no exercise, calorie gap
+- [x] Add pulse animation to badge
+- [x] Tested with mood changes and verified working
+
 ## Next Steps to Consider
 
 1. Add meal photo storage - Save original photos with food records for verification and historical reference
