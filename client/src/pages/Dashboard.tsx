@@ -60,6 +60,15 @@ export default function Dashboard() {
     target = 2000;
   }
 
+  // Calculate goal progress
+  const startWeight = Number(profile.weightKg) || 0;
+  const currentWeight = bodyMetrics?.weight || startWeight;
+  const goalWeightChange = goalKg;
+  const targetWeight = profile.fitnessGoal === 'lose' ? startWeight - goalWeightChange : startWeight + goalWeightChange;
+  const weightProgress = goalWeightChange > 0 ? Math.abs(startWeight - currentWeight) / goalWeightChange : 0;
+  const progressPercent = Math.min(100, Math.round(weightProgress * 100));
+  const weightRemaining = Math.abs(goalWeightChange - Math.abs(startWeight - currentWeight));
+
   const todayCalories = dashData?.today.calories ?? 0;
   const todayExercise = dashData?.today.exerciseCalories ?? 0;
   const netCalories = todayCalories - todayExercise;
@@ -251,22 +260,22 @@ export default function Dashboard() {
             </div>
             
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <p className="text-xs text-muted-foreground">起點 {profile.weightKg}kg</p>
-              <p className="text-xs text-muted-foreground text-right">目標 {profile.goalKg}kg</p>
+              <p className="text-xs text-muted-foreground">起點 {startWeight}kg</p>
+              <p className="text-xs text-muted-foreground text-right">目標 {targetWeight.toFixed(1)}kg</p>
             </div>
 
             <div className="w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
               <div 
                 className="bg-primary h-full rounded-full transition-all duration-300"
-                style={{ width: '35%' }}
+                style={{ width: `${progressPercent}%` }}
               ></div>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <p className="text-xs text-primary font-medium">35% 完成</p>
-              <p className="text-xs text-muted-foreground text-center">還差 3.6kg</p>
+              <p className="text-xs text-primary font-medium">{progressPercent}% 完成</p>
+              <p className="text-xs text-muted-foreground text-center">還差 {weightRemaining.toFixed(1)}kg</p>
               <div className="text-right">
-                <p className="text-2xl font-bold text-primary">92</p>
+                <p className="text-2xl font-bold text-primary">{goalDays}</p>
                 <p className="text-xs text-muted-foreground">天後</p>
               </div>
             </div>
