@@ -24,6 +24,7 @@ import AdminProducts from "./pages/AdminProducts";
 import BodyReportImport from "./pages/BodyReportImport";
 import AIRecommendations from "./pages/AIRecommendations";
 import MoodLog from "./pages/MoodLog";
+import HomeRecipes from "./pages/HomeRecipes";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -76,6 +77,11 @@ function Router() {
             <FoodLog />
           </AppLayout>
         )}
+      </Route>
+      <Route path={"/diet/inspiration/home-cooking"}>
+        <AppLayout>
+          <HomeRecipes />
+        </AppLayout>
       </Route>
       <Route path={"/exercise"}>
         <AppLayout>

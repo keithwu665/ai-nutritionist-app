@@ -500,3 +500,10 @@
 - [x] Implement modal open/close functionality
 - [x] Test on live site
 - [x] Verify mobile interaction
+
+## Home Cooking (在家料理) Category Page - COMPLETE
+- [x] Create HomeRecipes page with category grid layout
+- [x] Implement 6 category cards (早餐, 正餐, 沙律, 小食, 湯類, 其他)
+- [x] Add routing and navigation from Food page
+- [x] Test category selection on live site
+- [x] Verify responsive layout on mobile
