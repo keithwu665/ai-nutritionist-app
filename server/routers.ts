@@ -9,6 +9,7 @@ import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
 import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
+import { getMentalAdviceByMoodId } from "./utils/mentalWellnessEngine";
 import { dataExportRouter } from "./routers/dataExport";
 
 export const appRouter = router({
@@ -1252,6 +1253,13 @@ export const appRouter = router({
       }))
       .query(async ({ ctx, input }) => {
         return db.getMoodRecord(ctx.user.id, input.date);
+      }),
+    getMentalAdvice: protectedProcedure
+      .input(z.object({
+        mood: z.enum(['happy', 'neutral', 'sad', 'angry', 'tired']).optional(),
+      }))
+      .query(async ({ input }) => {
+        return getMentalAdviceByMoodId(input.mood || 'neutral');
       }),
   }),
 });

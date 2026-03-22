@@ -9,6 +9,7 @@ import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@share
 import { getExerciseDisplay } from '@/lib/exerciseMapping';
 import { getTodayDateString } from '@/lib/moodUtils';
 import MoodCalendar from '@/components/MoodCalendar';
+import MentalWellnessAdvice from '@/components/MentalWellnessAdvice';
 
 
 export default function Dashboard() {
@@ -354,6 +355,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Mental Wellness Advice */}
+            <MentalWellnessAdvice mood={todayMood as any} />
           </div>
         )}
 
