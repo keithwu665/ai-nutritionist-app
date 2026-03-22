@@ -35,7 +35,7 @@ export default function RecipeMethodSelection() {
     if (optionId === 'recipe-page') {
       // Navigate to recipe list page
       navigate(
-        `/diet/inspiration/home-cooking/${category}/${protein}/recipes?category=${category}&protein=${protein}`
+        `/diet/inspiration/home-cooking/${category}/${protein}/recipes`
       );
     } else {
       navigate(

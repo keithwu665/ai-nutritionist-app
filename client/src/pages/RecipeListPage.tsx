@@ -1,4 +1,4 @@
-import { useLocation } from 'wouter';
+import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ChevronLeft, Clock, Flame } from 'lucide-react';
@@ -7,42 +7,44 @@ import { ChevronLeft, Clock, Flame } from 'lucide-react';
 const recipesByProtein: Record<string, Array<{ id: string; name: string; kcal: number; time: string }>> = {
   chicken: [
     { id: 'c1', name: '香煎雞胸沙律', kcal: 420, time: '15分鐘' },
-    { id: 'c2', name: '雞胸粟米飯', kcal: 580, time: '20分鐘' },
+    { id: 'c2', name: '雞胸栗米飯', kcal: 580, time: '20分鐘' },
     { id: 'c3', name: '蒜香雞胸蔬菜碗', kcal: 450, time: '18分鐘' },
   ],
   pork: [
-    { id: 'p1', name: '豬肉蔬菜炒飯', kcal: 520, time: '20分鐘' },
-    { id: 'p2', name: '香煎豬扒配沙律', kcal: 480, time: '16分鐘' },
+    { id: 'p1', name: '香煎豬扒配沙律', kcal: 480, time: '16分鐘' },
+    { id: 'p2', name: '豬肉蔬菜炒飯', kcal: 520, time: '20分鐘' },
     { id: 'p3', name: '豬肉味噌湯', kcal: 350, time: '15分鐘' },
   ],
   beef: [
-    { id: 'b1', name: '牛肉番茄飯', kcal: 620, time: '25分鐘' },
-    { id: 'b2', name: '香煎牛排配蔬菜', kcal: 550, time: '20分鐘' },
-    { id: 'b3', name: '牛肉蘑菇湯', kcal: 380, time: '18分鐘' },
+    { id: 'b1', name: '牛肉炒西蘭花', kcal: 480, time: '18分鐘' },
+    { id: 'b2', name: '黑椒牛肉飯', kcal: 620, time: '22分鐘' },
+    { id: 'b3', name: '牛肉蔬菜碗', kcal: 520, time: '20分鐘' },
   ],
   seafood: [
-    { id: 's1', name: '蒜香蝦沙律', kcal: 320, time: '12分鐘' },
-    { id: 's2', name: '清蒸魚配米飯', kcal: 450, time: '20分鐘' },
-    { id: 's3', name: '海鮮湯麵', kcal: 480, time: '18分鐘' },
+    { id: 's1', name: '三文魚沙律', kcal: 380, time: '12分鐘' },
+    { id: 's2', name: '蒜蓉蝦意粉', kcal: 520, time: '20分鐘' },
+    { id: 's3', name: '海鮮湯', kcal: 420, time: '18分鐘' },
   ],
   eggs: [
-    { id: 'e1', name: '蛋白沙律', kcal: 280, time: '10分鐘' },
-    { id: 'e2', name: '番茄蛋飯', kcal: 420, time: '15分鐘' },
-    { id: 'e3', name: '蛋花湯配麵包', kcal: 350, time: '12分鐘' },
+    { id: 'e1', name: '菠菜炒蛋', kcal: 320, time: '10分鐘' },
+    { id: 'e2', name: '蛋白早餐碗', kcal: 380, time: '12分鐘' },
+    { id: 'e3', name: '番茄滑蛋', kcal: 350, time: '12分鐘' },
   ],
   vegetarian: [
-    { id: 'v1', name: '豆腐沙律', kcal: 280, time: '10分鐘' },
-    { id: 'v2', name: '蔬菜炒飯', kcal: 380, time: '15分鐘' },
-    { id: 'v3', name: '蔬菜湯麵', kcal: 320, time: '12分鐘' },
+    { id: 'v1', name: '雜菜豆腐碗', kcal: 320, time: '15分鐘' },
+    { id: 'v2', name: '牛油果沙律', kcal: 380, time: '10分鐘' },
+    { id: 'v3', name: '南瓜濃湯', kcal: 280, time: '20分鐘' },
   ],
 };
 
 export function RecipeListPage() {
   const [, setLocation] = useLocation();
-  const searchParams = new URLSearchParams(window.location.search);
-  const protein = searchParams.get('protein') || 'chicken';
-  const category = searchParams.get('category') || 'breakfast';
+  const params = useParams<{ category: string; protein: string }>();
+  
+  const category = params.category || 'breakfast';
+  const protein = params.protein || 'chicken';
 
+  // Get recipes for the selected protein type
   const recipes = recipesByProtein[protein] || recipesByProtein.chicken;
 
   const handleRecipeSelect = (recipeId: string) => {
