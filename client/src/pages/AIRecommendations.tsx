@@ -28,6 +28,16 @@ export default function AIRecommendations() {
     );
   }
 
+  // Filter out diet and exercise items from encouragement to avoid duplication
+  const filteredEncouragement = (recommendations?.encouragement || []).filter((item: any) => {
+    const content = (item.content || '').toLowerCase();
+    const title = (item.title || '').toLowerCase();
+    // Exclude items that are clearly diet or exercise related
+    const isDiet = content.includes('飲食') || content.includes('食物') || content.includes('卡路里') || content.includes('營養') || title.includes('飲食');
+    const isExercise = content.includes('運動') || content.includes('健身') || content.includes('鍛鍊') || content.includes('訓練') || title.includes('運動');
+    return !isDiet && !isExercise;
+  });
+
   const categories = [
     {
       id: 'diet',
@@ -55,7 +65,7 @@ export default function AIRecommendations() {
       title: '全面建議',
       icon: Sparkles,
       color: 'bg-purple-50 border-purple-100',
-      items: recommendations?.encouragement || [],
+      items: filteredEncouragement,
     },
   ];
 
