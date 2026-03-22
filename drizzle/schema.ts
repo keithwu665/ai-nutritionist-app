@@ -209,3 +209,17 @@ export const users = mysqlTable("users", {
 (table) => [
 	index("users_openId_unique").on(table.openId),
 ]);
+
+
+export const moodRecords = mysqlTable("mood_records", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	date: varchar({ length: 10 }).notNull(), // YYYY-MM-DD format
+	mood: mysqlEnum(['happy', 'neutral', 'sad', 'angry', 'tired']).notNull(),
+	note: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("mood_records_userId_date_unique").on(table.userId, table.date),
+]);

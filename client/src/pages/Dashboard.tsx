@@ -7,6 +7,8 @@ import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRigh
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
 import { getExerciseDisplay } from '@/lib/exerciseMapping';
+import { getTodayDateString } from '@/lib/moodUtils';
+import MoodCalendar from '@/components/MoodCalendar';
 
 
 export default function Dashboard() {
@@ -30,12 +32,16 @@ export default function Dashboard() {
     }
   }, [profileLoading, profile, setLocation]);
 
+  const saveMoodMutation = trpc.mood.save.useMutation();
+
   const handleMoodSelect = (mood: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const moods = JSON.parse(localStorage.getItem('userMoods') || '{}');
-    moods[today] = mood;
-    localStorage.setItem('userMoods', JSON.stringify(moods));
+    const today = getTodayDateString();
     setTodayMood(mood);
+    // Save to database
+    saveMoodMutation.mutate({
+      date: today,
+      mood: mood,
+    });
   };
 
   const isLoading = (!profile && profileLoading) || (!dashData && dashLoading) || (!recs && recsLoading);
@@ -151,6 +157,9 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+        
+        {/* Mood Calendar */}
+        <MoodCalendar />
         
         {/* Hero Calorie Card - Emerald Green */}
         <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">

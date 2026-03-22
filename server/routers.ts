@@ -1223,8 +1223,36 @@ export const appRouter = router({
         const user = await db.getUserById(ctx.user.id);
         if (user?.role !== 'admin') throw new Error('Only admins can delete Fitasty products');
         return db.deleteFitastyProduct(input.id);
+       }),
+  }),
+  // ========================================================================
+  // Mood Tracking
+  // ========================================================================
+  mood: router({
+    save: protectedProcedure
+      .input(z.object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        mood: z.enum(['happy', 'neutral', 'sad', 'angry', 'tired']),
+        note: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.saveMoodRecord(ctx.user.id, input.date, input.mood, input.note);
+      }),
+    getMonthRecords: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        month: z.number().min(1).max(12),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getMoodRecordsForMonth(ctx.user.id, input.year, input.month);
+      }),
+    getRecord: protectedProcedure
+      .input(z.object({
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      }))
+      .query(async ({ ctx, input }) => {
+        return db.getMoodRecord(ctx.user.id, input.date);
       }),
   }),
 });
-
 export type AppRouter = typeof appRouter;
