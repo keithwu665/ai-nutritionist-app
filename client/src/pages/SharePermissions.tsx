@@ -271,23 +271,7 @@ export default function SharePermissions() {
           {sharedUsers.length === 0 ? (
             <Card>
               <CardContent className="p-6 text-center">
-                <p className="text-gray-600 mb-4">你尚未分享任何資料</p>
-                <div className="space-y-2">
-                  <Button
-                    onClick={() => router.push('/invite-coach')}
-                    variant="outline"
-                    className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"
-                  >
-                    邀請教練
-                  </Button>
-                  <Button
-                    onClick={() => router.push('/invite-friend')}
-                    variant="outline"
-                    className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"
-                  >
-                    邀請朋友
-                  </Button>
-                </div>
+                <p className="text-gray-600">你尚未分享任何資料</p>
               </CardContent>
             </Card>
           ) : (
