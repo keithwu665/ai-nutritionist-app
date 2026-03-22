@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,16 +10,32 @@ import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@share
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const [todayMood, setTodayMood] = useState<string | null>(null);
   const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
   const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
   const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery();
   const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
+
+  // Load mood from localStorage on mount
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const moods = JSON.parse(localStorage.getItem('userMoods') || '{}');
+    setTodayMood(moods[today] || null);
+  }, []);
 
   useEffect(() => {
     if (!profileLoading && !profile) {
       setLocation('/onboarding');
     }
   }, [profileLoading, profile, setLocation]);
+
+  const handleMoodSelect = (mood: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const moods = JSON.parse(localStorage.getItem('userMoods') || '{}');
+    moods[today] = mood;
+    localStorage.setItem('userMoods', JSON.stringify(moods));
+    setTodayMood(mood);
+  };
 
   const isLoading = (!profile && profileLoading) || (!dashData && dashLoading) || (!recs && recsLoading);
 
@@ -98,6 +114,33 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="p-4 md:p-8 space-y-3 md:space-y-4 max-w-7xl mx-auto">
+        
+        {/* Mood Check-in Section */}
+        <div className="bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100">
+          <p className="text-sm font-semibold mb-2.5 text-foreground">今日心情</p>
+          <div className="flex gap-2 justify-between">
+            {[
+              { id: 'happy', emoji: '😊', label: '開心' },
+              { id: 'neutral', emoji: '😐', label: '普通' },
+              { id: 'sad', emoji: '😞', label: '低落' },
+              { id: 'stressed', emoji: '😡', label: '煩躁' },
+              { id: 'tired', emoji: '😴', label: '疲倦' },
+            ].map((mood) => (
+              <button
+                key={mood.id}
+                onClick={() => handleMoodSelect(mood.id)}
+                className={`flex-1 flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                  todayMood === mood.id
+                    ? 'bg-primary/10 border border-primary'
+                    : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                <span className="text-lg md:text-xl">{mood.emoji}</span>
+                <span className="text-xs font-medium text-foreground">{mood.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
         
         {/* Hero Calorie Card - Emerald Green */}
         <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">
@@ -199,208 +242,123 @@ export default function Dashboard() {
         </div>
 
         {/* Goal Progress Card */}
-        {(() => {
-          const goalKgNum = profile.goalKg ? Number(profile.goalKg) : 0;
-          const goalDaysNum = profile.goalDays ? Number(profile.goalDays) : 0;
-          const currentWt = Number(profile.weightKg) || 0;
-          let targetWeight = currentWt;
-          if (profile.fitnessGoal === 'lose' && goalKgNum > 0) {
-            targetWeight = currentWt - goalKgNum;
-          } else if (profile.fitnessGoal === 'gain' && goalKgNum > 0) {
-            targetWeight = currentWt + goalKgNum;
-          }
-          const remainingKg = Math.max(0, Math.abs(targetWeight - currentWt));
-          const progressPercent = goalKgNum > 0 ? Math.min(100, ((goalKgNum - remainingKg) / goalKgNum) * 100) : 0;
-          return (
-            <Card className="rounded-2xl">
-              <CardContent className="pt-3 pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-sm">目標進度</h3>
-                  <button 
-                  onClick={() => setLocation('/body')}
-                  className="text-primary text-xs font-medium flex items-center gap-1 hover:opacity-80"
-                >
-                    詳情 <ChevronRight className="h-3 w-3" />
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                    <div 
-                      className="bg-primary h-full rounded-full transition-all duration-300"
-                      style={{ width: `${progressPercent}%` }}
-                    ></div>
-                  </div>
-                  <div className="grid grid-cols-4 text-center text-xs gap-1">
-                    <div>
-                      <p className="text-muted-foreground text-xs">起點</p>
-                      <p className="font-bold text-sm">{currentWt.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">目標</p>
-                      <p className="font-bold text-sm">{targetWeight.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">還差</p>
-                      <p className="font-bold text-sm">{remainingKg.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">天後</p>
-                      <p className="font-bold text-primary text-sm">{goalDaysNum}</p>
-                    </div>
-                  </div>
-                  {goalDaysNum > 0 && goalKgNum > 0 && (
-                    <div className="mt-3 pt-3 border-t border-muted">
-                      <p className="text-xs text-muted-foreground">👉 每週約減 {((goalKgNum * 7) / goalDaysNum).toFixed(1)}–{((goalKgNum * 7) / goalDaysNum + 0.1).toFixed(1)} kg</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })()}
-
-        {/* Weight Trend Card */}
         <Card className="rounded-2xl">
-          <CardContent className="pt-5 pb-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">體重趨勢（7日）</h3>
-              <button 
-                onClick={() => setLocation('/body')}
-                className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
-              >
-                查看更多 <ChevronRight className="h-4 w-4" />
-              </button>
+          <CardContent className="pt-4 pb-4">
+            <div className="flex justify-between items-start mb-3">
+              <p className="text-sm font-semibold">目標進度</p>
+              <button className="text-xs text-primary hover:underline flex items-center gap-1">詳情 <ChevronRight className="h-3 w-3" /></button>
             </div>
-            <p className="text-sm text-green-600 font-medium mb-4">📈 7日下降 0.9 kg</p>
-            {dashData?.weightTrend && dashData.weightTrend.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={dashData.weightTrend.map(d => ({ ...d, date: d.date.slice(5) }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                  <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 3 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
-                暫無體重數據
+            
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <p className="text-xs text-muted-foreground">起點 {profile.weightKg}kg</p>
+              <p className="text-xs text-muted-foreground text-right">目標 {profile.goalKg}kg</p>
+            </div>
+
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+              <div 
+                className="bg-primary h-full rounded-full transition-all duration-300"
+                style={{ width: '35%' }}
+              ></div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <p className="text-xs text-primary font-medium">35% 完成</p>
+              <p className="text-xs text-muted-foreground text-center">還差 3.6kg</p>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-primary">92</p>
+                <p className="text-xs text-muted-foreground">天後</p>
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
 
-        {/* Exercise Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">今日運動</h3>
+        {/* AI Recommendations Section */}
+        {recs && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">AI 建議</h2>
+              <button 
+                onClick={() => setLocation('/recommendations')}
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+              >
+                查看全部 <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
+
+            {/* Diet Recommendation */}
+            <Card className="rounded-2xl bg-blue-50 border-blue-100">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">🍽️</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold mb-1">飲食建議</p>
+                    <p className="text-xs text-muted-foreground">{recs.nutritionAdvice || '增加蛋白質攝入，保持營養均衡。'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Exercise Recommendation */}
+            <Card className="rounded-2xl bg-green-50 border-green-100">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">💪</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold mb-1">運動建議</p>
+                    <p className="text-xs text-muted-foreground">{recs.exerciseAdvice || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Today's Exercise */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">今日運動</h2>
             <button 
               onClick={() => setLocation('/exercise')}
-              className="p-1.5 hover:bg-muted rounded-lg transition-colors"
+              className="text-xs text-primary hover:underline flex items-center gap-1"
             >
-              <Plus className="h-5 w-5 text-primary" />
+              查看詳情 <ChevronRight className="h-3 w-3" />
             </button>
           </div>
-          <Card className="rounded-2xl bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900">
-            <CardContent className="pt-4 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                  <span className="text-xl">🏋️</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-sm">健身</p>
-                  <p className="text-xs text-muted-foreground">45 分鐘 · 中強度</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-primary">280</p>
-                  <p className="text-xs text-muted-foreground">kcal</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* AI Recommendations */}
-        <div>
-          <h3 className="font-semibold mb-4">今日 AI 建議 🤖</h3>
-          <div className="space-y-3">
-            {recsLoading ? (
-              <div className="flex justify-center py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              </div>
-            ) : recs && (recs.diet?.length || recs.exercise?.length || recs.encouragement?.length) ? (
-              <>
-                {recs.diet?.map((rec, i) => (
-                  <RecCard key={`diet-${i}`} rec={rec} icon="🍽" />
-                ))}
-                {recs.exercise?.map((rec, i) => (
-                  <RecCard key={`ex-${i}`} rec={rec} icon="🏃" />
-                ))}
-                {recs.encouragement?.map((rec, i) => (
-                  <RecCard key={`enc-${i}`} rec={rec} icon="⭐" isEncouragement />
-                ))}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">暫無建議</p>
-            )}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div>
-          <h3 className="font-semibold mb-4">快速記錄</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <QuickActionCard 
-              icon="🍽" 
-              label="記錄餐點"
-              onClick={() => setLocation('/food')}
-            />
-            <QuickActionCard 
-              icon="🏃" 
-              label="記錄運動"
-              onClick={() => setLocation('/exercise')}
-            />
-            <QuickActionCard 
-              icon="⚖️" 
-              label="量體重"
-              onClick={() => setLocation('/body')}
-            />
-            <QuickActionCard 
-              icon="👨‍🏫" 
-              label="教練分享"
-              onClick={() => setLocation('/settings')}
-            />
-          </div>
+          {dashData?.today.exercises && dashData.today.exercises.length > 0 ? (
+            <div className="space-y-2">
+              {dashData.today.exercises.map((exercise, idx) => (
+                <Card key={idx} className="rounded-2xl">
+                  <CardContent className="pt-3 pb-3">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-sm font-semibold">{exercise.name}</p>
+                        <p className="text-xs text-muted-foreground">{exercise.duration} min · {exercise.calories} kcal</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-primary">{exercise.calories}</p>
+                        <p className="text-xs text-muted-foreground">kcal</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card className="rounded-2xl">
+              <CardContent className="pt-4 pb-4 text-center">
+                <p className="text-sm text-muted-foreground">今日暫無運動記錄</p>
+                <button 
+                  onClick={() => setLocation('/exercise')}
+                  className="text-xs text-primary hover:underline mt-2"
+                >
+                  + 新增運動
+                </button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
-  );
-}
-
-function RecCard({ rec, icon, isEncouragement }: { rec: { title: string; content: string; action: string }, icon: string, isEncouragement?: boolean }) {
-  return (
-    <Card className="rounded-2xl border-l-4 border-l-primary">
-      <CardContent className="pt-4 pb-4">
-        <div className="flex items-start gap-3">
-          <span className="text-xl shrink-0">{icon}</span>
-          <div className="flex-1">
-            <p className="font-semibold text-sm">{rec.title}</p>
-            <p className="text-xs text-muted-foreground mt-1">{rec.content}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function QuickActionCard({ icon, label, onClick }: { icon: string, label: string, onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="p-4 rounded-2xl bg-card border border-border hover:border-primary hover:shadow-md transition-all flex flex-col items-center justify-center gap-2"
-    >
-      <span className="text-3xl">{icon}</span>
-      <span className="text-xs font-medium text-foreground text-center">{label}</span>
-    </button>
   );
 }

@@ -147,6 +147,21 @@ export function generateNutritionSummary(values: NutritionValues): string {
 }
 
 // ============================================
+// MOOD MODIFIER HELPER
+// ============================================
+
+function getMoodModifier(mood: string): string {
+  const moodMap: Record<string, string> = {
+    happy: 'User is in a happy mood - be more positive and celebratory about their nutrition choices.',
+    neutral: 'User is in a neutral mood - provide balanced, straightforward advice.',
+    sad: 'User is in a sad mood - be extra supportive and encouraging, avoid harsh criticism.',
+    stressed: 'User is stressed - acknowledge the stress and suggest practical, stress-reducing nutrition tips.',
+    tired: 'User is tired - suggest lighter meals and recovery-focused nutrition, avoid overwhelming suggestions.',
+  };
+  return moodMap[mood] || '';
+}
+
+// ============================================
 // PART 4: AI DIET ADVICE (REAL INTERPRETATION)
 // ============================================
 
@@ -154,6 +169,7 @@ async function generateAIDietAdviceWithAI(
   facts: NutritionFacts,
   values: NutritionValues,
   personality: PersonalityType,
+  mood?: string,
   retryCount: number = 0
 ): Promise<string> {
   if (retryCount > 3) {
@@ -308,7 +324,8 @@ function generateFallbackAdvice(facts: NutritionFacts, values: NutritionValues, 
 
 export async function generateNutritionAdvice(
   values: NutritionValues,
-  personality: PersonalityType
+  personality: PersonalityType,
+  mood?: string
 ): Promise<AdviceResult> {
   // STEP 1: Generate structured nutrition facts
   const facts = generateNutritionFacts(values);
@@ -320,7 +337,7 @@ export async function generateNutritionAdvice(
   const nutritionSummary = generateNutritionSummary(values);
 
   // STEP 4: Generate real AI diet advice (interpretation + recommendation)
-  const aiDietAdvice = await generateAIDietAdviceWithAI(facts, values, personality);
+  const aiDietAdvice = await generateAIDietAdviceWithAI(facts, values, personality, mood);
 
   return {
     rating,
