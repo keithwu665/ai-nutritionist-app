@@ -8,7 +8,6 @@ import { Loader2, ChevronLeft, Utensils, Dumbbell, Heart, Sparkles } from 'lucid
 export default function AIRecommendations() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
-  const [selectedPersonality, setSelectedPersonality] = useState<'gentle' | 'coach' | 'hongkong'>('gentle');
 
   // Load mood from localStorage on mount
   useEffect(() => {
@@ -29,15 +28,8 @@ export default function AIRecommendations() {
     );
   }
 
-  // Get recommendations for selected personality
-  const currentRecs = selectedPersonality === 'coach' 
-    ? recommendations?.coach 
-    : selectedPersonality === 'hongkong' 
-    ? recommendations?.hongkong 
-    : recommendations?.gentle;
-
   // Filter out diet and exercise items from encouragement to avoid duplication
-  const filteredEncouragement = (currentRecs?.encouragement || []).filter((item: any) => {
+  const filteredEncouragement = (recommendations?.encouragement || []).filter((item: any) => {
     const content = (item.content || '').toLowerCase();
     const title = (item.title || '').toLowerCase();
     const isDiet = content.includes('飲食') || content.includes('食物') || content.includes('卡路里') || content.includes('營養') || title.includes('飲食');
@@ -51,21 +43,21 @@ export default function AIRecommendations() {
       title: '飲食建議',
       icon: Utensils,
       color: 'bg-blue-50 border-blue-100',
-      items: currentRecs?.diet || [],
+      items: recommendations?.diet || [],
     },
     {
       id: 'exercise',
       title: '運動建議',
       icon: Dumbbell,
       color: 'bg-green-50 border-green-100',
-      items: currentRecs?.exercise || [],
+      items: recommendations?.exercise || [],
     },
     {
       id: 'body',
       title: '身體建議',
       icon: Heart,
       color: 'bg-pink-50 border-pink-100',
-      items: currentRecs?.body || [],
+      items: recommendations?.body || [],
     },
     {
       id: 'overall',
@@ -76,17 +68,11 @@ export default function AIRecommendations() {
     },
   ];
 
-  const personalityLabels = {
-    gentle: '【溫柔貼身教練】',
-    coach: '【魔鬼教練】',
-    hongkong: '【香港寸嘴教練】',
-  };
-
   return (
     <div className="pb-32 md:pb-8">
       {/* Header */}
       <div className="p-4 md:p-8 border-b border-gray-200">
-        <div className="flex items-center gap-4 max-w-7xl mx-auto mb-6">
+        <div className="flex items-center gap-4 max-w-7xl mx-auto">
           <button
             onClick={() => setLocation('/dashboard')}
             className="p-2 hover:bg-muted rounded-full transition-colors"
@@ -94,24 +80,6 @@ export default function AIRecommendations() {
             <ChevronLeft className="h-5 w-5" />
           </button>
           <h1 className="text-2xl font-bold">AI 建議</h1>
-        </div>
-
-        {/* Personality Selector */}
-        <div className="max-w-7xl mx-auto">
-          <p className="text-sm text-muted-foreground mb-3">選擇教練風格：</p>
-          <div className="flex gap-2 flex-wrap">
-            {(['gentle', 'coach', 'hongkong'] as const).map((personality) => (
-              <Button
-                key={personality}
-                variant={selectedPersonality === personality ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedPersonality(personality)}
-                className="text-xs"
-              >
-                {personality === 'gentle' ? '溫柔教練' : personality === 'coach' ? '魔鬼教練' : '香港教練'}
-              </Button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -137,7 +105,6 @@ export default function AIRecommendations() {
                     <Card key={idx} className={`${category.color} border`}>
                       <CardContent className="p-4">
                         <div className="mb-2">
-                          <p className="font-semibold text-sm">{personalityLabels[selectedPersonality]}</p>
                           <p className="font-medium mt-1">{item.title}</p>
                         </div>
                         <p className="text-sm text-gray-700 mb-3 leading-relaxed">{item.content}</p>

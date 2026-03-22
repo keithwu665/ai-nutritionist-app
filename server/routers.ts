@@ -770,26 +770,16 @@ export const appRouter = router({
 
       let recommendations = generateAllRecommendations(analysisData);
 
-      // Generate recommendations for all 3 personalities
-      const gentleRecs = await transformAllRecommendationsWithPersonality(recommendations, 'gentle', input.mood);
-      const coachRecs = await transformAllRecommendationsWithPersonality(recommendations, 'coach', input.mood);
-      const hongkongRecs = await transformAllRecommendationsWithPersonality(recommendations, 'hongkong', input.mood);
-
-      const formatRecs = (recs: any) => ({
-        diet: recs.diet.slice(0, 3),
-        exercise: recs.exercise.slice(0, 2),
-        body: recs.body,
-        encouragement: recs.encouragement,
-      });
-
+      // Use selected coach personality from user profile
       const aiToneStyle = profile.aiToneStyle || 'gentle';
-      const selectedRecs = aiToneStyle === 'coach' ? coachRecs : aiToneStyle === 'hk_style' ? hongkongRecs : gentleRecs;
+      const personality = aiToneStyle === 'coach' ? 'coach' : aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
+      const selectedRecs = await transformAllRecommendationsWithPersonality(recommendations, personality, input.mood);
 
       return {
-        ...formatRecs(selectedRecs),
-        gentle: formatRecs(gentleRecs),
-        coach: formatRecs(coachRecs),
-        hongkong: formatRecs(hongkongRecs),
+        diet: selectedRecs.diet.slice(0, 3),
+        exercise: selectedRecs.exercise.slice(0, 2),
+        body: selectedRecs.body,
+        encouragement: selectedRecs.encouragement,
       };
     }),
   }),
