@@ -336,7 +336,7 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-sm font-semibold flex items-center gap-2"><span>{icon}</span> {label}</p>
-                        <p className="text-xs text-muted-foreground">{exercise.duration} min · {exercise.calories} kcal</p>
+                        <p className="text-xs text-muted-foreground">{exercise.duration} 分鐘</p>
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-primary">{exercise.calories}</p>
