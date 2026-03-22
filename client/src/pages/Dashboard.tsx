@@ -254,9 +254,8 @@ export default function Dashboard() {
         {/* Goal Progress Card */}
         <Card className="rounded-2xl">
           <CardContent className="pt-4 pb-4">
-            <div className="flex justify-between items-start mb-3">
+            <div className="mb-3">
               <p className="text-sm font-semibold">目標進度</p>
-              <button className="text-xs text-primary hover:underline">more</button>
             </div>
             
             <div className="grid grid-cols-2 gap-2 mb-3">
