@@ -212,47 +212,51 @@ export default function Dashboard() {
           const remainingKg = Math.max(0, Math.abs(targetWeight - currentWt));
           const progressPercent = goalKgNum > 0 ? Math.min(100, ((goalKgNum - remainingKg) / goalKgNum) * 100) : 0;
           return (
-            <Card className="rounded-2xl">
-              <CardContent className="pt-3 pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-sm">目標進度</h3>
+            <Card className="rounded-3xl border-0 shadow-sm">
+              <CardContent className="pt-6 pb-6 px-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-gray-900 text-lg">目標進度</h3>
                   <button 
-                  onClick={() => setLocation('/body')}
-                  className="text-primary text-xs font-medium flex items-center gap-1 hover:opacity-80"
-                >
-                    詳情 <ChevronRight className="h-3 w-3" />
+                    onClick={() => setLocation('/body')}
+                    className="text-emerald-600 text-sm font-medium flex items-center gap-1 hover:opacity-80"
+                  >
+                    詳情 <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="space-y-2">
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+
+                {/* Top Row: Starting and Target Weight */}
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <p className="text-sm text-gray-600 font-medium">起點 {currentWt.toFixed(1)}kg</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600 font-medium">目標 {targetWeight.toFixed(1)}kg</p>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mb-3">
+                  <div className="w-full bg-emerald-200 rounded-full h-3 overflow-hidden">
                     <div 
-                      className="bg-primary h-full rounded-full transition-all duration-300"
+                      className="bg-emerald-500 h-full rounded-full transition-all duration-300"
                       style={{ width: `${progressPercent}%` }}
                     ></div>
                   </div>
-                  <div className="grid grid-cols-4 text-center text-xs gap-1">
-                    <div>
-                      <p className="text-muted-foreground text-xs">起點</p>
-                      <p className="font-bold text-sm">{currentWt.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">目標</p>
-                      <p className="font-bold text-sm">{targetWeight.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">還差</p>
-                      <p className="font-bold text-sm">{remainingKg.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">天後</p>
-                      <p className="font-bold text-primary text-sm">{goalDaysNum}</p>
-                    </div>
+                </div>
+
+                {/* Bottom Row: Completion %, Remaining, Days */}
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="text-sm text-emerald-600 font-medium">{Math.round(progressPercent)}% 完成</p>
                   </div>
-                  {goalDaysNum > 0 && goalKgNum > 0 && (
-                    <div className="mt-3 pt-3 border-t border-muted">
-                      <p className="text-xs text-muted-foreground">👉 每週約減 {((goalKgNum * 7) / goalDaysNum).toFixed(1)}–{((goalKgNum * 7) / goalDaysNum + 0.1).toFixed(1)} kg</p>
-                    </div>
-                  )}
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 font-medium">還差 {remainingKg.toFixed(1)}kg</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-4xl font-bold text-emerald-600">{goalDaysNum}</p>
+                    <p className="text-xs text-gray-600 font-medium">天後</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
