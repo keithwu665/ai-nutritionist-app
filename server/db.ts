@@ -422,7 +422,7 @@ export async function getFitastyProductsByCategory(category: string) {
   try {
     const result = await db.select().from(fitastyProducts)
       .where(eq(fitastyProducts.category, category))
-      .orderBy(fitastyProducts.product_name_zh);
+      .orderBy(fitastyProducts.productNameZh);
     return result;
   } catch (error) {
     console.error('Error fetching products by category:', error);
@@ -459,8 +459,8 @@ export async function searchFitastyProducts(query: string) {
   try {
     const { like } = await import('drizzle-orm');
     const result = await db.select().from(fitastyProducts)
-      .where(like(fitastyProducts.product_name_zh, `%${query}%`))
-      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
+      .where(like(fitastyProducts.productNameZh, `%${query}%`))
+      .orderBy(fitastyProducts.category, fitastyProducts.productNameZh)
       .limit(20);
     return result;
   } catch (error) {
@@ -488,7 +488,7 @@ export async function listFitastyProducts(limit: number = 20, offset: number = 0
   if (!db) return [];
   try {
     const result = await db.select().from(fitastyProducts)
-      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
+      .orderBy(fitastyProducts.category, fitastyProducts.productNameZh)
       .limit(limit)
       .offset(offset);
     return result;

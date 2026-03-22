@@ -20,7 +20,7 @@ export async function getCachedFood(
   const result = await db
     .select()
     .from(generalFoodCache)
-    .where(and(eq(generalFoodCache.source, source), eq(generalFoodCache.external_id, externalId)))
+    .where(and(eq(generalFoodCache.source, source), eq(generalFoodCache.externalId, externalId)))
     .limit(1);
 
   return result[0] || null;
@@ -48,14 +48,14 @@ export async function cacheFoodResult(
 
   const values: any = {
     source,
-    external_id: externalId,
-    display_name: displayName,
+    externalId: externalId,
+    displayName: displayName,
     brand: brand || null,
-    kcal_per_100g: macros.kcal ? Number(macros.kcal) : null,
-    protein_g_per_100g: macros.protein ? Number(macros.protein) : null,
-    carbs_g_per_100g: macros.carbs ? Number(macros.carbs) : null,
-    fat_g_per_100g: macros.fat ? Number(macros.fat) : null,
-    raw_json: rawJson,
+    kcalPer100g: macros.kcal ? Number(macros.kcal) : null,
+    proteinGPer100g: macros.protein ? Number(macros.protein) : null,
+    carbsGPer100g: macros.carbs ? Number(macros.carbs) : null,
+    fatGPer100g: macros.fat ? Number(macros.fat) : null,
+    rawJson: rawJson,
   };
 
   await db.insert(generalFoodCache).values(values);
@@ -90,10 +90,10 @@ export async function searchFitastyProducts(query: string) {
       .select()
       .from(fitastyProducts)
       .where(and(
-        eq(fitastyProducts.is_active, 1),
-        like(fitastyProducts.product_name_zh, `%${query}%`)
+        eq(fitastyProducts.isActive, 1),
+        like(fitastyProducts.productNameZh, `%${query}%`)
       ))
-      .orderBy(fitastyProducts.category, fitastyProducts.product_name_zh)
+      .orderBy(fitastyProducts.category, fitastyProducts.productNameZh)
       .limit(10);
     return result;
   } catch (error) {

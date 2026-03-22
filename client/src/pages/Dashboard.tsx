@@ -124,7 +124,7 @@ export default function Dashboard() {
               { id: 'happy', emoji: '😊', label: '開心' },
               { id: 'neutral', emoji: '😐', label: '普通' },
               { id: 'sad', emoji: '😞', label: '低落' },
-              { id: 'stressed', emoji: '😡', label: '煩躁' },
+              { id: 'angry', emoji: '😡', label: '煩躁' },
               { id: 'tired', emoji: '😴', label: '疲倦' },
             ].map((mood) => (
               <button
