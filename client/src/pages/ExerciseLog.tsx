@@ -55,6 +55,7 @@ export default function ExerciseLog() {
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isCommunityOpen, setIsCommunityOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'records' | 'suggestions'>('records');
   const [exerciseAdvice, setExerciseAdvice] = useState<string>('');
   const [isLoadingAdvice, setIsLoadingAdvice] = useState(false);
@@ -320,13 +321,36 @@ export default function ExerciseLog() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">運動記錄</h1>
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-full px-6">
-              <Plus className="h-5 w-5 mr-2" /> 新增運動
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
+        <div className="flex gap-2">
+          <Dialog open={isCommunityOpen} onOpenChange={setIsCommunityOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-purple-600 hover:bg-purple-700 rounded-full px-6">
+                <Users className="h-5 w-5 mr-2" /> Community
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Community 👥</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-lg font-semibold">Community 功能即將推出</p>
+                <p className="text-sm text-gray-600">敬請期待，之後可以同朋友一齊做運動 💪</p>
+                <Button 
+                  onClick={() => setIsCommunityOpen(false)}
+                  className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800"
+                >
+                  關閉
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-emerald-600 hover:bg-emerald-700 rounded-full px-6">
+                <Plus className="h-5 w-5 mr-2" /> 新增運動
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>新增運動</DialogTitle>
             </DialogHeader>
@@ -406,6 +430,7 @@ export default function ExerciseLog() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Weekly Summary Card */}

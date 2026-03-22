@@ -493,3 +493,10 @@
 - [ ] Style to match app design (soft green background, rounded corners)
 - [ ] Verify section displays below AI suggestion content
 - [ ] Test and verify no existing functionality is affected
+
+## Community Button Feature - COMPLETE
+- [x] Add Community button to 運動 page
+- [x] Create placeholder modal component
+- [x] Implement modal open/close functionality
+- [x] Test on live site
+- [x] Verify mobile interaction
