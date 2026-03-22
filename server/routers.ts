@@ -731,7 +731,7 @@ export const appRouter = router({
       ]);
 
       if (!profile) {
-        return { diet: [], exercise: [], encouragement: [] };
+        return { diet: [], exercise: [], body: [], encouragement: [], gentle: {}, coach: {}, hongkong: {} };
       }
 
       const { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } = await import("@shared/calculations");
@@ -770,31 +770,26 @@ export const appRouter = router({
 
       let recommendations = generateAllRecommendations(analysisData);
 
-      // Apply personality transformation for all personalities (including gentle)
-      // Default to 'gentle' if aiToneStyle is not set
+      // Generate recommendations for all 3 personalities
+      const gentleRecs = await transformAllRecommendationsWithPersonality(recommendations, 'gentle', input.mood);
+      const coachRecs = await transformAllRecommendationsWithPersonality(recommendations, 'coach', input.mood);
+      const hongkongRecs = await transformAllRecommendationsWithPersonality(recommendations, 'hongkong', input.mood);
+
+      const formatRecs = (recs: any) => ({
+        diet: recs.diet.slice(0, 3),
+        exercise: recs.exercise.slice(0, 2),
+        body: recs.body,
+        encouragement: recs.encouragement,
+      });
+
       const aiToneStyle = profile.aiToneStyle || 'gentle';
-      const personality = aiToneStyle === 'coach' ? 'coach' : aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
-      recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality, input.mood);
+      const selectedRecs = aiToneStyle === 'coach' ? coachRecs : aiToneStyle === 'hk_style' ? hongkongRecs : gentleRecs;
 
       return {
-        diet: recommendations.diet.slice(0, 3).map(r => ({
-          title: r.title,
-          content: r.message,
-          dataBasis: r.dataBasis,
-          action: r.action,
-        })),
-        exercise: recommendations.exercise.slice(0, 2).map(r => ({
-          title: r.title,
-          content: r.message,
-          dataBasis: r.dataBasis,
-          action: r.action,
-        })),
-        encouragement: recommendations.encouragement.map(r => ({
-          title: r.title,
-          content: r.message,
-          dataBasis: r.dataBasis,
-          action: r.action,
-        })),
+        ...formatRecs(selectedRecs),
+        gentle: formatRecs(gentleRecs),
+        coach: formatRecs(coachRecs),
+        hongkong: formatRecs(hongkongRecs),
       };
     }),
   }),

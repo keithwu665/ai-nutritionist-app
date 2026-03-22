@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Loader2, ChevronLeft, Utensils, Dumbbell, Heart, Sparkles } from 'lucid
 export default function AIRecommendations() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
+  const [selectedPersonality, setSelectedPersonality] = useState<'gentle' | 'coach' | 'hongkong'>('gentle');
 
   // Load mood from localStorage on mount
   useEffect(() => {
@@ -28,11 +29,17 @@ export default function AIRecommendations() {
     );
   }
 
+  // Get recommendations for selected personality
+  const currentRecs = selectedPersonality === 'coach' 
+    ? recommendations?.coach 
+    : selectedPersonality === 'hongkong' 
+    ? recommendations?.hongkong 
+    : recommendations?.gentle;
+
   // Filter out diet and exercise items from encouragement to avoid duplication
-  const filteredEncouragement = (recommendations?.encouragement || []).filter((item: any) => {
+  const filteredEncouragement = (currentRecs?.encouragement || []).filter((item: any) => {
     const content = (item.content || '').toLowerCase();
     const title = (item.title || '').toLowerCase();
-    // Exclude items that are clearly diet or exercise related
     const isDiet = content.includes('飲食') || content.includes('食物') || content.includes('卡路里') || content.includes('營養') || title.includes('飲食');
     const isExercise = content.includes('運動') || content.includes('健身') || content.includes('鍛鍊') || content.includes('訓練') || title.includes('運動');
     return !isDiet && !isExercise;
@@ -44,21 +51,21 @@ export default function AIRecommendations() {
       title: '飲食建議',
       icon: Utensils,
       color: 'bg-blue-50 border-blue-100',
-      items: recommendations?.diet || [],
+      items: currentRecs?.diet || [],
     },
     {
       id: 'exercise',
       title: '運動建議',
       icon: Dumbbell,
       color: 'bg-green-50 border-green-100',
-      items: recommendations?.exercise || [],
+      items: currentRecs?.exercise || [],
     },
     {
       id: 'body',
       title: '身體建議',
       icon: Heart,
       color: 'bg-pink-50 border-pink-100',
-      items: [], // Placeholder for future body recommendations
+      items: currentRecs?.body || [],
     },
     {
       id: 'overall',
@@ -69,84 +76,84 @@ export default function AIRecommendations() {
     },
   ];
 
+  const personalityLabels = {
+    gentle: '【溫柔貼身教練】',
+    coach: '【魔鬼教練】',
+    hongkong: '【香港寸嘴教練】',
+  };
+
   return (
     <div className="pb-32 md:pb-8">
       {/* Header */}
       <div className="p-4 md:p-8 border-b border-gray-200">
-        <div className="flex items-center gap-4 max-w-7xl mx-auto">
+        <div className="flex items-center gap-4 max-w-7xl mx-auto mb-6">
           <button
             onClick={() => setLocation('/dashboard')}
             className="p-2 hover:bg-muted rounded-full transition-colors"
           >
-            <ChevronLeft className="h-5 w-5 text-foreground" />
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <div>
-            <h1 className="text-2xl font-bold">AI 建議</h1>
-            <p className="text-xs text-muted-foreground mt-1">
-              {todayMood ? `根據你的心情 (${todayMood}) 提供個性化建議` : '根據你的數據提供個性化建議'}
-            </p>
+          <h1 className="text-2xl font-bold">AI 建議</h1>
+        </div>
+
+        {/* Personality Selector */}
+        <div className="max-w-7xl mx-auto">
+          <p className="text-sm text-muted-foreground mb-3">選擇教練風格：</p>
+          <div className="flex gap-2 flex-wrap">
+            {(['gentle', 'coach', 'hongkong'] as const).map((personality) => (
+              <Button
+                key={personality}
+                variant={selectedPersonality === personality ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedPersonality(personality)}
+                className="text-xs"
+              >
+                {personality === 'gentle' ? '溫柔教練' : personality === 'coach' ? '魔鬼教練' : '香港教練'}
+              </Button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="p-4 md:p-8 space-y-4 max-w-7xl mx-auto">
-        {categories.map((category) => {
-          const Icon = category.icon;
-          const hasItems = category.items.length > 0;
+      {/* Recommendations */}
+      <div className="p-4 md:p-8 max-w-7xl mx-auto">
+        <div className="space-y-6">
+          {categories.map((category) => (
+            <div key={category.id}>
+              <div className="flex items-center gap-2 mb-4">
+                <category.icon className="h-5 w-5 text-primary" />
+                <h2 className="text-lg font-semibold">{category.title}</h2>
+              </div>
 
-          return (
-            <Card key={category.id} className={`rounded-2xl border ${category.color}`}>
-              <CardContent className="pt-4 pb-4">
-                {/* Category Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <h2 className="text-lg font-semibold">{category.title}</h2>
-                </div>
-
-                {/* Category Items */}
-                {hasItems ? (
-                  <div className="space-y-3">
-                    {category.items.map((item: any, idx: number) => (
-                      <div key={idx} className="bg-white rounded-lg p-3 border border-gray-100">
-                        <div className="flex justify-between items-start gap-3 mb-2">
-                          <h3 className="font-semibold text-sm">{item.title}</h3>
-                          {item.dataBasis && (
-                            <span className="text-xs text-muted-foreground bg-gray-100 px-2 py-1 rounded">
-                              {item.dataBasis}
-                            </span>
-                          )}
+              {category.items.length === 0 ? (
+                <Card className={`${category.color} border`}>
+                  <CardContent className="p-4 text-center text-muted-foreground">
+                    暫無建議
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {category.items.map((item: any, idx: number) => (
+                    <Card key={idx} className={`${category.color} border`}>
+                      <CardContent className="p-4">
+                        <div className="mb-2">
+                          <p className="font-semibold text-sm">{personalityLabels[selectedPersonality]}</p>
+                          <p className="font-medium mt-1">{item.title}</p>
                         </div>
-                        <p className="text-sm text-foreground mb-2">{item.content}</p>
-                        {item.action && (
-                          <div className="text-xs text-primary font-medium">
-                            💡 {item.action}
-                          </div>
+                        <p className="text-sm text-gray-700 mb-3 leading-relaxed">{item.content}</p>
+                        {item.dataBasis && (
+                          <p className="text-xs text-muted-foreground mb-2">📊 {item.dataBasis}</p>
                         )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-sm text-muted-foreground">
-                      {category.id === 'body' ? '身體數據建議將在未來推出' : '暫無建議'}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-
-        {/* Action Button */}
-        <div className="flex gap-3 justify-center pt-4">
-          <Button
-            onClick={() => setLocation('/dashboard')}
-            variant="outline"
-            className="rounded-full"
-          >
-            返回儀錶板
-          </Button>
+                        {item.action && (
+                          <p className="text-xs text-primary font-medium">✓ {item.action}</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>

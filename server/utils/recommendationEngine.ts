@@ -199,6 +199,37 @@ export function generateExerciseRecommendations(data: AnalysisData): Recommendat
 }
 
 /**
+ * Generate body metrics recommendations
+ */
+export function generateBodyMetricsRecommendations(data: AnalysisData): Recommendation[] {
+  const recs: Recommendation[] = [];
+  const bodyMetrics = data.lastSevenDays.bodyMetrics;
+  
+  if (bodyMetrics.length < 2) return recs;
+  
+  const sorted = [...bodyMetrics].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const firstWeight = sorted[0].weight;
+  const lastWeight = sorted[sorted.length - 1].weight;
+  const weightChange = lastWeight - firstWeight;
+  const weeklyRate = (weightChange / (sorted.length - 1)) * 7;
+  
+  if (Math.abs(weeklyRate) > 0.5) {
+    const direction = weeklyRate > 0 ? '增加' : '下降';
+    const rate = Math.abs(weeklyRate).toFixed(1);
+    recs.push({
+      type: "encouragement",
+      title: "體重變化趨勢",
+      message: `體重${direction}${rate}kg/週。${weeklyRate > 0 ? '若非目標，需調整策略。' : '進度良好！'}`,
+      dataBasis: `${firstWeight}kg → ${lastWeight}kg`,
+      action: weeklyRate > 0 ? "檢查熱量攝入" : "保持目前策略",
+      priority: "high",
+    });
+  }
+  
+  return recs;
+}
+
+/**
  * Generate encouragement recommendations
  */
 export function generateEncouragementRecommendations(data: AnalysisData): Recommendation[] {
@@ -251,11 +282,13 @@ export function generateEncouragementRecommendations(data: AnalysisData): Recomm
 export function generateAllRecommendations(data: AnalysisData): {
   diet: Recommendation[];
   exercise: Recommendation[];
+  body: Recommendation[];
   encouragement: Recommendation[];
 } {
   return {
     diet: generateDietRecommendations(data),
     exercise: generateExerciseRecommendations(data),
+    body: generateBodyMetricsRecommendations(data),
     encouragement: generateEncouragementRecommendations(data),
   };
 }
@@ -279,6 +312,7 @@ export async function transformAllRecommendationsWithPersonality(
   return {
     diet: await Promise.all(recommendations.diet.map(transformRec)),
     exercise: await Promise.all(recommendations.exercise.map(transformRec)),
+    body: await Promise.all(recommendations.body.map(transformRec)),
     encouragement: await Promise.all(recommendations.encouragement.map(transformRec)),
   };
 }
