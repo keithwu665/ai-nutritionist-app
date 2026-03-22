@@ -712,7 +712,9 @@ export const appRouter = router({
   // Recommendations
   // ========================================================================
   recommendations: router({
-    get: protectedProcedure.query(async ({ ctx }) => {
+    get: protectedProcedure
+      .input(z.object({ mood: z.string().optional() }))
+      .query(async ({ ctx, input }) => {
       const today = new Date().toISOString().split('T')[0];
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
@@ -772,7 +774,7 @@ export const appRouter = router({
       // Default to 'gentle' if aiToneStyle is not set
       const aiToneStyle = profile.aiToneStyle || 'gentle';
       const personality = aiToneStyle === 'coach' ? 'coach' : aiToneStyle === 'hk_style' ? 'hongkong' : 'gentle';
-      recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality);
+      recommendations = await transformAllRecommendationsWithPersonality(recommendations, personality, input.mood);
 
       return {
         diet: recommendations.diet.slice(0, 3).map(r => ({

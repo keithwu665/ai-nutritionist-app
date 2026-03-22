@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [todayMood, setTodayMood] = useState<string | null>(null);
   const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
   const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
-  const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery();
+  const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
 
   // Load mood from localStorage on mount
@@ -246,7 +246,7 @@ export default function Dashboard() {
           <CardContent className="pt-4 pb-4">
             <div className="flex justify-between items-start mb-3">
               <p className="text-sm font-semibold">目標進度</p>
-              <button className="text-xs text-primary hover:underline flex items-center gap-1">詳情 <ChevronRight className="h-3 w-3" /></button>
+              <button className="text-xs text-primary hover:underline">more</button>
             </div>
             
             <div className="grid grid-cols-2 gap-2 mb-3">
@@ -278,7 +278,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">AI 建議</h2>
               <button 
-                onClick={() => setLocation('/recommendations')}
+                onClick={() => setLocation('/ai-recommendations')}
                 className="text-xs text-primary hover:underline flex items-center gap-1"
               >
                 查看全部 <ChevronRight className="h-3 w-3" />
@@ -292,7 +292,7 @@ export default function Dashboard() {
                   <div className="text-2xl">🍽️</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold mb-1">飲食建議</p>
-                    <p className="text-xs text-muted-foreground">{recs.nutritionAdvice || '增加蛋白質攝入，保持營養均衡。'}</p>
+                    <p className="text-xs text-muted-foreground">{recs.diet?.[0]?.content || '增加蛋白質攝入，保持營養均衡。'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -305,7 +305,7 @@ export default function Dashboard() {
                   <div className="text-2xl">💪</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold mb-1">運動建議</p>
-                    <p className="text-xs text-muted-foreground">{recs.exerciseAdvice || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
+                    <p className="text-xs text-muted-foreground">{recs.exercise?.[0]?.content || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
                   </div>
                 </div>
               </CardContent>

@@ -22,6 +22,7 @@ import InviteFriend from "./pages/InviteFriend";
 import Onboarding from "./pages/Onboarding";
 import AdminProducts from "./pages/AdminProducts";
 import BodyReportImport from "./pages/BodyReportImport";
+import AIRecommendations from "./pages/AIRecommendations";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -100,13 +101,17 @@ function Router() {
           <InviteFriend />
         </AppLayout>
       </Route>
-      <Route path={"/admin/products"}>
+      <Route path={"/settings/invite-friend"}>
         <AppLayout>
-          <AdminProducts />
+          <InviteFriend />
         </AppLayout>
       </Route>
-      <Route path={"/404"} component={NotFound} />
-      <Route component={NotFound} />
+      <Route path={"/ai-recommendations"}>
+        <AppLayout>
+          <AIRecommendations />
+        </AppLayout>
+      </Route>
+      <Route path={"*"} component={NotFound} />
     </Switch>
   );
 }

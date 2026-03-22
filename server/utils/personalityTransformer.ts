@@ -65,13 +65,30 @@ Output ONLY the transformed message, no explanation:`,
 /**
  * Transform a recommendation message into a personality-specific tone
  */
+function getMoodContext(mood?: string): string {
+  if (!mood) return '';
+  const moodMap: Record<string, string> = {
+    happy: 'The user is in a happy mood - be extra positive and celebratory.',
+    neutral: 'The user is in a neutral mood - provide balanced, straightforward advice.',
+    sad: 'The user is in a sad mood - be extra supportive and encouraging, avoid harsh criticism.',
+    stressed: 'The user is stressed - acknowledge the stress and suggest practical, stress-reducing tips.',
+    tired: 'The user is tired - suggest lighter, recovery-focused options, avoid overwhelming suggestions.',
+  };
+  return moodMap[mood] || '';
+}
+
 export async function transformRecommendationMessage(
   originalMessage: string,
-  personality: PersonalityType
+  personality: PersonalityType,
+  mood?: string
 ): Promise<string> {
   // Defensive fallback: ensure personality is valid
   const validPersonality = personality in PERSONALITY_PROMPTS ? personality : 'gentle';
-  const prompt = PERSONALITY_PROMPTS[validPersonality].replace('{originalMessage}', originalMessage);
+  let prompt = PERSONALITY_PROMPTS[validPersonality].replace('{originalMessage}', originalMessage);
+  const moodContext = getMoodContext(mood);
+  if (moodContext) {
+    prompt = prompt.replace('Output ONLY the transformed message, no explanation:', `MOOD CONTEXT: ${moodContext}\n\nOutput ONLY the transformed message, no explanation:`);
+  }
 
   try {
     const response = await invokeLLM({
@@ -101,11 +118,13 @@ export async function transformRecommendationMessage(
  */
 export async function transformActionText(
   originalAction: string,
-  personality: PersonalityType
+  personality: PersonalityType,
+  mood?: string
 ): Promise<string> {
   // Defensive fallback: ensure personality is valid
   const validPersonality = personality in PERSONALITY_PROMPTS ? personality : 'gentle';
-  const prompt = `Transform this action item into a ${validPersonality === 'gentle' ? 'warm, caring' : validPersonality === 'coach' ? 'strict, demanding' : 'sarcastic, playful Hong Kong'} tone.
+  const moodContext = getMoodContext(mood);
+  const prompt = `Transform this action item into a ${validPersonality === 'gentle' ? 'warm, caring' : validPersonality === 'coach' ? 'strict, demanding' : 'sarcastic, playful Hong Kong'} tone.${moodContext ? `\n\nMOOD CONTEXT: ${moodContext}` : ''}
 
 ORIGINAL: "${originalAction}"
 

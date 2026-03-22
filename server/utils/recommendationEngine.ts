@@ -265,14 +265,15 @@ export function generateAllRecommendations(data: AnalysisData): {
  */
 export async function transformAllRecommendationsWithPersonality(
   recommendations: ReturnType<typeof generateAllRecommendations>,
-  personality: 'gentle' | 'coach' | 'hongkong'
+  personality: 'gentle' | 'coach' | 'hongkong',
+  mood?: string
 ): Promise<ReturnType<typeof generateAllRecommendations>> {
   const { transformRecommendationMessage, transformActionText } = await import('./personalityTransformer');
 
   const transformRec = async (rec: Recommendation): Promise<Recommendation> => ({
     ...rec,
-    message: await transformRecommendationMessage(rec.message, personality),
-    action: await transformActionText(rec.action, personality),
+    message: await transformRecommendationMessage(rec.message, personality, mood),
+    action: await transformActionText(rec.action, personality, mood),
   });
 
   return {
