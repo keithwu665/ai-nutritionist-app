@@ -628,7 +628,6 @@ export const appRouter = router({
         totalDuration: z.number(),
         lastWorkoutType: z.string().optional(),
         personality: z.enum(['gentle', 'strict', 'hongkong']),
-        mood: z.string().optional(),
       }))
       .query(async ({ ctx, input }) => {
         const { generateExerciseAdviceWithFallback } = await import('./exerciseAdviceEngine');
@@ -640,8 +639,7 @@ export const appRouter = router({
               totalDuration: input.totalDuration,
               lastWorkoutType: input.lastWorkoutType,
             },
-            input.personality,
-            input.mood
+            input.personality
           );
           return { advice, success: true };
         } catch (error) {
