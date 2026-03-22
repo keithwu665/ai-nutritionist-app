@@ -128,8 +128,8 @@ export function calculateDailyCalorieTarget(
   calorieMode: 'safe' | 'aggressive' = 'safe'
 ): { dailyCalories: number; originalCalories: number; dailyDeficit: number; isAggressive: boolean } {
   const KCAL_PER_KG_FAT = 7700;
-  // Safe mode uses 1200 floor, aggressive mode uses lower floor
-  const MIN_CALORIES_SAFE = gender === 'female' ? 1200 : 1200;
+  // Safe mode uses minimum safe intake, aggressive mode uses lower floor
+  const MIN_CALORIES_SAFE = gender === 'female' ? 1200 : 1500;
   const MIN_CALORIES_AGGRESSIVE = gender === 'female' ? 1000 : 1200;
   const MIN_CALORIES = calorieMode === 'aggressive' ? MIN_CALORIES_AGGRESSIVE : MIN_CALORIES_SAFE;
   

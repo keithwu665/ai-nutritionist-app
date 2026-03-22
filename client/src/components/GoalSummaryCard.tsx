@@ -55,7 +55,7 @@ export function GoalSummaryCard({
 
   // Calculate daily deficit and safety
   const KCAL_PER_KG_FAT = 7700;
-  const MIN_CALORIES_SAFE = genderStr === 'female' ? 1200 : 1200;
+  const MIN_CALORIES_SAFE = genderStr === 'female' ? 1200 : 1500;
   const MIN_CALORIES_AGGRESSIVE = genderStr === 'female' ? 1000 : 1200;
   
   let dailyDeficit = 0;
