@@ -126,7 +126,17 @@ export default function Dashboard() {
         
         {/* Mood Check-in Section */}
         <div className="bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100">
-          <p className="text-sm font-semibold mb-2.5 text-foreground">今日心情</p>
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-sm font-semibold text-foreground">今日心情</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/mood-log')}
+              className="text-xs font-medium text-primary hover:bg-primary/10"
+            >
+              心情紀錄
+            </Button>
+          </div>
           <div className="flex gap-2 justify-between">
             {[
               { id: 'happy', emoji: '😊', label: '開心' },
@@ -320,35 +330,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Mental Wellness Advice */}
-            <Card className="rounded-2xl bg-purple-50 border-purple-100">
-              <CardContent className="pt-4 pb-4">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">🧠</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold mb-2">心靈建議</p>
-                    {todayMood ? (
-                      <div className="space-y-1.5 text-xs text-muted-foreground">
-                        <div>
-                          <p className="font-semibold text-foreground">【今日狀態】</p>
-                          <p>根據你今日的心情，保持積極心態。</p>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">【近期狀態】</p>
-                          <p>保持穩定的情緒，照顧好自己。</p>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">【可以做的事】</p>
-                          <p>試試深呼吸或輕鬆的運動，幫助放鬆身心。</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">選擇今日心情，獲得個人化的心靈建議。</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+
           </div>
         )}
 

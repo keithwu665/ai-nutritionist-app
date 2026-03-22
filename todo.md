@@ -124,13 +124,15 @@
 - [ ] Publish to live site
 - [ ] Test personalities on live domain
 
-## Mental Wellness Advice Card Rendering - COMPLETE
-- [x] Render 心靈建議 🧠 card on Dashboard
-- [x] Display card below mood selector
+## Mental Wellness Advice Card Relocation - COMPLETE
+- [x] Remove Mental Wellness Advice card from Dashboard
+- [x] Add 心情紀錄 button to mood selector section
+- [x] Create MoodLog page with calendar UI
+- [x] Display Mental Wellness Advice below calendar in MoodLog
 - [x] Show three sections: 【今日狀態】, 【近期狀態】, 【可以做的事】
-- [x] Update card content based on selected mood
-- [x] Card visible on main Dashboard screen
-- [x] Verified working with mood selection
+- [x] Update advice dynamically based on selected mood and date
+- [x] Add 7-day mood statistics section
+- [x] Verified working with date selection and mood changes
 
 ## Next Steps to Consider
 

@@ -23,6 +23,7 @@ import Onboarding from "./pages/Onboarding";
 import AdminProducts from "./pages/AdminProducts";
 import BodyReportImport from "./pages/BodyReportImport";
 import AIRecommendations from "./pages/AIRecommendations";
+import MoodLog from "./pages/MoodLog";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -109,6 +110,11 @@ function Router() {
       <Route path={"/ai-recommendations"}>
         <AppLayout>
           <AIRecommendations />
+        </AppLayout>
+      </Route>
+      <Route path={"/mood-log"}>
+        <AppLayout>
+          <MoodLog />
         </AppLayout>
       </Route>
       <Route path={"*"} component={NotFound} />
