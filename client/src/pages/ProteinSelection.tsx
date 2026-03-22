@@ -26,8 +26,8 @@ export default function ProteinSelection({ category }: ProteinSelectionProps) {
   const [, navigate] = useLocation();
 
   const handleProteinClick = (proteinId: string) => {
-    // Navigate to recipe list page with category and protein
-    navigate(`/diet/inspiration/home-cooking/${category}/recipes/${proteinId}`);
+    // Navigate to Level 3 selection page with category and protein
+    navigate(`/diet/inspiration/home-cooking/${category}/${proteinId}`);
   };
 
   const handleBack = () => {

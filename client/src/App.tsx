@@ -27,6 +27,10 @@ import MoodLog from "./pages/MoodLog";
 import HomeRecipes from "./pages/HomeRecipes";
 import ProteinSelection from "./pages/ProteinSelection";
 import RecipeList from "./pages/RecipeList";
+import RecipeMethodSelection from "./pages/RecipeMethodSelection";
+import RecipePage from "./pages/RecipePage";
+import AIRecommendedRecipes from "./pages/AIRecommendedRecipes";
+import FitastyIntegration from "./pages/FitastyIntegration";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -92,14 +96,35 @@ function Router() {
           </AppLayout>
         )}
       </Route>
-      <Route path={"/diet/inspiration/home-cooking/:category/recipes/:protein"}>
-        {({ category, protein }) => (
+      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein"}>
+        {() => (
           <AppLayout>
-            <RecipeList category={category} protein={protein} />
+            <RecipeMethodSelection />
           </AppLayout>
         )}
       </Route>
-      <Route path={"/exercise"}>
+      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein\u002Frecipe-page"}>
+        {() => (
+          <AppLayout>
+            <RecipePage />
+          </AppLayout>
+        )}
+      </Route>
+      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein\u002Fai-recommended"}>
+        {() => (
+          <AppLayout>
+            <AIRecommendedRecipes />
+          </AppLayout>
+        )}
+      </Route>
+      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein\u002Ffitasty"}>
+        {() => (
+          <AppLayout>
+            <FitastyIntegration />
+          </AppLayout>
+        )}
+      </Route>
+      <Route path={"\u002Fexercise"}>
         <AppLayout>
           <ExerciseLog />
         </AppLayout>

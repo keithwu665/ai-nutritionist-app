@@ -142,6 +142,36 @@
 - [x] Add pulse animation to badge
 - [x] Tested with mood changes and verified working
 
+## Home Cooking (在家料理) Category Page - COMPLETE
+- [x] Create HomeRecipes page with category grid layout
+- [x] Implement 6 category cards (早餐, 正餐, 沙律, 小食, 湯類, 其他)
+- [x] Add routing and navigation from Food page
+- [x] Test category selection on live site
+- [x] Verify responsive layout on mobile
+
+## Protein Selection Screen (Level 2) - COMPLETE
+- [x] Update HomeRecipes to handle category selection and navigate
+- [x] Create ProteinSelection page with 6 protein options
+- [x] Add routing for protein selection page
+- [x] Create placeholder RecipeList page
+- [x] Test protein selection flow on live site
+- [x] Verify no crashes or loading issues
+
+## Level 3 Selection Screen - COMPLETE
+- [x] Create RecipeMethodSelection page with 3 options
+- [x] Update ProteinSelection to navigate to Level 3 page
+- [x] Create placeholder pages for each option (RecipePage, AIRecommendedRecipes, FitastyIntegration)
+- [x] Add routing for Level 3 and placeholder pages
+- [x] Test Level 3 selection flow on live site
+- [x] Verify all 3 options are clickable and functional
+
+## Community Button Feature - COMPLETE
+- [x] Add Community button to 運動 page
+- [x] Create placeholder modal component
+- [x] Implement modal open/close functionality
+- [x] Test on live site
+- [x] Verify mobile interaction
+
 ## Next Steps to Consider
 
 1. Add meal photo storage - Save original photos with food records for verification and historical reference
@@ -515,3 +545,11 @@
 - [x] Create placeholder RecipeList page
 - [x] Test protein selection flow on live site
 - [x] Verify no crashes or loading issues
+
+## Level 3 Selection Screen (在家料理) - IN PROGRESS
+- [ ] Create Level 3 selection page with 3 options
+- [ ] Update ProteinSelection to navigate to Level 3 page
+- [ ] Create placeholder pages for each Level 3 option
+- [ ] Add routing for Level 3 and placeholder pages
+- [ ] Test Level 3 selection flow on live site
+- [ ] Verify all options clickable and working
