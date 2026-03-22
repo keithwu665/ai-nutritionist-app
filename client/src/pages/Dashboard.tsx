@@ -97,29 +97,29 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="p-4 md:p-8 space-y-4 md:space-y-6 max-w-7xl mx-auto">
+      <div className="p-4 md:p-8 space-y-3 md:space-y-4 max-w-7xl mx-auto">
         
         {/* Hero Calorie Card - Emerald Green */}
-        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-6 md:p-8 text-white shadow-lg">
-          <div className="grid grid-cols-2 gap-6 mb-6">
+        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             {/* Left: Intake */}
             <div>
-              <p className="text-sm font-medium opacity-90 mb-1">今日熱量</p>
-              <p className="text-4xl md:text-5xl font-bold mb-2">{Math.round(todayCalories)}</p>
-              <p className="text-xs opacity-75 mb-1">/ {Math.round(target)} kcal</p>
+              <p className="text-xs font-medium opacity-90 mb-0.5">今日熱量</p>
+              <p className="text-3xl md:text-4xl font-bold mb-1">{Math.round(todayCalories)}</p>
+              <p className="text-xs opacity-75 mb-0.5">/ {Math.round(target)} kcal</p>
               <p className="text-xs opacity-75">還差 {Math.round(remaining)} kcal</p>
             </div>
             {/* Right: Net Calories */}
             <div className="text-right">
-              <p className="text-sm font-medium opacity-90 mb-1">淨熱量</p>
-              <p className="text-4xl md:text-5xl font-bold">{Math.round(netCalories)}</p>
-              <p className="text-xs opacity-75 mt-2">kcal</p>
+              <p className="text-xs font-medium opacity-90 mb-0.5">淨熱量</p>
+              <p className="text-3xl md:text-4xl font-bold">{Math.round(netCalories)}</p>
+              <p className="text-xs opacity-75 mt-1">kcal</p>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+          <div className="mb-3">
+            <div className="w-full bg-white/20 rounded-full h-1.5 overflow-hidden">
               <div 
                 className="bg-white h-full rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(caloriePercent, 100)}%` }}
@@ -128,14 +128,14 @@ export default function Dashboard() {
           </div>
 
           {/* Macro Circles */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2">
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-white/30 flex items-center justify-center mb-2 relative">
-                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-white border-r-white" style={{
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-white/30 flex items-center justify-center mb-1 relative">
+                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-white border-r-white" style={{
                   transform: 'rotate(' + (protein / (totalMacros || 1) * 360) + 'deg)'
                 }}></div>
                 <div className="text-center">
-                  <p className="text-lg md:text-xl font-bold">{Math.round(protein)}</p>
+                  <p className="text-sm md:text-base font-bold">{Math.round(protein)}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -143,9 +143,9 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-orange-300 flex items-center justify-center mb-2">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-orange-300 flex items-center justify-center mb-1">
                 <div className="text-center">
-                  <p className="text-lg md:text-xl font-bold">{Math.round(fat)}</p>
+                  <p className="text-sm md:text-base font-bold">{Math.round(fat)}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -153,9 +153,9 @@ export default function Dashboard() {
             </div>
 
             <div className="flex flex-col items-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-blue-300 flex items-center justify-center mb-2">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-blue-300 flex items-center justify-center mb-1">
                 <div className="text-center">
-                  <p className="text-lg md:text-xl font-bold">{Math.round(carbs)}</p>
+                  <p className="text-sm md:text-base font-bold">{Math.round(carbs)}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -165,35 +165,35 @@ export default function Dashboard() {
         </div>
 
         {/* Body Metrics Cards - 3 Column */}
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-3 gap-2 md:gap-3">
           <Card className="rounded-2xl">
-            <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground font-medium mb-2">體重</p>
-              <p className="text-2xl font-bold">{profile.weightKg}</p>
-              <p className="text-xs text-muted-foreground mt-1">kg</p>
+            <CardContent className="pt-3 pb-3">
+              <p className="text-xs text-muted-foreground font-medium mb-1">體重</p>
+              <p className="text-xl font-bold">{profile.weightKg}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">kg</p>
               {bodyMetrics && (
-                <p className="text-xs text-green-600 mt-1">-0.2 kg</p>
+                <p className="text-xs text-green-600 mt-0.5">-0.2 kg</p>
               )}
             </CardContent>
           </Card>
 
           <Card className="rounded-2xl">
-            <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground font-medium mb-2">體脂 %</p>
-              <p className="text-2xl font-bold">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
-              <p className="text-xs text-muted-foreground mt-1">%</p>
+            <CardContent className="pt-3 pb-3">
+              <p className="text-xs text-muted-foreground font-medium mb-1">體脂 %</p>
+              <p className="text-xl font-bold">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">%</p>
               {bodyMetrics && (
-                <p className="text-xs text-green-600 mt-1">↓ 正在減少</p>
+                <p className="text-xs text-green-600 mt-0.5">↓ 正在減少</p>
               )}
             </CardContent>
           </Card>
 
           <Card className="rounded-2xl">
-            <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground font-medium mb-2">BMI</p>
-              <p className="text-2xl font-bold">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
-              <p className="text-xs text-muted-foreground mt-1">kg/m²</p>
-              <p className="text-xs text-green-600 mt-1">正常</p>
+            <CardContent className="pt-3 pb-3">
+              <p className="text-xs text-muted-foreground font-medium mb-1">BMI</p>
+              <p className="text-xl font-bold">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">kg/m²</p>
+              <p className="text-xs text-green-600 mt-0.5">正常</p>
             </CardContent>
           </Card>
         </div>
@@ -213,39 +213,39 @@ export default function Dashboard() {
           const progressPercent = goalKgNum > 0 ? Math.min(100, ((goalKgNum - remainingKg) / goalKgNum) * 100) : 0;
           return (
             <Card className="rounded-2xl">
-              <CardContent className="pt-5 pb-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold">目標進度</h3>
+              <CardContent className="pt-3 pb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-sm">目標進度</h3>
                   <button 
                   onClick={() => setLocation('/body')}
-                  className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
+                  className="text-primary text-xs font-medium flex items-center gap-1 hover:opacity-80"
                 >
-                    詳情 <ChevronRight className="h-4 w-4" />
+                    詳情 <ChevronRight className="h-3 w-3" />
                   </button>
                 </div>
-                <div className="space-y-3">
-                  <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+                <div className="space-y-2">
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                     <div 
                       className="bg-primary h-full rounded-full transition-all duration-300"
                       style={{ width: `${progressPercent}%` }}
                     ></div>
                   </div>
-                  <div className="grid grid-cols-4 text-center text-xs">
+                  <div className="grid grid-cols-4 text-center text-xs gap-1">
                     <div>
-                      <p className="text-muted-foreground">起點</p>
-                      <p className="font-bold">{currentWt.toFixed(1)}kg</p>
+                      <p className="text-muted-foreground text-xs">起點</p>
+                      <p className="font-bold text-sm">{currentWt.toFixed(1)}kg</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">目標</p>
-                      <p className="font-bold">{targetWeight.toFixed(1)}kg</p>
+                      <p className="text-muted-foreground text-xs">目標</p>
+                      <p className="font-bold text-sm">{targetWeight.toFixed(1)}kg</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">還差</p>
-                      <p className="font-bold">{remainingKg.toFixed(1)}kg</p>
+                      <p className="text-muted-foreground text-xs">還差</p>
+                      <p className="font-bold text-sm">{remainingKg.toFixed(1)}kg</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">天後</p>
-                      <p className="font-bold text-primary">{goalDaysNum}</p>
+                      <p className="text-muted-foreground text-xs">天後</p>
+                      <p className="font-bold text-primary text-sm">{goalDaysNum}</p>
                     </div>
                   </div>
                   {goalDaysNum > 0 && goalKgNum > 0 && (
