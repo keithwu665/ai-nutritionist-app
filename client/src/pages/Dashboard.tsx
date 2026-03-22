@@ -51,7 +51,8 @@ export default function Dashboard() {
     });
   };
 
-  const isLoading = (!profile && profileLoading) || (!dashData && dashLoading) || (!recs && recsLoading);
+  // Only block on initial page load, not on recommendations refetch
+  const isLoading = (!profile && profileLoading) || (!dashData && dashLoading);
 
   if (isLoading) {
     return (
