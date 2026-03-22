@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
+import { getExerciseDisplay } from '@/lib/exerciseMapping';
 
 
 export default function Dashboard() {
@@ -327,12 +328,14 @@ export default function Dashboard() {
 
           {dashData?.today.exercises && dashData.today.exercises.length > 0 ? (
             <div className="space-y-2">
-              {dashData.today.exercises.map((exercise, idx) => (
+              {dashData.today.exercises.map((exercise, idx) => {
+                const { icon, label } = getExerciseDisplay(exercise.name);
+                return (
                 <Card key={idx} className="rounded-2xl">
                   <CardContent className="pt-3 pb-3">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="text-sm font-semibold">{exercise.name}</p>
+                        <p className="text-sm font-semibold flex items-center gap-2"><span>{icon}</span> {label}</p>
                         <p className="text-xs text-muted-foreground">{exercise.duration} min · {exercise.calories} kcal</p>
                       </div>
                       <div className="text-right">
@@ -342,7 +345,8 @@ export default function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <Card className="rounded-2xl">
