@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,10 +12,16 @@ import { getExerciseDisplay } from '@/lib/exerciseMapping';
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
-  const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
+  const profileQuery = trpc.profile.get.useQuery();
+  const { data: profile, isLoading: profileLoading, error: profileError } = profileQuery;
   const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
   const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[Dashboard] Profile query state:', { profileLoading, profile, profileError });
+  }, [profileLoading, profile, profileError]);
 
   // Load mood from localStorage on mount
   useEffect(() => {
@@ -25,7 +31,8 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!profileLoading && !profile) {
+    if (profileLoading) return;
+    if (!profile) {
       setLocation('/onboarding');
     }
   }, [profileLoading, profile, setLocation]);
@@ -38,7 +45,8 @@ export default function Dashboard() {
     setTodayMood(mood);
   };
 
-  const isLoading = (!profile && profileLoading) || (!dashData && dashLoading) || (!recs && recsLoading);
+  // Only show loading if profile is actually loading and we don't have any data
+  const isLoading = profileLoading && !profile;
 
   if (isLoading) {
     return (
@@ -307,6 +315,36 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <p className="text-sm font-semibold mb-1">運動建議</p>
                     <p className="text-xs text-muted-foreground">{recs.exercise?.[0]?.message || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Mental Wellness Advice */}
+            <Card className="rounded-2xl bg-purple-50 border-purple-100">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">🧠</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold mb-2">心靈建議</p>
+                    {todayMood ? (
+                      <div className="space-y-1.5 text-xs text-muted-foreground">
+                        <div>
+                          <p className="font-semibold text-foreground">【今日狀態】</p>
+                          <p>根據你今日的心情，保持積極心態。</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">【近期狀態】</p>
+                          <p>保持穩定的情緒，照顧好自己。</p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">【可以做的事】</p>
+                          <p>試試深呼吸或輕鬆的運動，幫助放鬆身心。</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">選擇今日心情，獲得個人化的心靈建議。</p>
+                    )}
                   </div>
                 </div>
               </CardContent>

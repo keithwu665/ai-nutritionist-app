@@ -85,10 +85,10 @@ export async function saveBodyMetrics(
     muscleMassKg?: string | number;
     note?: string;
     source?: string;
-    report_photo_url?: string;
-    measured_at?: string;
-    fat_mass_kg?: string | number;
-    ffm_kg?: string | number;
+    reportPhotoUrl?: string;
+    measuredAt?: string;
+    fatMassKg?: string | number;
+    ffmKg?: string | number;
   }
 ) {
   const db = await getDb();
@@ -101,9 +101,9 @@ export async function saveBodyMetrics(
     muscleMassKg: data.muscleMassKg ? String(data.muscleMassKg) : undefined,
     note: data.note,
     source: data.source,
-    report_photo_url: data.report_photo_url,
-    measured_at: data.measured_at,
-    fat_mass_kg: data.fat_mass_kg ? String(data.fat_mass_kg) : undefined,
-    ffm_kg: data.ffm_kg ? String(data.ffm_kg) : undefined,
+    reportPhotoUrl: data.reportPhotoUrl,
+    measuredAt: data.measuredAt,
+    fatMassKg: data.fatMassKg ? String(data.fatMassKg) : undefined,
+    ffmKg: data.ffmKg ? String(data.ffmKg) : undefined,
   });
 }

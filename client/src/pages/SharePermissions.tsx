@@ -129,7 +129,7 @@ export default function SharePermissions() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.back()}
+            onClick={() => window.history.back()}
             className="p-0 h-auto"
           >
             <ChevronLeft className="h-6 w-6" />
@@ -250,13 +250,13 @@ export default function SharePermissions() {
           <h2 className="text-base font-semibold text-gray-800">邀請</h2>
           <div className="space-y-2">
             <Button
-              onClick={() => router.push('/invite-coach')}
+              onClick={() => window.location.href = '/invite-coach'}
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
             >
               邀請教練
             </Button>
             <Button
-              onClick={() => router.push('/invite-friend')}
+              onClick={() => window.location.href = '/invite-friend'}
               variant="outline"
               className="w-full border-emerald-600 text-emerald-600 hover:bg-emerald-50"
             >

@@ -114,9 +114,10 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         try {
-          return db.deleteFoodLogItem(input.id, ctx.user.id);
+          const { id, ...updateData } = input;
+          return db.updateBodyMetric(id, ctx.user.id, updateData);
         } catch (error) {
-          console.error('[FoodLogs] deleteItem error:', error instanceof Error ? error.message : String(error));
+          console.error('[BodyMetrics] update error:', error instanceof Error ? error.message : String(error));
           throw error;
         }
       }),

@@ -60,7 +60,7 @@ export default function InviteCoach() {
     toast.success('教練邀請已發送');
     
     setTimeout(() => {
-      router.back();
+      window.history.back();
     }, 1500);
   };
 
@@ -72,7 +72,7 @@ export default function InviteCoach() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.back()}
+            onClick={() => window.history.back()}
             className="p-0 h-auto"
           >
             <ChevronLeft className="h-6 w-6" />

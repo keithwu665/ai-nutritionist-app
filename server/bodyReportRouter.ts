@@ -96,12 +96,12 @@ export const bodyReportRouter = router({
         weightKg: input.weightKg,
         bodyFatPercent: input.bodyFatPercent,
         muscleMassKg: input.muscleMassKg,
-        fat_mass_kg: input.fatMassKg,
-        ffm_kg: input.ffmKg,
+        fatMassKg: input.fatMassKg,
+        ffmKg: input.ffmKg,
         note: input.note,
         source: input.provider,
-        report_photo_url: input.photoUrl,
-        measured_at: new Date().toISOString(),
+        reportPhotoUrl: input.photoUrl,
+        measuredAt: new Date().toISOString(),
       });
 
       console.log(`[bodyReport] Body metrics saved`);

@@ -274,7 +274,7 @@ Interpret these facts and give practical advice about whether this meal is suita
     // Validate that advice is not just macro numbers
     if (advice.length === 0 || advice.match(/^\d+g.*\d+g.*\d+g.*kcal$/)) {
       console.warn('[generateAIDietAdviceWithAI] Advice is just numbers, regenerating');
-      return generateAIDietAdviceWithAI(facts, values, personality, retryCount + 1);
+      return generateAIDietAdviceWithAI(facts, values, personality, undefined, retryCount + 1);
     }
 
     return advice;

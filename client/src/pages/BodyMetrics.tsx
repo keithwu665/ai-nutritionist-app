@@ -163,8 +163,8 @@ export default function BodyMetrics() {
     console.log(`   Current date: ${selectedDate}, Previous date: ${previousMetric.date}`);
   }
   const weightTrend = getTrend(selectedWeight, previousMetric ? Number(previousMetric.weightKg) : null);
-  const bodyFatTrend = getTrend(selectedDayMetric?.bodyFatPercent, previousMetric?.bodyFatPercent);
-  const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg, previousMetric?.muscleMassKg);
+  const bodyFatTrend = getTrend(selectedDayMetric?.bodyFatPercent ? Number(selectedDayMetric.bodyFatPercent) : null, previousMetric?.bodyFatPercent ? Number(previousMetric.bodyFatPercent) : null);
+  const muscleMassTrend = getTrend(selectedDayMetric?.muscleMassKg ? Number(selectedDayMetric.muscleMassKg) : null, previousMetric?.muscleMassKg ? Number(previousMetric.muscleMassKg) : null);
 
   // Generate AI Coach Advice with timeout protection
   const generateAdvice = useCallback(() => {
