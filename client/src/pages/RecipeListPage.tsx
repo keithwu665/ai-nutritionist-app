@@ -6,9 +6,16 @@ import { ChevronLeft, Clock, Flame } from 'lucide-react';
 // Mock recipe data by protein type
 const recipesByProtein: Record<string, Array<{ id: string; name: string; kcal: number; time: string }>> = {
   chicken: [
-    { id: 'c1', name: '香煎雞胸沙律', kcal: 420, time: '15分鐘' },
-    { id: 'c2', name: '雞胸栗米飯', kcal: 580, time: '20分鐘' },
-    { id: 'c3', name: '蒜香雞胸蔬菜碗', kcal: 450, time: '18分鐘' },
+    { id: 'c1', name: '香煎雞胸蛋白早餐碗', kcal: 320, time: '15分鐘' },
+    { id: 'c2', name: '雞胸牛油果全麥吐司', kcal: 380, time: '12分鐘' },
+    { id: 'c3', name: '雞肉菠菜蛋白捲', kcal: 310, time: '18分鐘' },
+    { id: 'c4', name: '雞胸番茄沙律碗', kcal: 340, time: '14分鐘' },
+    { id: 'c5', name: '雞肉藜麥早餐碗', kcal: 360, time: '20分鐘' },
+    { id: 'c6', name: '雞胸蘑菇炒蛋', kcal: 330, time: '16分鐘' },
+    { id: 'c7', name: '雞肉低脂芝士三文治', kcal: 350, time: '13分鐘' },
+    { id: 'c8', name: '雞胸蔬菜卷餅', kcal: 320, time: '12分鐘' },
+    { id: 'c9', name: '雞肉燕麥鹹粥', kcal: 340, time: '22分鐘' },
+    { id: 'c10', name: '雞胸青瓜乳酪碗', kcal: 300, time: '10分鐘' },
   ],
   pork: [
     { id: 'p1', name: '香煎豬扒配沙律', kcal: 480, time: '16分鐘' },
