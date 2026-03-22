@@ -34,12 +34,17 @@ export default function Dashboard() {
     }
   }, [profileLoading, profile, setLocation]);
 
-  const saveMoodMutation = trpc.mood.save.useMutation();
+  const saveMoodMutation = trpc.mood.save.useMutation({
+    onError: (error) => {
+      console.error('Failed to save mood:', error);
+    },
+  });
 
   const handleMoodSelect = (mood: string) => {
     const today = getTodayDateString();
+    // Optimistic UI update - immediately show the selected mood
     setTodayMood(mood);
-    // Save to database
+    // Save to database in background (non-blocking)
     saveMoodMutation.mutate({
       date: today,
       mood: mood,
