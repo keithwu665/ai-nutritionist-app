@@ -563,3 +563,12 @@
 - [x] Add back button navigation
 - [x] Use mock recipe data for testing
 - [x] Verify TypeScript compilation and no errors
+
+## Fix 食譜頁 Flow - COMPLETE
+- [x] Create recipe list page with mock recipes for each protein type
+- [x] Add at least 3 recipes per protein type (6 proteins total)
+- [x] Update RecipeMethodSelection to navigate to recipe list
+- [x] Update recipe list to navigate to detail page on selection
+- [x] Add routing for recipe list page
+- [x] Implement recipe selection with navigation to detail page
+- [x] Verify navigation: Category → Protein → Level 3 → 食譜頁 → Recipe List → Detail

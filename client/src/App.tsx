@@ -31,6 +31,7 @@ import RecipeMethodSelection from "./pages/RecipeMethodSelection";
 import RecipePage from "./pages/RecipePage";
 import AIRecommendedRecipes from "./pages/AIRecommendedRecipes";
 import FitastyIntegration from "./pages/FitastyIntegration";
+import { RecipeListPage } from "./pages/RecipeListPage";
 import AppLayout from "./components/AppLayout";
 
 function Router() {
@@ -103,7 +104,14 @@ function Router() {
           </AppLayout>
         )}
       </Route>
-      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein\u002Frecipe-page"}>
+      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein\u002Frecipes"}>
+        {() => (
+          <AppLayout>
+            <RecipeListPage />
+          </AppLayout>
+        )}
+      </Route>
+      <Route path={"\u002Fdiet\u002Finspiration\u002Fhome-cooking\u002F:category\u002F:protein\u002F:recipeId"}>
         {() => (
           <AppLayout>
             <RecipePage />

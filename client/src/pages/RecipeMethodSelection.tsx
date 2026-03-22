@@ -32,9 +32,16 @@ export default function RecipeMethodSelection() {
   ];
 
   const handleOptionClick = (optionId: string) => {
-    navigate(
-      `/diet/inspiration/home-cooking/${category}/${protein}/${optionId}`
-    );
+    if (optionId === 'recipe-page') {
+      // Navigate to recipe list page
+      navigate(
+        `/diet/inspiration/home-cooking/${category}/${protein}/recipes?category=${category}&protein=${protein}`
+      );
+    } else {
+      navigate(
+        `/diet/inspiration/home-cooking/${category}/${protein}/${optionId}`
+      );
+    }
   };
 
   return (
