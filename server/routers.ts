@@ -9,7 +9,6 @@ import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
 import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
-import { getMentalAdviceByMoodId } from "./utils/mentalWellnessEngine";
 import { dataExportRouter } from "./routers/dataExport";
 
 export const appRouter = router({
@@ -1224,43 +1223,8 @@ export const appRouter = router({
         const user = await db.getUserById(ctx.user.id);
         if (user?.role !== 'admin') throw new Error('Only admins can delete Fitasty products');
         return db.deleteFitastyProduct(input.id);
-       }),
-  }),
-  // ========================================================================
-  // Mood Tracking
-  // ========================================================================
-  mood: router({
-    save: protectedProcedure
-      .input(z.object({
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-        mood: z.enum(['happy', 'neutral', 'sad', 'angry', 'tired']),
-        note: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        return db.saveMoodRecord(ctx.user.id, input.date, input.mood, input.note);
-      }),
-    getMonthRecords: protectedProcedure
-      .input(z.object({
-        year: z.number(),
-        month: z.number().min(1).max(12),
-      }))
-      .query(async ({ ctx, input }) => {
-        return db.getMoodRecordsForMonth(ctx.user.id, input.year, input.month);
-      }),
-    getRecord: protectedProcedure
-      .input(z.object({
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      }))
-      .query(async ({ ctx, input }) => {
-        return db.getMoodRecord(ctx.user.id, input.date);
-      }),
-    getMentalAdvice: protectedProcedure
-      .input(z.object({
-        mood: z.enum(['happy', 'neutral', 'sad', 'angry', 'tired']).optional(),
-      }))
-      .query(async ({ input }) => {
-        return getMentalAdviceByMoodId(input.mood || 'neutral');
       }),
   }),
 });
+
 export type AppRouter = typeof appRouter;

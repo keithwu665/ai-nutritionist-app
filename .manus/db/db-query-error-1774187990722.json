@@ -1,8 +1,0 @@
-{
-  "query": "CREATE TABLE `mood_records` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`date` varchar(10) NOT NULL,\n\t`mood` enum('happy','neutral','sad','angry','tired') NOT NULL,\n\t`note` text,\n\t`createdAt` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP\n);\nCREATE INDEX `mood_records_userId_date_unique` ON `mood_records` (`userId`,`date`);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute CREATE TABLE `mood_records` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`date` varchar(10) NOT NULL,\n\t`mood` enum('happy','neutral','sad','angry','tired') NOT NULL,\n\t`note` text,\n\t`createdAt` timestamp NOT NULL DEFAULT 'CURRENT_TIMESTAMP',\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP\n);\nCREATE INDEX `mood_records_userId_date_unique` ON `mood_records` (`userId`,`date`);",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1067 (42000) at line 1: Invalid default value for 'createdAt'"
-  ]
-}

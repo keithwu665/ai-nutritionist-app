@@ -134,13 +134,6 @@
       "when": 1773984280896,
       "tag": "0018_hesitant_alice",
       "breakpoints": true
-    },
-    {
-      "idx": 19,
-      "version": "5",
-      "when": 1774187712500,
-      "tag": "0019_tense_omega_flight",
-      "breakpoints": true
     }
   ]
 }

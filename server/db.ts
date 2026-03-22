@@ -11,7 +11,6 @@ import {
   fitastyProducts,
   bodyReportTemplates,
   bodyPhotos,
-  moodRecords,
 } from "../drizzle/schema";
 
 type InsertUser = InferInsertModel<typeof users>;
@@ -23,8 +22,6 @@ type InsertExercise = InferInsertModel<typeof exercises>;
 type InsertFitastyProduct = InferInsertModel<typeof fitastyProducts>;
 type InsertBodyReportTemplate = InferInsertModel<typeof bodyReportTemplates>;
 type InsertBodyPhoto = InferInsertModel<typeof bodyPhotos>;
-type InsertMoodRecord = InferInsertModel<typeof moodRecords>;
-type SelectMoodRecord = InferSelectModel<typeof moodRecords>;
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -689,75 +686,4 @@ export async function deleteBodyPhoto(photoId: number, userId: number) {
     ));
   
   return { success: true };
-}
-
-
-// ============================================================================
-// MOOD RECORDS
-// ============================================================================
-
-export async function saveMoodRecord(userId: number, date: string, mood: string, note?: string) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  // Check if mood record exists for this date
-  const existing = await db.select().from(moodRecords)
-    .where(and(
-      eq(moodRecords.userId, userId),
-      eq(moodRecords.date, date)
-    ))
-    .limit(1);
-  
-  if (existing.length > 0) {
-    // Update existing record
-    await db.update(moodRecords)
-      .set({ mood, note })
-      .where(and(
-        eq(moodRecords.userId, userId),
-        eq(moodRecords.date, date)
-      ));
-  } else {
-    // Insert new record
-    await db.insert(moodRecords).values({
-      userId,
-      date,
-      mood,
-      note,
-    });
-  }
-  
-  return { success: true };
-}
-
-export async function getMoodRecordsForMonth(userId: number, year: number, month: number) {
-  const db = await getDb();
-  if (!db) return [];
-  
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
-  const endDate = new Date(year, month, 0);
-  const endDateStr = `${year}-${String(month).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
-  
-  const records = await db.select().from(moodRecords)
-    .where(and(
-      eq(moodRecords.userId, userId),
-      gte(moodRecords.date, startDate),
-      lte(moodRecords.date, endDateStr)
-    ))
-    .orderBy(asc(moodRecords.date));
-  
-  return records;
-}
-
-export async function getMoodRecord(userId: number, date: string) {
-  const db = await getDb();
-  if (!db) return null;
-  
-  const result = await db.select().from(moodRecords)
-    .where(and(
-      eq(moodRecords.userId, userId),
-      eq(moodRecords.date, date)
-    ))
-    .limit(1);
-  
-  return result.length > 0 ? result[0] : null;
 }
