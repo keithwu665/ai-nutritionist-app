@@ -14,6 +14,7 @@ import MoodCalendar from '@/components/MoodCalendar';
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
+  const [showMoodCalendar, setShowMoodCalendar] = useState(false);
   const { data: profile, isLoading: profileLoading } = trpc.profile.get.useQuery();
   const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
   const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
@@ -133,7 +134,15 @@ export default function Dashboard() {
         
         {/* Mood Check-in Section */}
         <div className="bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100">
-          <p className="text-sm font-semibold mb-2.5 text-foreground">今日心情</p>
+          <div className="flex justify-between items-center mb-2.5">
+            <p className="text-sm font-semibold text-foreground">今日心情</p>
+            <button
+              onClick={() => setShowMoodCalendar(true)}
+              className="text-xs text-primary hover:underline font-medium"
+            >
+              心情紀錄
+            </button>
+          </div>
           <div className="flex gap-2 justify-between">
             {[
               { id: 'happy', emoji: '😊', label: '開心' },
@@ -158,8 +167,25 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* Mood Calendar */}
-        <MoodCalendar />
+        {/* Mood Calendar Modal */}
+        {showMoodCalendar && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex justify-between items-center">
+                <h2 className="font-semibold text-foreground">心情紀錄</h2>
+                <button
+                  onClick={() => setShowMoodCalendar(false)}
+                  className="text-gray-500 hover:text-gray-700 text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-4">
+                <MoodCalendar />
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Hero Calorie Card - Emerald Green */}
         <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">
