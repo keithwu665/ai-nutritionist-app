@@ -16,15 +16,32 @@ interface ExerciseAdvice {
 }
 
 /**
+ * Get mood context for exercise advice
+ */
+function getMoodContextExercise(mood: string): string {
+  const moodMap: Record<string, string> = {
+    happy: '用戶今天心情開心，應該給予鼓勵和積極的建議。',
+    neutral: '用戶今天心情普通，應該給予平衡和穩定的建議。',
+    sad: '用戶今天心情低落，應該給予溫暖和支持的建議。',
+    stressed: '用戶今天感到煩躁，應該給予實用和有幫助的建議來緩解壓力。',
+    tired: '用戶今天感到疲倦，應該建議休息和恢復，避免過度負荷。',
+  };
+  return moodMap[mood] || '';
+}
+
+/**
  * Generate neutral exercise insight based on workout data
  */
-async function generateNeutralExerciseAdvice(data: ExerciseData): Promise<string> {
+async function generateNeutralExerciseAdvice(data: ExerciseData, mood?: string): Promise<string> {
   const prompt = `Based on the following exercise data, generate a brief, neutral exercise insight in Traditional Chinese (香港用語):
 
 Calories burned today: ${data.caloriesBurned} kcal
 Workouts completed today: ${data.workoutCount}
 Total duration today: ${data.totalDuration} minutes
 ${data.lastWorkoutType ? `Last workout type: ${data.lastWorkoutType}` : ""}
+
+MOOD CONTEXT:
+${mood ? getMoodContextExercise(mood) : 'User mood is neutral.'}
 
 Generate a short, factual insight (1-2 sentences) that:
 1. Acknowledges the exercise data accurately
@@ -69,7 +86,8 @@ IMPORTANT: Only output the advice text, nothing else.`;
 async function transformToPersonality(
   neutralAdvice: string,
   personality: ExercisePersonality,
-  data: ExerciseData
+  data: ExerciseData,
+  mood?: string
 ): Promise<string> {
   let personalityPrompt = "";
 
@@ -165,13 +183,14 @@ Output ONLY the rewritten advice, no explanation:`;
  */
 export async function generateExerciseAdvice(
   data: ExerciseData,
-  personality: ExercisePersonality
+  personality: ExercisePersonality,
+  mood?: string
 ): Promise<ExerciseAdvice> {
   // Step 1: Generate neutral advice
-  const neutralAdvice = await generateNeutralExerciseAdvice(data);
+  const neutralAdvice = await generateNeutralExerciseAdvice(data, mood);
 
   // Step 2: Transform to personality
-  const personalityAdvice = await transformToPersonality(neutralAdvice, personality, data);
+  const personalityAdvice = await transformToPersonality(neutralAdvice, personality, data, mood);
 
   return {
     neutralAdvice,
@@ -185,7 +204,8 @@ export async function generateExerciseAdvice(
  */
 export async function generateExerciseAdviceWithFallback(
   data: ExerciseData,
-  personality: ExercisePersonality
+  personality: ExercisePersonality,
+  mood?: string
 ): Promise<string> {
   // If no workout today, use personality-specific fallback
   if (data.caloriesBurned === 0 && data.workoutCount === 0) {
@@ -200,6 +220,6 @@ export async function generateExerciseAdviceWithFallback(
   }
 
   // Otherwise generate full advice
-  const advice = await generateExerciseAdvice(data, personality);
+  const advice = await generateExerciseAdvice(data, personality, mood);
   return advice.personalityAdvice;
 }
