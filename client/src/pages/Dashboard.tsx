@@ -68,7 +68,7 @@ export default function Dashboard() {
     const hour = new Date().getHours();
     const name = profile?.displayName || '';
     const greeting = hour < 12 ? '早晨' : hour < 18 ? '午安' : '晚安';
-    const emoji = hour < 12 ? '🌤️' : hour < 18 ? '☀️' : '🌙';
+    const emoji = hour < 12 ? '👋' : hour < 18 ? '☀️' : '🌙';
     
     if (name) {
       return `${greeting}，${name}！${emoji}`;
@@ -77,19 +77,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="pb-32 md:pb-8">
-      {/* Greeting Section - Rebuilt from Screenshot */}
-      <div className="p-4">
-        <p className="text-xs text-muted-foreground mb-4">{getDateString()}</p>
-        <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold">{getGreeting()}</h1>
-          <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-muted rounded-full transition-colors">
-              <Bell className="h-5 w-5 text-foreground" />
-            </button>
-            <button className="p-2 hover:bg-muted rounded-full transition-colors" onClick={() => setLocation('/settings')}>
-              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-primary" />
+    <div className="pb-32 md:pb-8 bg-white">
+      {/* Header Section */}
+      <div className="p-4 md:p-6">
+        <p className="text-xs text-gray-500 mb-3">{getDateString()}</p>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{getGreeting()}</h1>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <Bell className="h-5 w-5 text-gray-700" />
+              </button>
+              <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">2</span>
+            </div>
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={() => setLocation('/settings')}>
+              <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                <span className="text-emerald-600 font-bold text-sm">美</span>
               </div>
             </button>
           </div>
@@ -97,29 +100,31 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="p-4 md:p-8 space-y-3 md:space-y-4 max-w-7xl mx-auto">
+      <div className="px-4 md:px-6 space-y-4 max-w-7xl mx-auto">
         
-        {/* Hero Calorie Card - Emerald Green */}
-        <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">
-          <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* Hero Calorie Card - Large Green Gradient */}
+        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl p-6 md:p-8 text-white shadow-md">
+          <div className="grid grid-cols-2 gap-8 mb-6">
             {/* Left: Intake */}
             <div>
-              <p className="text-xs font-medium opacity-90 mb-0.5">今日熱量</p>
-              <p className="text-3xl md:text-4xl font-bold mb-1">{Math.round(todayCalories)}</p>
-              <p className="text-xs opacity-75 mb-0.5">/ {Math.round(target)} kcal</p>
-              <p className="text-xs opacity-75">還差 {Math.round(remaining)} kcal</p>
+              <p className="text-sm font-medium opacity-90 mb-2">今日熱量</p>
+              <div className="flex items-baseline gap-2 mb-2">
+                <p className="text-5xl md:text-6xl font-bold">{Math.round(todayCalories)}</p>
+                <p className="text-sm opacity-75">/ {Math.round(target)} kcal</p>
+              </div>
+              <p className="text-sm opacity-85">還差 {Math.round(remaining)} kcal</p>
             </div>
             {/* Right: Net Calories */}
             <div className="text-right">
-              <p className="text-xs font-medium opacity-90 mb-0.5">淨熱量</p>
-              <p className="text-3xl md:text-4xl font-bold">{Math.round(netCalories)}</p>
-              <p className="text-xs opacity-75 mt-1">kcal</p>
+              <p className="text-sm font-medium opacity-90 mb-2">淨熱量</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2">{Math.round(netCalories)}</p>
+              <p className="text-sm opacity-85">kcal</p>
             </div>
           </div>
 
           {/* Progress Bar */}
-          <div className="mb-3">
-            <div className="w-full bg-white/20 rounded-full h-1.5 overflow-hidden">
+          <div className="mb-6">
+            <div className="w-full bg-white/30 rounded-full h-2.5 overflow-hidden">
               <div 
                 className="bg-white h-full rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(caloriePercent, 100)}%` }}
@@ -128,34 +133,73 @@ export default function Dashboard() {
           </div>
 
           {/* Macro Circles */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-4">
+            {/* Protein */}
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-white/30 flex items-center justify-center mb-1 relative">
-                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-white border-r-white" style={{
-                  transform: 'rotate(' + (protein / (totalMacros || 1) * 360) + 'deg)'
-                }}></div>
-                <div className="text-center">
-                  <p className="text-sm md:text-base font-bold">{Math.round(protein)}</p>
+              <div className="relative w-24 h-24 mb-2">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="6" />
+                  <circle 
+                    cx="50" 
+                    cy="50" 
+                    r="45" 
+                    fill="none" 
+                    stroke="white" 
+                    strokeWidth="6"
+                    strokeDasharray={`${(protein / totalMacros) * 283} 283`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <p className="text-xl font-bold">{Math.round(protein)}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
               <p className="text-xs font-medium">蛋白質</p>
             </div>
 
+            {/* Fat */}
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-orange-300 flex items-center justify-center mb-1">
-                <div className="text-center">
-                  <p className="text-sm md:text-base font-bold">{Math.round(fat)}</p>
+              <div className="relative w-24 h-24 mb-2">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="6" />
+                  <circle 
+                    cx="50" 
+                    cy="50" 
+                    r="45" 
+                    fill="none" 
+                    stroke="#fbbf24" 
+                    strokeWidth="6"
+                    strokeDasharray={`${(fat / totalMacros) * 283} 283`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <p className="text-xl font-bold">{Math.round(fat)}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
               <p className="text-xs font-medium">脂肪</p>
             </div>
 
+            {/* Carbs */}
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-blue-300 flex items-center justify-center mb-1">
-                <div className="text-center">
-                  <p className="text-sm md:text-base font-bold">{Math.round(carbs)}</p>
+              <div className="relative w-24 h-24 mb-2">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="6" />
+                  <circle 
+                    cx="50" 
+                    cy="50" 
+                    r="45" 
+                    fill="none" 
+                    stroke="#60a5fa" 
+                    strokeWidth="6"
+                    strokeDasharray={`${(carbs / totalMacros) * 283} 283`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <p className="text-xl font-bold">{Math.round(carbs)}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -165,35 +209,35 @@ export default function Dashboard() {
         </div>
 
         {/* Body Metrics Cards - 3 Column */}
-        <div className="grid grid-cols-3 gap-2 md:gap-3">
-          <Card className="rounded-2xl">
-            <CardContent className="pt-3 pb-3">
-              <p className="text-xs text-muted-foreground font-medium mb-1">體重</p>
-              <p className="text-xl font-bold">{profile.weightKg}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">kg</p>
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="rounded-2xl border-0 shadow-sm">
+            <CardContent className="pt-5 pb-5 px-4">
+              <p className="text-xs text-gray-500 font-medium mb-2">體重</p>
+              <p className="text-3xl font-bold text-gray-900">{profile.weightKg}</p>
+              <p className="text-xs text-gray-400 mt-1">kg</p>
               {bodyMetrics && (
-                <p className="text-xs text-green-600 mt-0.5">-0.2 kg</p>
+                <p className="text-xs text-emerald-600 font-medium mt-2">-0.2 kg</p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardContent className="pt-3 pb-3">
-              <p className="text-xs text-muted-foreground font-medium mb-1">體脂 %</p>
-              <p className="text-xl font-bold">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">%</p>
+          <Card className="rounded-2xl border-0 shadow-sm">
+            <CardContent className="pt-5 pb-5 px-4">
+              <p className="text-xs text-gray-500 font-medium mb-2">體脂 %</p>
+              <p className="text-3xl font-bold text-gray-900">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
+              <p className="text-xs text-gray-400 mt-1">%</p>
               {bodyMetrics && (
-                <p className="text-xs text-green-600 mt-0.5">↓ 正在減少</p>
+                <p className="text-xs text-emerald-600 font-medium mt-2">↓ 正在減少</p>
               )}
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl">
-            <CardContent className="pt-3 pb-3">
-              <p className="text-xs text-muted-foreground font-medium mb-1">BMI</p>
-              <p className="text-xl font-bold">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">kg/m²</p>
-              <p className="text-xs text-green-600 mt-0.5">正常</p>
+          <Card className="rounded-2xl border-0 shadow-sm">
+            <CardContent className="pt-5 pb-5 px-4">
+              <p className="text-xs text-gray-500 font-medium mb-2">BMI</p>
+              <p className="text-3xl font-bold text-gray-900">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
+              <p className="text-xs text-gray-400 mt-1">kg/m²</p>
+              <p className="text-xs text-emerald-600 font-medium mt-2">正常</p>
             </CardContent>
           </Card>
         </div>
@@ -212,195 +256,57 @@ export default function Dashboard() {
           const remainingKg = Math.max(0, Math.abs(targetWeight - currentWt));
           const progressPercent = goalKgNum > 0 ? Math.min(100, ((goalKgNum - remainingKg) / goalKgNum) * 100) : 0;
           return (
-            <Card className="rounded-2xl">
-              <CardContent className="pt-3 pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold text-sm">目標進度</h3>
+            <Card className="rounded-2xl border-0 shadow-sm">
+              <CardContent className="pt-6 pb-6 px-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-gray-900 text-lg">目標進度</h3>
                   <button 
-                  onClick={() => setLocation('/body')}
-                  className="text-primary text-xs font-medium flex items-center gap-1 hover:opacity-80"
-                >
-                    詳情 <ChevronRight className="h-3 w-3" />
+                    onClick={() => setLocation('/body')}
+                    className="text-emerald-600 text-sm font-medium flex items-center gap-1 hover:opacity-80"
+                  >
+                    詳情 <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="space-y-2">
-                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">起點</p>
+                    <p className="text-lg font-bold text-gray-900">{currentWt.toFixed(1)}kg</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 mb-1">目標</p>
+                    <p className="text-lg font-bold text-gray-900">{targetWeight.toFixed(1)}kg</p>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div 
-                      className="bg-primary h-full rounded-full transition-all duration-300"
+                      className="bg-emerald-500 h-full rounded-full transition-all duration-300"
                       style={{ width: `${progressPercent}%` }}
                     ></div>
                   </div>
-                  <div className="grid grid-cols-4 text-center text-xs gap-1">
-                    <div>
-                      <p className="text-muted-foreground text-xs">起點</p>
-                      <p className="font-bold text-sm">{currentWt.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">目標</p>
-                      <p className="font-bold text-sm">{targetWeight.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">還差</p>
-                      <p className="font-bold text-sm">{remainingKg.toFixed(1)}kg</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs">天後</p>
-                      <p className="font-bold text-primary text-sm">{goalDaysNum}</p>
-                    </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">{progressPercent.toFixed(0)}% 完成</p>
+                    <p className="text-sm font-medium text-gray-900"></p>
                   </div>
-                  {goalDaysNum > 0 && goalKgNum > 0 && (
-                    <div className="mt-3 pt-3 border-t border-muted">
-                      <p className="text-xs text-muted-foreground">👉 每週約減 {((goalKgNum * 7) / goalDaysNum).toFixed(1)}–{((goalKgNum * 7) / goalDaysNum + 0.1).toFixed(1)} kg</p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">還差</p>
+                    <p className="text-lg font-bold text-gray-900">{remainingKg.toFixed(1)}kg</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">剩餘天數</p>
+                    <p className="text-2xl font-bold text-emerald-600">{goalDaysNum}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           );
         })()}
-
-        {/* Weight Trend Card */}
-        <Card className="rounded-2xl">
-          <CardContent className="pt-5 pb-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">體重趨勢（7日）</h3>
-              <button 
-                onClick={() => setLocation('/body')}
-                className="text-primary text-sm font-medium flex items-center gap-1 hover:opacity-80"
-              >
-                查看更多 <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="text-sm text-green-600 font-medium mb-4">📈 7日下降 0.9 kg</p>
-            {dashData?.weightTrend && dashData.weightTrend.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={dashData.weightTrend.map(d => ({ ...d, date: d.date.slice(5) }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                  <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="weight" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 3 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-32 flex items-center justify-center text-muted-foreground text-sm">
-                暫無體重數據
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Exercise Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">今日運動</h3>
-            <button 
-              onClick={() => setLocation('/exercise')}
-              className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-            >
-              <Plus className="h-5 w-5 text-primary" />
-            </button>
-          </div>
-          <Card className="rounded-2xl bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900">
-            <CardContent className="pt-4 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                  <span className="text-xl">🏋️</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-sm">健身</p>
-                  <p className="text-xs text-muted-foreground">45 分鐘 · 中強度</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-primary">280</p>
-                  <p className="text-xs text-muted-foreground">kcal</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* AI Recommendations */}
-        <div>
-          <h3 className="font-semibold mb-4">今日 AI 建議 🤖</h3>
-          <div className="space-y-3">
-            {recsLoading ? (
-              <div className="flex justify-center py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              </div>
-            ) : recs && (recs.diet?.length || recs.exercise?.length || recs.encouragement?.length) ? (
-              <>
-                {recs.diet?.map((rec, i) => (
-                  <RecCard key={`diet-${i}`} rec={rec} icon="🍽" />
-                ))}
-                {recs.exercise?.map((rec, i) => (
-                  <RecCard key={`ex-${i}`} rec={rec} icon="🏃" />
-                ))}
-                {recs.encouragement?.map((rec, i) => (
-                  <RecCard key={`enc-${i}`} rec={rec} icon="⭐" isEncouragement />
-                ))}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">暫無建議</p>
-            )}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div>
-          <h3 className="font-semibold mb-4">快速記錄</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <QuickActionCard 
-              icon="🍽" 
-              label="記錄餐點"
-              onClick={() => setLocation('/food')}
-            />
-            <QuickActionCard 
-              icon="🏃" 
-              label="記錄運動"
-              onClick={() => setLocation('/exercise')}
-            />
-            <QuickActionCard 
-              icon="⚖️" 
-              label="量體重"
-              onClick={() => setLocation('/body')}
-            />
-            <QuickActionCard 
-              icon="👨‍🏫" 
-              label="教練分享"
-              onClick={() => setLocation('/settings')}
-            />
-          </div>
-        </div>
       </div>
     </div>
-  );
-}
-
-function RecCard({ rec, icon, isEncouragement }: { rec: { title: string; content: string; action: string }, icon: string, isEncouragement?: boolean }) {
-  return (
-    <Card className="rounded-2xl border-l-4 border-l-primary">
-      <CardContent className="pt-4 pb-4">
-        <div className="flex items-start gap-3">
-          <span className="text-xl shrink-0">{icon}</span>
-          <div className="flex-1">
-            <p className="font-semibold text-sm">{rec.title}</p>
-            <p className="text-xs text-muted-foreground mt-1">{rec.content}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function QuickActionCard({ icon, label, onClick }: { icon: string, label: string, onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="p-4 rounded-2xl bg-card border border-border hover:border-primary hover:shadow-md transition-all flex flex-col items-center justify-center gap-2"
-    >
-      <span className="text-3xl">{icon}</span>
-      <span className="text-xs font-medium text-foreground text-center">{label}</span>
-    </button>
   );
 }
