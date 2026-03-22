@@ -9,7 +9,7 @@ import { bodyMetricsPhotoImportRouter } from "./routers/bodyMetricsPhotoImport";
 import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
 import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
-import { getMentalWellnessAdvice } from "./utils/mentalWellnessEngine";
+import { getMentalAdviceByMoodId } from "./utils/mentalWellnessEngine";
 import { dataExportRouter } from "./routers/dataExport";
 
 export const appRouter = router({
@@ -1258,28 +1258,8 @@ export const appRouter = router({
       .input(z.object({
         mood: z.enum(['happy', 'neutral', 'sad', 'angry', 'tired']).optional(),
       }))
-      .query(async ({ input, ctx }) => {
-        const mood = (input.mood || 'neutral') as 'happy' | 'neutral' | 'sad' | 'angry' | 'tired';
-        
-        // Get last 7 days of mood history
-        const today = new Date();
-        const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const moodHistory = await db.getMoodRecordsForMonth(
-          ctx.user.id,
-          sevenDaysAgo.getFullYear(),
-          sevenDaysAgo.getMonth() + 1
-        );
-        
-        // Filter to last 7 days and extract moods
-        const recentMoods = moodHistory
-          .filter(record => {
-            const recordDate = new Date(record.date);
-            return recordDate >= sevenDaysAgo && recordDate < today;
-          })
-          .map(record => record.mood as 'happy' | 'neutral' | 'sad' | 'angry' | 'tired')
-          .slice(-7);
-        
-        return getMentalWellnessAdvice(mood, recentMoods);
+      .query(async ({ input }) => {
+        return getMentalAdviceByMoodId(input.mood || 'neutral');
       }),
   }),
 });
