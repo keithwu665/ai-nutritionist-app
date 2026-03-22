@@ -292,7 +292,7 @@ export default function Dashboard() {
                   <div className="text-2xl">🍽️</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold mb-1">飲食建議</p>
-                    <p className="text-xs text-muted-foreground">{recs.diet?.[0]?.content || '增加蛋白質攝入，保持營養均衡。'}</p>
+                    <p className="text-xs text-muted-foreground">{recs.diet?.[0]?.message || '增加蛋白質攝入，保持營養均衡。'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -305,7 +305,7 @@ export default function Dashboard() {
                   <div className="text-2xl">💪</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold mb-1">運動建議</p>
-                    <p className="text-xs text-muted-foreground">{recs.exercise?.[0]?.content || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
+                    <p className="text-xs text-muted-foreground">{recs.exercise?.[0]?.message || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
                   </div>
                 </div>
               </CardContent>

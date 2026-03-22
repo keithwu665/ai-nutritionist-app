@@ -694,11 +694,17 @@ export const appRouter = router({
           exerciseMinutes: todayExercises.reduce((sum, ex) => sum + ex.durationMinutes, 0),
           fitastyCalories: todayFitastyCalories,
           fitastyRatio: todayFitastyRatio,
+          exercises: todayExercises.map(ex => ({
+            name: ex.type,
+            duration: ex.durationMinutes,
+            calories: Number(ex.caloriesBurned),
+          })),
         },
         weekly: {
           avgCalories: uniqueFoodDays > 0 ? weekCalories / uniqueFoodDays : 0,
           avgExerciseMinutes: uniqueExerciseDays > 0 ? weekExerciseMinutes / uniqueExerciseDays : 0,
           totalExerciseDays: uniqueExerciseDays,
+          exercises: todayExercises,
         },
         weightTrend: weightTrend.map(m => ({
           date: m.date,
