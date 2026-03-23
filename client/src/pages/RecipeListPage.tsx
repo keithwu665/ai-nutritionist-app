@@ -1,8 +1,7 @@
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ChevronLeft, Clock, Flame } from 'lucide-react';
-import { getRecipesByProteinAndCategory } from '@/lib/recipeData';
+import { ChevronLeft, Clock, Flame } from 'lucide-react';import { getRecipesByMealAndProtein } from '../lib/recipeDataReorganized';
 
 // Map URL protein parameter to recipe protein_type
 const proteinMap: Record<string, 'chicken' | 'pork' | 'beef' | 'seafood' | 'egg' | 'vegetarian'> = {
@@ -19,6 +18,9 @@ export function RecipeListPage() {
   const [, setLocation] = useLocation();
   const params = useParams<{ category: string; protein: string }>();
   
+  // LEVEL 4 LOGGING
+  console.log('[LEVEL 4] RecipeListPage params:', params);
+  
   // Extract category and protein from URL path
   // URL: /diet/inspiration/home-cooking/breakfast/pork/recipes
   // Segments: [0]=empty, [1]=diet, [2]=inspiration, [3]=home-cooking, [4]=breakfast, [5]=pork, [6]=recipes
@@ -26,24 +28,66 @@ export function RecipeListPage() {
   const category = pathSegments[4] || params.category || 'breakfast';
   const protein = pathSegments[5] || params.protein || 'chicken';
   
+  console.log('[LEVEL 4] URL path:', window.location.pathname);
+  console.log('[LEVEL 4] pathSegments:', pathSegments);
+  console.log('[LEVEL 4] extracted category:', category);
+  console.log('[LEVEL 4] extracted protein:', protein);
+  
   // Map URL protein to recipe protein_type
   const proteinType = proteinMap[protein] || 'chicken';
 
-  // Get recipes for the selected protein type and category
-  const allRecipes = getRecipesByProteinAndCategory(proteinType, 'breakfast');
+
+  // Map category to recipe meal type format
+  const categoryMap: Record<string, 'breakfast' | 'lunch' | 'dinner' | 'salad' | 'snack' | 'soup'> = {
+    breakfast: 'breakfast',
+    main: 'lunch',
+    salad: 'salad',
+    snack: 'snack',
+    soup: 'soup',
+    other: 'dinner'
+  };
+  const mealType = categoryMap[category] || 'breakfast';
+  const allRecipes = getRecipesByMealAndProtein(mealType, proteinType);
   
   // Convert to display format
   const recipes = allRecipes.map(r => ({
     id: r.id,
     name: r.name,
     kcal: r.kcal,
-    time: '15分鐘' // Default time, can be customized per recipe
+    time: '15分鐘', // Default time, can be customized per recipe
+    mealType: r.category,
+    proteinType: r.protein_type
   }));
+  
+  // MANDATORY PROTEIN-LEVEL DEBUG LOGGING
+  console.log('RECIPE selectedMealType:', category);
+  console.log('RECIPE selectedProtein:', protein);
+  console.log('DATA CHECK - ALL RECIPES:', allRecipes.map(r => ({
+    name: r.name,
+    mealType: r.category,
+    proteinType: r.protein_type
+  })));
+  console.log('FILTER INPUT:', {
+    mealType: category,
+    proteinType: protein
+  });
+  console.log('FILTER RESULT:', recipes.map(r => ({
+    name: r.name,
+    mealType: r.mealType,
+    proteinType: r.proteinType
+  })));
+
 
 
   const handleRecipeSelect = (recipeId: string) => {
     // Navigate to recipe detail page with recipe ID
+    console.log('NAV protein:', protein);
+    console.log('[NAV L3->RECIPE] navigating with:', { category, protein, recipeId });
     setLocation(`/diet/inspiration/home-cooking/${category}/${protein}/${recipeId}`);
+  }
+
+  const handleBack = () => {
+    setLocation(`/diet/inspiration/home-cooking/${category}/${protein}`);
   };
 
   return (
