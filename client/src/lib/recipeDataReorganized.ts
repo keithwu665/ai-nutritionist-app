@@ -2342,6 +2342,1671 @@ const lunchChicken: RecipeData[] = [
   }
 ];
 
+const lunchPork: RecipeData[] = [
+  {
+    id: "l-p-1",
+    name: "香煎豬扒配糙米飯",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 420,
+    protein: 42,
+    fat: 14,
+    carbs: 32,
+    totalWeight: 520,
+    ingredients: [
+      { name: "豬里肌", quantity: "180g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "70g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "豬里肌用中火煎至兩面金黃",
+      "西蘭花和紅蘿蔔炒熟",
+      "將豬肉切成片狀",
+      "盛碟並調味享用"
+    ],
+    fatLossTips: [
+      "豬里肌是瘦肉，蛋白質豐富",
+      "糙米低GI，穩定血糖",
+      "西蘭花含硫化物，促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "l-p-2",
+    name: "豬肉蔬菜炒飯",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 410,
+    protein: 40,
+    fat: 13,
+    carbs: 35,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豬里肌", quantity: "160g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "豌豆", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "豬肉切塊炒至熟透",
+      "加入紅椒、豌豆、洋蔥炒勻",
+      "加入糙米混合",
+      "加入大蒜調味",
+      "盛碟享用"
+    ],
+    fatLossTips: [
+      "豬里肌低脂高蛋白",
+      "彩色蔬菜含多種維生素",
+      "炒飯易於消化吸收"
+    ]
+  },
+  {
+    id: "l-p-3",
+    name: "豬肉黑豆飯",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 430,
+    protein: 41,
+    fat: 12,
+    carbs: 38,
+    totalWeight: 530,
+    ingredients: [
+      { name: "豬里肌", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "黑豆", quantity: "60g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米和黑豆一起煮熟",
+      "豬肉切塊炒至熟透",
+      "加入紅椒和洋蔥炒勻",
+      "混合米豆混合物",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "黑豆含花青素，強效抗氧化",
+      "黑豆高纖低GI，穩定血糖",
+      "豬肉搭配豆類，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-p-4",
+    name: "蒜香豬里肌蔬菜碗",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 400,
+    protein: 42,
+    fat: 11,
+    carbs: 30,
+    totalWeight: 490,
+    ingredients: [
+      { name: "豬里肌", quantity: "170g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "西蘭花", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "大蒜", quantity: "3瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "豬肉切塊炒至熟透",
+      "加入大蒜爆香",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米，調味盛碟"
+    ],
+    fatLossTips: [
+      "大蒜含硫化物，促進脂肪燃燒",
+      "豬里肌蛋白質高，飽腹感強",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-p-5",
+    name: "豬肉番茄意粉",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 420,
+    protein: 39,
+    fat: 12,
+    carbs: 40,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豬里肌", quantity: "150g" },
+      { name: "全麥意粉", quantity: "80g" },
+      { name: "番茄罐頭", quantity: "200g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "全麥意粉煮至半熟",
+      "豬肉切塊炒至熟透",
+      "加入洋蔥和大蒜爆香",
+      "加入番茄罐頭燉煮",
+      "混合意粉，調味享用"
+    ],
+    fatLossTips: [
+      "全麥意粉富含纖維，增加飽腹感",
+      "番茄含茄紅素，抗氧化",
+      "豬肉提供優質蛋白質"
+    ]
+  },
+  {
+    id: "l-p-6",
+    name: "豬肉藜麥飯碗",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 410,
+    protein: 41,
+    fat: 11,
+    carbs: 36,
+    totalWeight: 510,
+    ingredients: [
+      { name: "豬里肌", quantity: "160g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "豬肉切塊炒至熟透",
+      "混合紅椒、黃瓜、洋蔥",
+      "加入豬肉和藜麥",
+      "淋上橄欖油和檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完全蛋白質，營養全面",
+      "檸檬汁促進消化和脂肪燃燒",
+      "豬肉搭配藜麥，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-p-7",
+    name: "豬肉西蘭花糙米飯",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 400,
+    protein: 41,
+    fat: 10,
+    carbs: 34,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豬里肌", quantity: "160g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "100g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" },
+      { name: "檸檬汁", quantity: "0.5湯匙（7.5ml）" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "豬肉切塊炒至熟透",
+      "加入大蒜爆香",
+      "加入西蘭花炒至熟透",
+      "混合糙米，淋上檸檬汁調味"
+    ],
+    fatLossTips: [
+      "西蘭花含硫化物，促進脂肪燃燒",
+      "糙米低GI，穩定血糖",
+      "豬肉高蛋白，增加飽腹感"
+    ]
+  },
+  {
+    id: "l-p-8",
+    name: "低脂叉燒飯",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 430,
+    protein: 40,
+    fat: 13,
+    carbs: 38,
+    totalWeight: 520,
+    ingredients: [
+      { name: "豬里肌", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "豌豆", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "蜂蜜", quantity: "1茶匙（5g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "豬肉切塊，用蜂蜜醃製",
+      "炒至焦香",
+      "加入紅蘿蔔、豌豆、洋蔥炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "低脂叉燒，蛋白質豐富",
+      "蜂蜜提供天然甜味，低卡",
+      "彩色蔬菜營養全面"
+    ]
+  },
+  {
+    id: "l-p-9",
+    name: "豬肉彩椒炒飯",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 420,
+    protein: 40,
+    fat: 12,
+    carbs: 36,
+    totalWeight: 510,
+    ingredients: [
+      { name: "豬里肌", quantity: "160g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黃椒", quantity: "50g" },
+      { name: "青椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "豬肉切塊炒至熟透",
+      "加入彩椒和洋蔥炒勻",
+      "加入糙米混合",
+      "調味後盛碟",
+      "享用彩色營養飯"
+    ],
+    fatLossTips: [
+      "彩椒含多種維生素和礦物質",
+      "豬肉高蛋白，增加飽腹感",
+      "彩色食材，營養更全面"
+    ]
+  },
+  {
+    id: "l-p-10",
+    name: "豬肉生菜飯卷",
+    protein_type: "pork",
+    category: "lunch",
+    kcal: 380,
+    protein: 42,
+    fat: 9,
+    carbs: 28,
+    totalWeight: 450,
+    ingredients: [
+      { name: "豬里肌", quantity: "150g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "生菜葉", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "豬肉切塊炒至熟透",
+      "紅蘿蔔和黃瓜切絲",
+      "用生菜葉包裹糙米、豬肉和蔬菜",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "豬肉提供優質蛋白質",
+      "蔬菜豐富，營養全面"
+    ]
+  }
+];
+
+const lunchBeef: RecipeData[] = [
+  {
+    id: "l-b-1",
+    name: "黑椒牛肉糙米飯",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 440,
+    protein: 44,
+    fat: 14,
+    carbs: 32,
+    totalWeight: 530,
+    ingredients: [
+      { name: "牛肉", quantity: "180g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "黑椒", quantity: "1g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "檸檬汁", quantity: "0.5湯匙（7.5ml）" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "牛肉切塊，用黑椒醃製",
+      "用中火煎至兩面焦香",
+      "加入洋蔥和大蒜爆香",
+      "混合糙米，淋上檸檬汁調味"
+    ],
+    fatLossTips: [
+      "黑椒含胡椒鹼，促進脂肪燃燒",
+      "牛肉含鐵質，增強體力",
+      "糙米低GI，穩定血糖"
+    ]
+  },
+  {
+    id: "l-b-2",
+    name: "牛肉西蘭花飯碗",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 430,
+    protein: 43,
+    fat: 12,
+    carbs: 34,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "牛肉切塊炒至熟透",
+      "加入大蒜爆香",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米，調味盛碟"
+    ],
+    fatLossTips: [
+      "西蘭花含硫化物，促進脂肪燃燒",
+      "牛肉高蛋白，增加飽腹感",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-b-3",
+    name: "牛肉番茄意粉",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 440,
+    protein: 41,
+    fat: 13,
+    carbs: 40,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "全麥意粉", quantity: "80g" },
+      { name: "番茄罐頭", quantity: "200g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "全麥意粉煮至半熟",
+      "牛肉切塊炒至熟透",
+      "加入洋蔥和大蒜爆香",
+      "加入番茄罐頭燉煮",
+      "混合意粉，調味享用"
+    ],
+    fatLossTips: [
+      "全麥意粉富含纖維，增加飽腹感",
+      "番茄含茄紅素，抗氧化",
+      "牛肉提供優質蛋白質"
+    ]
+  },
+  {
+    id: "l-b-4",
+    name: "蒜香牛肉蔬菜碗",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 420,
+    protein: 44,
+    fat: 11,
+    carbs: 30,
+    totalWeight: 510,
+    ingredients: [
+      { name: "牛肉", quantity: "180g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "西蘭花", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "大蒜", quantity: "3瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "牛肉切塊炒至熟透",
+      "加入大蒜爆香",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米，調味盛碟"
+    ],
+    fatLossTips: [
+      "大蒜含硫化物，促進脂肪燃燒",
+      "牛肉蛋白質高，飽腹感強",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-b-5",
+    name: "牛肉黑豆飯",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 450,
+    protein: 43,
+    fat: 12,
+    carbs: 38,
+    totalWeight: 540,
+    ingredients: [
+      { name: "牛肉", quantity: "180g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "黑豆", quantity: "60g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米和黑豆一起煮熟",
+      "牛肉切塊炒至熟透",
+      "加入紅椒和洋蔥炒勻",
+      "混合米豆混合物",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "黑豆含花青素，強效抗氧化",
+      "黑豆高纖低GI，穩定血糖",
+      "牛肉搭配豆類，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-b-6",
+    name: "牛肉藜麥飯",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 430,
+    protein: 43,
+    fat: 11,
+    carbs: 36,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "牛肉切塊炒至熟透",
+      "混合紅椒、黃瓜、洋蔥",
+      "加入牛肉和藜麥",
+      "淋上橄欖油和檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完全蛋白質，營養全面",
+      "檸檬汁促進消化和脂肪燃燒",
+      "牛肉搭配藜麥，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-b-7",
+    name: "牛肉彩椒炒飯",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 440,
+    protein: 42,
+    fat: 12,
+    carbs: 36,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黃椒", quantity: "50g" },
+      { name: "青椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "牛肉切塊炒至熟透",
+      "加入彩椒和洋蔥炒勻",
+      "加入糙米混合",
+      "調味後盛碟",
+      "享用彩色營養飯"
+    ],
+    fatLossTips: [
+      "彩椒含多種維生素和礦物質",
+      "牛肉高蛋白，增加飽腹感",
+      "彩色食材，營養更全面"
+    ]
+  },
+  {
+    id: "l-b-8",
+    name: "牛肉蘑菇糙米飯",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 420,
+    protein: 43,
+    fat: 10,
+    carbs: 34,
+    totalWeight: 510,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "蘑菇", quantity: "100g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "牛肉切塊炒至熟透",
+      "加入蘑菇、洋蔥和大蒜炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "蘑菇低卡高纖，增加飽腹感",
+      "牛肉高蛋白，增加肌肉質量",
+      "糙米低GI，穩定血糖"
+    ]
+  },
+  {
+    id: "l-b-9",
+    name: "牛肉生菜飯卷",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 400,
+    protein: 44,
+    fat: 9,
+    carbs: 28,
+    totalWeight: 460,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "生菜葉", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "牛肉切塊炒至熟透",
+      "紅蘿蔔和黃瓜切絲",
+      "用生菜葉包裹糙米、牛肉和蔬菜",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "牛肉提供優質蛋白質",
+      "蔬菜豐富，營養全面"
+    ]
+  },
+  {
+    id: "l-b-10",
+    name: "牛肉粟米飯碗",
+    protein_type: "beef",
+    category: "lunch",
+    kcal: 430,
+    protein: 42,
+    fat: 12,
+    carbs: 36,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "粟米", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "牛肉切塊炒至熟透",
+      "加入粟米、紅蘿蔔、洋蔥炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "粟米含纖維，促進消化",
+      "牛肉高蛋白，增加飽腹感",
+      "糙米低GI，穩定血糖"
+    ]
+  }
+];
+
+const lunchSeafood: RecipeData[] = [
+  {
+    id: "l-s-1",
+    name: "三文魚糙米飯",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 420,
+    protein: 42,
+    fat: 13,
+    carbs: 32,
+    totalWeight: 520,
+    ingredients: [
+      { name: "三文魚", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "三文魚用中火煎至半熟",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米",
+      "淋上檸檬汁調味"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "西蘭花含硫化物，增強代謝",
+      "糙米低GI，穩定血糖"
+    ]
+  },
+  {
+    id: "l-s-2",
+    name: "蒜蓉蝦藜麥碗",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 400,
+    protein: 41,
+    fat: 10,
+    carbs: 34,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蝦仁", quantity: "160g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "大蒜", quantity: "3瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "大蒜爆香後加入蝦仁炒至變紅",
+      "混合紅椒和黃瓜",
+      "加入藜麥混合",
+      "淋上檸檬汁調味享用"
+    ],
+    fatLossTips: [
+      "蝦仁低脂高蛋白，完美午餐",
+      "藜麥含完全蛋白質，營養全面",
+      "大蒜促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "l-s-3",
+    name: "吞拿魚番茄意粉",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 410,
+    protein: 40,
+    fat: 11,
+    carbs: 40,
+    totalWeight: 510,
+    ingredients: [
+      { name: "吞拿魚罐頭", quantity: "150g" },
+      { name: "全麥意粉", quantity: "80g" },
+      { name: "番茄罐頭", quantity: "200g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "全麥意粉煮至半熟",
+      "洋蔥和大蒜爆香",
+      "加入番茄罐頭和吞拿魚燉煮",
+      "混合意粉",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "吞拿魚高蛋白低脂",
+      "全麥意粉富含纖維",
+      "番茄含茄紅素，抗氧化"
+    ]
+  },
+  {
+    id: "l-s-4",
+    name: "三文魚西蘭花飯碗",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 430,
+    protein: 43,
+    fat: 12,
+    carbs: 34,
+    totalWeight: 520,
+    ingredients: [
+      { name: "三文魚", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "三文魚用中火煎至熟透",
+      "加入大蒜爆香",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米，調味盛碟"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "西蘭花含硫化物，增強代謝",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-s-5",
+    name: "蝦仁彩椒炒飯",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 410,
+    protein: 40,
+    fat: 11,
+    carbs: 36,
+    totalWeight: 510,
+    ingredients: [
+      { name: "蝦仁", quantity: "160g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黃椒", quantity: "50g" },
+      { name: "青椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "蝦仁炒至變紅",
+      "加入彩椒和洋蔥炒勻",
+      "加入糙米混合",
+      "調味後盛碟",
+      "享用彩色營養飯"
+    ],
+    fatLossTips: [
+      "彩椒含多種維生素和礦物質",
+      "蝦仁高蛋白低脂",
+      "彩色食材，營養更全面"
+    ]
+  },
+  {
+    id: "l-s-6",
+    name: "海鮮黑豆飯",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 420,
+    protein: 41,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 520,
+    ingredients: [
+      { name: "蝦仁", quantity: "150g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "黑豆", quantity: "60g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米和黑豆一起煮熟",
+      "蝦仁炒至變紅",
+      "加入紅椒和洋蔥炒勻",
+      "混合米豆混合物",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "黑豆含花青素，強效抗氧化",
+      "黑豆高纖低GI，穩定血糖",
+      "蝦仁搭配豆類，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-s-7",
+    name: "三文魚粟米飯",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 430,
+    protein: 42,
+    fat: 12,
+    carbs: 36,
+    totalWeight: 530,
+    ingredients: [
+      { name: "三文魚", quantity: "170g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "粟米", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "三文魚用中火煎至熟透",
+      "加入粟米、紅蘿蔔、洋蔥炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "粟米含纖維，促進消化",
+      "糙米低GI，穩定血糖"
+    ]
+  },
+  {
+    id: "l-s-8",
+    name: "蒜香蝦仁糙米飯",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 410,
+    protein: 41,
+    fat: 10,
+    carbs: 34,
+    totalWeight: 510,
+    ingredients: [
+      { name: "蝦仁", quantity: "160g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "大蒜", quantity: "3瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "大蒜爆香後加入蝦仁炒至變紅",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米",
+      "調味盛碟"
+    ],
+    fatLossTips: [
+      "大蒜含硫化物，促進脂肪燃燒",
+      "蝦仁蛋白質高，飽腹感強",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-s-9",
+    name: "吞拿魚生菜飯卷",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 390,
+    protein: 42,
+    fat: 8,
+    carbs: 28,
+    totalWeight: 450,
+    ingredients: [
+      { name: "吞拿魚罐頭", quantity: "150g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "生菜葉", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "紅蘿蔔和黃瓜切絲",
+      "用生菜葉包裹糙米、吞拿魚和蔬菜",
+      "調味享用",
+      "完美午餐便當"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "吞拿魚高蛋白低脂",
+      "蔬菜豐富，營養全面"
+    ]
+  },
+  {
+    id: "l-s-10",
+    name: "海鮮蔬菜碗",
+    protein_type: "seafood",
+    category: "lunch",
+    kcal: 400,
+    protein: 41,
+    fat: 10,
+    carbs: 32,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蝦仁", quantity: "150g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "西蘭花", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "玉米粒", quantity: "50g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "蝦仁炒至變紅",
+      "加入西蘭花、紅蘿蔔、玉米粒炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "蝦仁低脂高蛋白",
+      "彩色蔬菜營養全面",
+      "玉米粒含纖維，促進消化"
+    ]
+  }
+];
+
+const lunchEgg: RecipeData[] = [
+  {
+    id: "l-e-1",
+    name: "番茄滑蛋糙米飯",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 380,
+    protein: 38,
+    fat: 11,
+    carbs: 34,
+    totalWeight: 480,
+    ingredients: [
+      { name: "蛋", quantity: "3個" },
+      { name: "糙米", quantity: "80g" },
+      { name: "番茄", quantity: "100g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "番茄切塊，洋蔥切絲",
+      "大蒜爆香後加入番茄和洋蔥",
+      "倒入打好的蛋液，輕輕攪拌至滑蛋",
+      "混合糙米調味盛碟"
+    ],
+    fatLossTips: [
+      "蛋含完全蛋白質，營養全面",
+      "番茄含茄紅素，抗氧化",
+      "糙米低GI，穩定血糖"
+    ]
+  },
+  {
+    id: "l-e-2",
+    name: "菠菜蛋白飯碗",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 390,
+    protein: 39,
+    fat: 10,
+    carbs: 36,
+    totalWeight: 490,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "糙米", quantity: "80g" },
+      { name: "菠菜", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "蛋白炒至半熟",
+      "加入菠菜、紅蘿蔔、洋蔥炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "蛋白低脂高蛋白",
+      "菠菜含鐵質，提升新陳代謝",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-e-3",
+    name: "蘑菇炒蛋藜麥飯",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 400,
+    protein: 38,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蛋", quantity: "3個" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "蘑菇", quantity: "100g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "蘑菇切片，洋蔥切絲",
+      "大蒜爆香後加入蘑菇和洋蔥炒勻",
+      "倒入打好的蛋液，輕輕攪拌",
+      "混合藜麥調味盛碟"
+    ],
+    fatLossTips: [
+      "蘑菇低卡高纖，增加飽腹感",
+      "蛋含完全蛋白質",
+      "藜麥含完全蛋白質，營養全面"
+    ]
+  },
+  {
+    id: "l-e-4",
+    name: "蛋白彩椒炒飯",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 380,
+    protein: 37,
+    fat: 10,
+    carbs: 36,
+    totalWeight: 490,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黃椒", quantity: "50g" },
+      { name: "青椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "蛋白炒至熟透",
+      "加入彩椒和洋蔥炒勻",
+      "加入糙米混合",
+      "調味後盛碟",
+      "享用彩色營養飯"
+    ],
+    fatLossTips: [
+      "彩椒含多種維生素和礦物質",
+      "蛋白低脂高蛋白",
+      "彩色食材，營養更全面"
+    ]
+  },
+  {
+    id: "l-e-5",
+    name: "雙蛋白黑豆飯",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 410,
+    protein: 39,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 510,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "糙米", quantity: "80g" },
+      { name: "黑豆", quantity: "60g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米和黑豆一起煮熟",
+      "蛋白炒至熟透",
+      "加入紅椒和洋蔥炒勻",
+      "混合米豆混合物",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "黑豆含花青素，強效抗氧化",
+      "黑豆高纖低GI，穩定血糖",
+      "蛋白搭配豆類，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-e-6",
+    name: "粟米蛋飯碗",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 400,
+    protein: 38,
+    fat: 11,
+    carbs: 36,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蛋", quantity: "3個" },
+      { name: "糙米", quantity: "80g" },
+      { name: "粟米", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "蛋炒至熟透",
+      "加入粟米、紅蘿蔔、洋蔥炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "粟米含纖維，促進消化",
+      "蛋含完全蛋白質",
+      "糙米低GI，穩定血糖"
+    ]
+  },
+  {
+    id: "l-e-7",
+    name: "滑蛋蔬菜意粉",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 390,
+    protein: 37,
+    fat: 10,
+    carbs: 40,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蛋", quantity: "3個" },
+      { name: "全麥意粉", quantity: "80g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "全麥意粉煮至半熟",
+      "番茄切塊，洋蔥切絲",
+      "大蒜爆香後加入番茄和洋蔥",
+      "倒入打好的蛋液，輕輕攪拌至滑蛋",
+      "混合意粉調味享用"
+    ],
+    fatLossTips: [
+      "全麥意粉富含纖維，增加飽腹感",
+      "番茄含茄紅素，抗氧化",
+      "蛋含完全蛋白質"
+    ]
+  },
+  {
+    id: "l-e-8",
+    name: "菠菜蛋白糙米飯",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 380,
+    protein: 38,
+    fat: 9,
+    carbs: 34,
+    totalWeight: 490,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "糙米", quantity: "80g" },
+      { name: "菠菜", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "蛋白炒至半熟",
+      "加入大蒜爆香",
+      "加入菠菜和紅蘿蔔炒勻",
+      "混合糙米，調味盛碟"
+    ],
+    fatLossTips: [
+      "菠菜含鐵質，提升新陳代謝",
+      "蛋白低脂高蛋白",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-e-9",
+    name: "番茄蛋白飯卷",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 370,
+    protein: 37,
+    fat: 8,
+    carbs: 28,
+    totalWeight: 450,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "糙米", quantity: "70g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "生菜葉", quantity: "80g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "蛋白炒至熟透",
+      "番茄和黃瓜切片",
+      "用生菜葉包裹糙米、蛋白和蔬菜",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "番茄含茄紅素，抗氧化",
+      "蛋白低脂高蛋白"
+    ]
+  },
+  {
+    id: "l-e-10",
+    name: "蛋白生菜飯碗",
+    protein_type: "egg",
+    category: "lunch",
+    kcal: 380,
+    protein: 39,
+    fat: 9,
+    carbs: 32,
+    totalWeight: 490,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "糙米", quantity: "70g" },
+      { name: "生菜", quantity: "100g" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "紅蘿蔔", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "蛋白炒至熟透",
+      "混合生菜、番茄、黃瓜、紅蘿蔔",
+      "加入蛋白和糙米",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "蛋白低脂高蛋白",
+      "蔬菜豐富，營養全面"
+    ]
+  }
+];
+
+const lunchVegetarian: RecipeData[] = [
+  {
+    id: "l-v-1",
+    name: "豆腐藜麥飯碗",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 400,
+    protein: 36,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "豆腐切塊炒至金黃",
+      "混合紅椒、黃瓜、洋蔥",
+      "加入豆腐和藜麥",
+      "淋上橄欖油和檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "豆腐低脂高蛋白",
+      "藜麥含完全蛋白質，營養全面",
+      "檸檬汁促進消化和脂肪燃燒"
+    ]
+  },
+  {
+    id: "l-v-2",
+    name: "鷹嘴豆糙米飯",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 410,
+    protein: 35,
+    fat: 10,
+    carbs: 40,
+    totalWeight: 510,
+    ingredients: [
+      { name: "鷹嘴豆罐頭", quantity: "150g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "大蒜爆香後加入鷹嘴豆",
+      "加入紅椒和洋蔥炒勻",
+      "混合糙米",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "鷹嘴豆高蛋白高纖",
+      "糙米低GI，穩定血糖",
+      "豆類搭配穀物，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-v-3",
+    name: "雜菜黑豆飯",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 400,
+    protein: 34,
+    fat: 9,
+    carbs: 40,
+    totalWeight: 510,
+    ingredients: [
+      { name: "黑豆罐頭", quantity: "150g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "玉米粒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米和黑豆一起煮熟",
+      "加入紅椒、玉米粒、洋蔥炒勻",
+      "混合米豆混合物",
+      "調味後盛碟",
+      "享用彩色營養飯"
+    ],
+    fatLossTips: [
+      "黑豆含花青素，強效抗氧化",
+      "黑豆高纖低GI，穩定血糖",
+      "彩色蔬菜營養全面"
+    ]
+  },
+  {
+    id: "l-v-4",
+    name: "豆腐番茄意粉",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 410,
+    protein: 33,
+    fat: 10,
+    carbs: 42,
+    totalWeight: 520,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "全麥意粉", quantity: "80g" },
+      { name: "番茄罐頭", quantity: "200g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "全麥意粉煮至半熟",
+      "豆腐切塊炒至金黃",
+      "加入洋蔥和大蒜爆香",
+      "加入番茄罐頭燉煮",
+      "混合意粉，調味享用"
+    ],
+    fatLossTips: [
+      "全麥意粉富含纖維，增加飽腹感",
+      "番茄含茄紅素，抗氧化",
+      "豆腐低脂高蛋白"
+    ]
+  },
+  {
+    id: "l-v-5",
+    name: "牛油果藜麥飯",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 420,
+    protein: 35,
+    fat: 13,
+    carbs: 36,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛油果", quantity: "1個（120g）" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "牛油果切半，用叉子壓成泥狀",
+      "混合紅椒、黃瓜、番茄",
+      "加入藜麥和牛油果泥",
+      "淋上橄欖油和檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "牛油果含健康脂肪，促進脂肪燃燒",
+      "藜麥含完全蛋白質，營養全面",
+      "檸檬汁促進消化"
+    ]
+  },
+  {
+    id: "l-v-6",
+    name: "豆腐西蘭花糙米飯",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 400,
+    protein: 34,
+    fat: 10,
+    carbs: 36,
+    totalWeight: 510,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "西蘭花", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "豆腐切塊炒至金黃",
+      "加入大蒜爆香",
+      "加入西蘭花和紅蘿蔔炒勻",
+      "混合糙米，調味盛碟"
+    ],
+    fatLossTips: [
+      "西蘭花含硫化物，促進脂肪燃燒",
+      "豆腐低脂高蛋白",
+      "蔬菜富含纖維，促進消化"
+    ]
+  },
+  {
+    id: "l-v-7",
+    name: "雜菜彩椒炒飯",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 390,
+    protein: 33,
+    fat: 10,
+    carbs: 38,
+    totalWeight: 510,
+    ingredients: [
+      { name: "豌豆", quantity: "60g" },
+      { name: "玉米粒", quantity: "60g" },
+      { name: "糙米", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黃椒", quantity: "50g" },
+      { name: "青椒", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" }
+    ],
+    steps: [
+      "加入豌豆和玉米粒炒勻",
+      "加入彩椒和洋蔥炒勻",
+      "加入糙米混合",
+      "調味後盛碟",
+      "享用彩色營養飯"
+    ],
+    fatLossTips: [
+      "彩椒含多種維生素和礦物質",
+      "豌豆和玉米粒高蛋白高纖",
+      "彩色食材，營養更全面"
+    ]
+  },
+  {
+    id: "l-v-8",
+    name: "鷹嘴豆蔬菜碗",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 410,
+    protein: 34,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 520,
+    ingredients: [
+      { name: "鷹嘴豆罐頭", quantity: "150g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "西蘭花", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "玉米粒", quantity: "50g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "加入西蘭花、紅蘿蔔、玉米粒炒勻",
+      "混合鷹嘴豆和糙米",
+      "調味後盛碟",
+      "享用營養豐富的蔬菜碗"
+    ],
+    fatLossTips: [
+      "鷹嘴豆高蛋白高纖",
+      "彩色蔬菜營養全面",
+      "豆類搭配穀物，蛋白質互補"
+    ]
+  },
+  {
+    id: "l-v-9",
+    name: "豆腐生菜飯卷",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 380,
+    protein: 32,
+    fat: 9,
+    carbs: 30,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "糙米", quantity: "70g" },
+      { name: "生菜葉", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "糙米煮熟",
+      "豆腐切塊炒至金黃",
+      "紅蘿蔔和黃瓜切絲",
+      "用生菜葉包裹糙米、豆腐和蔬菜",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "豆腐低脂高蛋白",
+      "蔬菜豐富，營養全面"
+    ]
+  },
+  {
+    id: "l-v-10",
+    name: "南瓜藜麥飯碗",
+    protein_type: "vegetarian",
+    category: "lunch",
+    kcal: 400,
+    protein: 33,
+    fat: 10,
+    carbs: 40,
+    totalWeight: 510,
+    ingredients: [
+      { name: "南瓜", quantity: "150g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1.5g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "南瓜切塊，大蒜爆香",
+      "加入南瓜、紅椒、洋蔥炒勻",
+      "混合藜麥",
+      "調味後盛碟"
+    ],
+    fatLossTips: [
+      "南瓜低卡高纖，增加飽腹感",
+      "藜麥含完全蛋白質，營養全面",
+      "南瓜含β-胡蘿蔔素，抗氧化"
+    ]
+  }
+];
+
 // Salad Recipes (沙律)
 const saladChicken: RecipeData[] = [
   {
@@ -2688,11 +4353,11 @@ export const recipes: Record<string, Record<string, RecipeData[]>> = {
   },
   lunch: {
     chicken: lunchChicken,
-    pork: [], // To be filled
-    beef: [], // To be filled
-    seafood: [], // To be filled
-    egg: [], // To be filled
-    vegetarian: [] // To be filled
+    pork: lunchPork,
+    beef: lunchBeef,
+    seafood: lunchSeafood,
+    egg: lunchEgg,
+    vegetarian: lunchVegetarian
   },
   dinner: {
     chicken: [], // To be filled
