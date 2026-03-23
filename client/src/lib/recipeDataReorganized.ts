@@ -4341,6 +4341,1672 @@ const saladChicken: RecipeData[] = [
   }
 ];
 
+// Salad Recipes - Pork (溫沙律 / 日式風格)
+const saladPork: RecipeData[] = [
+  {
+    id: "s-p-1",
+    name: "低脂叉燒生菜沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 340,
+    protein: 42,
+    fat: 10,
+    carbs: 18,
+    totalWeight: 420,
+    ingredients: [
+      { name: "低脂叉燒", quantity: "160g" },
+      { name: "生菜", quantity: "120g" },
+      { name: "黃瓜", quantity: "80g" },
+      { name: "紅蘿蔔", quantity: "40g" },
+      { name: "芝麻", quantity: "1湯匙（10g）" },
+      { name: "日式醬油", quantity: "1湯匙（15ml）" },
+      { name: "米醋", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "低脂叉燒切成薄片",
+      "生菜撕碎，黃瓜和紅蘿蔔切絲",
+      "混合所有蔬菜和叉燒",
+      "淋上日式醬油和米醋",
+      "撒上芝麻享用"
+    ],
+    fatLossTips: [
+      "低脂叉燒蛋白質豐富，飽腹感強",
+      "芝麻含鈣質，促進骨骼健康",
+      "日式調味低鹽，健康減脂"
+    ]
+  },
+  {
+    id: "s-p-2",
+    name: "豬里肌芝麻菠菜沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 360,
+    protein: 44,
+    fat: 11,
+    carbs: 20,
+    totalWeight: 440,
+    ingredients: [
+      { name: "豬里肌", quantity: "170g" },
+      { name: "菠菜", quantity: "100g" },
+      { name: "黑芝麻", quantity: "1.5湯匙（15g）" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "日式醬油", quantity: "1湯匙（15ml）" },
+      { name: "米醋", quantity: "1茶匙（5ml）" },
+      { name: "芝麻油", quantity: "0.5茶匙（2.5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豬里肌煮熟切成薄片",
+      "菠菜焯水後冷卻",
+      "混合菠菜、豬肉、洋蔥",
+      "淋上日式醬油、米醋和芝麻油",
+      "撒上黑芝麻享用"
+    ],
+    fatLossTips: [
+      "菠菜含鐵質，提升新陳代謝",
+      "黑芝麻含鈣質和Omega-3",
+      "豬里肌低脂高蛋白，完美減脂食材"
+    ]
+  },
+  {
+    id: "s-p-3",
+    name: "燒豬肉溫沙律碗",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 380,
+    protein: 43,
+    fat: 13,
+    carbs: 22,
+    totalWeight: 460,
+    ingredients: [
+      { name: "燒豬肉", quantity: "160g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "甜菜根", quantity: "60g" },
+      { name: "核桃", quantity: "20g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "紅酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "燒豬肉切成塊狀",
+      "甜菜根煮熟切塊",
+      "核桃切碎",
+      "混合生菜、豬肉、甜菜根、洋蔥",
+      "淋上橄欖油和紅酒醋，撒上核桃"
+    ],
+    fatLossTips: [
+      "甜菜根含硝酸鹽，促進血液循環",
+      "核桃含Omega-3，促進脂肪燃燒",
+      "溫沙律增加飽腹感，更易控制食量"
+    ]
+  },
+  {
+    id: "s-p-4",
+    name: "豬肉青瓜日式沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 320,
+    protein: 40,
+    fat: 9,
+    carbs: 16,
+    totalWeight: 400,
+    ingredients: [
+      { name: "豬肉", quantity: "150g" },
+      { name: "青瓜", quantity: "150g" },
+      { name: "海帶", quantity: "20g" },
+      { name: "紅蘿蔔", quantity: "30g" },
+      { name: "日式醬油", quantity: "1湯匙（15ml）" },
+      { name: "米醋", quantity: "1茶匙（5ml）" },
+      { name: "白芝麻", quantity: "1茶匙（5g）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豬肉煮熟切成薄片",
+      "青瓜切成薄片",
+      "海帶泡軟切絲",
+      "混合所有材料",
+      "淋上日式醬油和米醋，撒上白芝麻"
+    ],
+    fatLossTips: [
+      "青瓜低卡高水分，增加飽腹感",
+      "海帶含碘質，促進甲狀腺代謝",
+      "日式調味清淡，適合減脂"
+    ]
+  },
+  {
+    id: "s-p-5",
+    name: "豬肉藜麥溫沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 390,
+    protein: 42,
+    fat: 12,
+    carbs: 28,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豬肉", quantity: "140g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "菠菜", quantity: "80g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "豬肉煮熟切成塊狀",
+      "菠菜焯水",
+      "混合藜麥、豬肉、菠菜、紅椒、洋蔥",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "藜麥含完全蛋白質，營養豐富",
+      "菠菜含鐵質，提升新陳代謝",
+      "溫沙律易消化，適合晚餐"
+    ]
+  },
+  {
+    id: "s-p-6",
+    name: "豬肉番茄芝麻沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 350,
+    protein: 41,
+    fat: 10,
+    carbs: 20,
+    totalWeight: 430,
+    ingredients: [
+      { name: "豬肉", quantity: "150g" },
+      { name: "番茄", quantity: "120g" },
+      { name: "生菜", quantity: "100g" },
+      { name: "黑芝麻", quantity: "1湯匙（10g）" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "米醋", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豬肉煮熟切成塊狀",
+      "番茄切塊，生菜撕碎",
+      "混合所有蔬菜和豬肉",
+      "淋上橄欖油和米醋",
+      "撒上黑芝麻享用"
+    ],
+    fatLossTips: [
+      "番茄含茄紅素，強效抗氧化",
+      "黑芝麻含鈣質，促進骨骼健康",
+      "低油沙律，健康減脂選擇"
+    ]
+  },
+  {
+    id: "s-p-7",
+    name: "豬肉西蘭花蒜香沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 370,
+    protein: 43,
+    fat: 11,
+    carbs: 19,
+    totalWeight: 450,
+    ingredients: [
+      { name: "豬肉", quantity: "160g" },
+      { name: "西蘭花", quantity: "120g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "大蒜", quantity: "3瓣（10g）" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豬肉煮熟切成塊狀",
+      "西蘭花焯水後冷卻",
+      "大蒜切碎",
+      "混合西蘭花、豬肉、生菜、紅椒",
+      "淋上蒜香橄欖油和檸檬汁"
+    ],
+    fatLossTips: [
+      "西蘭花含蘿蔔硫素，促進脂肪燃燒",
+      "大蒜含硫化物，增強免疫力",
+      "蒜香低油沙律，健康減脂"
+    ]
+  },
+  {
+    id: "s-p-8",
+    name: "豬肉蘋果清爽沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 360,
+    protein: 40,
+    fat: 10,
+    carbs: 26,
+    totalWeight: 450,
+    ingredients: [
+      { name: "豬肉", quantity: "140g" },
+      { name: "蘋果", quantity: "100g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "核桃", quantity: "20g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "蘋果醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豬肉煮熟切成塊狀",
+      "蘋果切塊，核桃切碎",
+      "混合生菜、豬肉、蘋果、洋蔥",
+      "淋上橄欖油和蘋果醋",
+      "撒上核桃享用"
+    ],
+    fatLossTips: [
+      "蘋果含果膠，促進消化",
+      "核桃含Omega-3，促進脂肪燃燒",
+      "蘋果醋幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "s-p-9",
+    name: "豬肉蛋白凱撒沙律",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 380,
+    protein: 44,
+    fat: 12,
+    carbs: 18,
+    totalWeight: 440,
+    ingredients: [
+      { name: "豬肉", quantity: "160g" },
+      { name: "羅馬生菜", quantity: "120g" },
+      { name: "帕瑪森芝士", quantity: "20g" },
+      { name: "全麥麵包丁", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "豬肉煮熟切成塊狀",
+      "羅馬生菜撕碎",
+      "混合生菜、豬肉、麵包丁",
+      "淋上橄欖油和檸檬汁",
+      "撒上帕瑪森芝士，調味享用"
+    ],
+    fatLossTips: [
+      "羅馬生菜低卡高纖，增加飽腹感",
+      "帕瑪森芝士提供鈣質，不過量",
+      "全麥麵包丁增加纖維，促進消化"
+    ]
+  },
+  {
+    id: "s-p-10",
+    name: "豬肉生菜卷沙律碗",
+    protein_type: "pork",
+    category: "salad",
+    kcal: 340,
+    protein: 42,
+    fat: 9,
+    carbs: 20,
+    totalWeight: 420,
+    ingredients: [
+      { name: "豬肉", quantity: "150g" },
+      { name: "生菜", quantity: "150g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "紅椒", quantity: "30g" },
+      { name: "日式醬油", quantity: "1湯匙（15ml）" },
+      { name: "米醋", quantity: "1茶匙（5ml）" },
+      { name: "白芝麻", quantity: "1茶匙（5g）" }
+    ],
+    steps: [
+      "豬肉煮熟切成薄片",
+      "蔬菜切成條狀",
+      "用生菜葉包裹豬肉和蔬菜",
+      "淋上日式醬油和米醋",
+      "撒上白芝麻享用"
+    ],
+    fatLossTips: [
+      "生菜卷低卡高纖，增加飽腹感",
+      "多彩蔬菜提供豐富營養",
+      "日式調味清淡，適合減脂"
+    ]
+  }
+];
+
+// Salad Recipes - Beef (牛排沙律 / 西方風格)
+const saladBeef: RecipeData[] = [
+  {
+    id: "s-b-1",
+    name: "黑椒牛肉凱撒沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 400,
+    protein: 45,
+    fat: 14,
+    carbs: 20,
+    totalWeight: 460,
+    ingredients: [
+      { name: "黑椒牛肉", quantity: "180g" },
+      { name: "羅馬生菜", quantity: "120g" },
+      { name: "帕瑪森芝士", quantity: "25g" },
+      { name: "全麥麵包丁", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煎至半熟，撒上黑椒",
+      "靜置5分鐘後切成薄片",
+      "羅馬生菜撕碎",
+      "混合生菜、牛肉、麵包丁",
+      "淋上橄欖油和檸檬汁，撒上帕瑪森芝士"
+    ],
+    fatLossTips: [
+      "黑椒牛肉高蛋白，肌肉合成效率高",
+      "羅馬生菜低卡高纖，增加飽腹感",
+      "帕瑪森芝士提供鈣質，不過量"
+    ]
+  },
+  {
+    id: "s-b-2",
+    name: "牛排牛油果沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 420,
+    protein: 46,
+    fat: 16,
+    carbs: 18,
+    totalWeight: 480,
+    ingredients: [
+      { name: "牛排", quantity: "170g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "番茄", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "2茶匙（10ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛排煎至喜歡的熟度",
+      "靜置5分鐘後切成薄片",
+      "牛油果切半，用叉子壓成泥狀",
+      "混合生菜、番茄、洋蔥",
+      "放上牛肉和牛油果泥，淋上橄欖油和檸檬汁"
+    ],
+    fatLossTips: [
+      "牛排高蛋白高鐵，適合減脂增肌",
+      "牛油果含健康脂肪，促進脂肪燃燒",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "s-b-3",
+    name: "牛肉藜麥能量沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 410,
+    protein: 44,
+    fat: 13,
+    carbs: 28,
+    totalWeight: 500,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黑豆", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "牛肉煮熟切成塊狀",
+      "黑豆瀝乾",
+      "混合藜麥、牛肉、生菜、紅椒、黑豆",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "藜麥含完全蛋白質，營養豐富",
+      "黑豆含纖維，促進消化",
+      "能量沙律適合運動後補充"
+    ]
+  },
+  {
+    id: "s-b-4",
+    name: "牛肉菠菜蛋白沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 390,
+    protein: 46,
+    fat: 12,
+    carbs: 16,
+    totalWeight: 450,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "菠菜", quantity: "120g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "核桃", quantity: "20g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "紅酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟切成塊狀",
+      "菠菜焯水後冷卻",
+      "蛋白煮熟切半",
+      "核桃切碎",
+      "混合菠菜、牛肉、蛋白、洋蔥，淋上橄欖油和紅酒醋，撒上核桃"
+    ],
+    fatLossTips: [
+      "菠菜含鐵質，提升新陳代謝",
+      "蛋白高蛋白低脂，完美減脂食材",
+      "核桃含Omega-3，促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "s-b-5",
+    name: "牛肉番茄羅勒沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 380,
+    protein: 43,
+    fat: 11,
+    carbs: 20,
+    totalWeight: 460,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "番茄", quantity: "150g" },
+      { name: "新鮮羅勒", quantity: "20g" },
+      { name: "莫薩里拉芝士", quantity: "30g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "巴薩米克醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟切成薄片",
+      "番茄切塊",
+      "莫薩里拉芝士撕碎",
+      "混合牛肉、番茄、洋蔥、羅勒",
+      "淋上橄欖油和巴薩米克醋，撒上莫薩里拉芝士"
+    ],
+    fatLossTips: [
+      "番茄含茄紅素，強效抗氧化",
+      "羅勒含抗氧化物，促進脂肪燃燒",
+      "莫薩里拉芝士提供鈣質，不過量"
+    ]
+  },
+  {
+    id: "s-b-6",
+    name: "牛肉西蘭花橄欖油沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 400,
+    protein: 45,
+    fat: 13,
+    carbs: 18,
+    totalWeight: 470,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "西蘭花", quantity: "120g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "大蒜", quantity: "3瓣（10g）" },
+      { name: "橄欖油", quantity: "2茶匙（10ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟切成塊狀",
+      "西蘭花焯水後冷卻",
+      "大蒜切碎",
+      "混合西蘭花、牛肉、生菜、紅椒",
+      "淋上蒜香橄欖油和檸檬汁"
+    ],
+    fatLossTips: [
+      "西蘭花含蘿蔔硫素，促進脂肪燃燒",
+      "大蒜含硫化物，增強免疫力",
+      "橄欖油含單不飽和脂肪，健康選擇"
+    ]
+  },
+  {
+    id: "s-b-7",
+    name: "牛肉青瓜優格沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 370,
+    protein: 44,
+    fat: 10,
+    carbs: 20,
+    totalWeight: 450,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "青瓜", quantity: "150g" },
+      { name: "希臘優格", quantity: "60g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "牛肉煮熟切成塊狀",
+      "青瓜切成薄片",
+      "希臘優格混合檸檬汁",
+      "混合生菜、牛肉、青瓜、洋蔥",
+      "淋上優格醬，調味享用"
+    ],
+    fatLossTips: [
+      "青瓜低卡高水分，增加飽腹感",
+      "希臘優格高蛋白低脂，完美減脂食材",
+      "優格含益生菌，促進消化"
+    ]
+  },
+  {
+    id: "s-b-8",
+    name: "牛肉彩椒暖沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 390,
+    protein: 44,
+    fat: 12,
+    carbs: 22,
+    totalWeight: 470,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "紅椒", quantity: "60g" },
+      { name: "黃椒", quantity: "60g" },
+      { name: "綠椒", quantity: "60g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "紅酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟切成塊狀",
+      "彩椒和洋蔥切成條狀",
+      "用橄欖油炒彩椒和洋蔥至軟",
+      "混合牛肉和炒好的蔬菜",
+      "淋上紅酒醋享用"
+    ],
+    fatLossTips: [
+      "彩椒含維生素C，促進脂肪氧化",
+      "多彩蔬菜提供豐富營養",
+      "暖沙律易消化，適合晚餐"
+    ]
+  },
+  {
+    id: "s-b-9",
+    name: "牛肉蘑菇沙律碗",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 380,
+    protein: 43,
+    fat: 11,
+    carbs: 20,
+    totalWeight: 460,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "蘑菇", quantity: "120g" },
+      { name: "生菜", quantity: "100g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "大蒜", quantity: "2瓣（7g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "紅酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟切成塊狀",
+      "蘑菇切片",
+      "用橄欖油炒蘑菇和大蒜",
+      "混合生菜、牛肉、炒好的蘑菇、洋蔥",
+      "淋上紅酒醋享用"
+    ],
+    fatLossTips: [
+      "蘑菇含多糖體，增強免疫力",
+      "蘑菇低卡高纖，增加飽腹感",
+      "暖沙律易消化，適合晚餐"
+    ]
+  },
+  {
+    id: "s-b-10",
+    name: "牛肉芝士輕食沙律",
+    protein_type: "beef",
+    category: "salad",
+    kcal: 400,
+    protein: 45,
+    fat: 13,
+    carbs: 18,
+    totalWeight: 460,
+    ingredients: [
+      { name: "牛肉", quantity: "170g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "切達芝士", quantity: "30g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟切成薄片",
+      "切達芝士切成小塊",
+      "混合生菜、牛肉、番茄、洋蔥",
+      "撒上切達芝士",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "牛肉高蛋白高鐵，適合減脂增肌",
+      "切達芝士提供鈣質，不過量",
+      "輕食沙律易消化，適合午餐"
+    ]
+  }
+];
+
+// Salad Recipes - Seafood (清爽冷沙律 / 清新風格)
+const saladSeafood: RecipeData[] = [
+  {
+    id: "s-sf-1",
+    name: "三文魚牛油果沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 380,
+    protein: 40,
+    fat: 14,
+    carbs: 18,
+    totalWeight: 450,
+    ingredients: [
+      { name: "三文魚", quantity: "150g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "番茄", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "三文魚煮熟切成塊狀",
+      "牛油果切半，用叉子壓成泥狀",
+      "混合生菜、番茄、洋蔥",
+      "放上三文魚和牛油果泥",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "牛油果含健康脂肪，促進代謝",
+      "清爽沙律低卡高營養，完美減脂"
+    ]
+  },
+  {
+    id: "s-sf-2",
+    name: "蒜香蝦仁沙律碗",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 320,
+    protein: 38,
+    fat: 9,
+    carbs: 16,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蝦仁", quantity: "160g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "大蒜", quantity: "4瓣（12g）" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "白葡萄酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "大蒜切碎",
+      "用橄欖油炒大蒜和蝦仁",
+      "蝦仁炒至變紅後冷卻",
+      "混合生菜、炒好的蝦仁、紅椒",
+      "淋上白葡萄酒醋和檸檬汁"
+    ],
+    fatLossTips: [
+      "蝦仁高蛋白低脂，完美減脂食材",
+      "大蒜含硫化物，增強免疫力",
+      "清爽沙律易消化，適合午餐"
+    ]
+  },
+  {
+    id: "s-sf-3",
+    name: "吞拿魚蛋白沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 340,
+    protein: 42,
+    fat: 10,
+    carbs: 14,
+    totalWeight: 420,
+    ingredients: [
+      { name: "吞拿魚", quantity: "150g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "吞拿魚瀝乾",
+      "蛋白煮熟切半",
+      "混合生菜、吞拿魚、蛋白、番茄、黃瓜",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "吞拿魚高蛋白低脂，完美減脂食材",
+      "蛋白高蛋白低脂，增加飽腹感",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-sf-4",
+    name: "三文魚菠菜清爽沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 360,
+    protein: 39,
+    fat: 12,
+    carbs: 18,
+    totalWeight: 450,
+    ingredients: [
+      { name: "三文魚", quantity: "140g" },
+      { name: "菠菜", quantity: "120g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "白葡萄酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "三文魚煮熟切成塊狀",
+      "菠菜焯水後冷卻",
+      "混合菠菜、生菜、三文魚、洋蔥",
+      "淋上橄欖油、白葡萄酒醋和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "菠菜含鐵質，提升新陳代謝",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-sf-5",
+    name: "蝦仁藜麥冷沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 370,
+    protein: 40,
+    fat: 11,
+    carbs: 24,
+    totalWeight: 480,
+    ingredients: [
+      { name: "蝦仁", quantity: "150g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "蝦仁煮熟冷卻",
+      "混合藜麥、蝦仁、生菜、紅椒、黃瓜",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "蝦仁高蛋白低脂，完美減脂食材",
+      "藜麥含完全蛋白質，營養豐富",
+      "冷沙律清爽低卡，適合夏季"
+    ]
+  },
+  {
+    id: "s-sf-6",
+    name: "海鮮混合沙律碗",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 350,
+    protein: 41,
+    fat: 10,
+    carbs: 16,
+    totalWeight: 440,
+    ingredients: [
+      { name: "蝦仁", quantity: "80g" },
+      { name: "吞拿魚", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蝦仁和吞拿魚瀝乾",
+      "混合生菜、蝦仁、吞拿魚、番茄、黃瓜",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "海鮮混合高蛋白低脂，營養豐富",
+      "多種海鮮提供不同營養",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-sf-7",
+    name: "三文魚番茄沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 360,
+    protein: 38,
+    fat: 12,
+    carbs: 20,
+    totalWeight: 460,
+    ingredients: [
+      { name: "三文魚", quantity: "140g" },
+      { name: "番茄", quantity: "150g" },
+      { name: "新鮮羅勒", quantity: "20g" },
+      { name: "莫薩里拉芝士", quantity: "30g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "巴薩米克醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "三文魚煮熟切成塊狀",
+      "番茄切塊",
+      "莫薩里拉芝士撕碎",
+      "混合三文魚、番茄、洋蔥、羅勒",
+      "淋上橄欖油和巴薩米克醋，撒上莫薩里拉芝士"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "番茄含茄紅素，強效抗氧化",
+      "羅勒含抗氧化物，促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "s-sf-8",
+    name: "蝦仁青瓜優格沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 330,
+    protein: 39,
+    fat: 8,
+    carbs: 18,
+    totalWeight: 430,
+    ingredients: [
+      { name: "蝦仁", quantity: "150g" },
+      { name: "青瓜", quantity: "150g" },
+      { name: "希臘優格", quantity: "60g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蝦仁煮熟冷卻",
+      "青瓜切成薄片",
+      "希臘優格混合檸檬汁",
+      "混合生菜、蝦仁、青瓜、洋蔥",
+      "淋上優格醬，調味享用"
+    ],
+    fatLossTips: [
+      "蝦仁高蛋白低脂，完美減脂食材",
+      "青瓜低卡高水分，增加飽腹感",
+      "希臘優格含益生菌，促進消化"
+    ]
+  },
+  {
+    id: "s-sf-9",
+    name: "吞拿魚粟米沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 350,
+    protein: 40,
+    fat: 10,
+    carbs: 22,
+    totalWeight: 450,
+    ingredients: [
+      { name: "吞拿魚", quantity: "150g" },
+      { name: "粟米", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "吞拿魚瀝乾",
+      "混合生菜、吞拿魚、粟米、紅椒、洋蔥",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "吞拿魚高蛋白低脂，完美減脂食材",
+      "粟米含纖維，促進消化",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-sf-10",
+    name: "三文魚凱撒沙律",
+    protein_type: "seafood",
+    category: "salad",
+    kcal: 390,
+    protein: 41,
+    fat: 13,
+    carbs: 20,
+    totalWeight: 470,
+    ingredients: [
+      { name: "三文魚", quantity: "150g" },
+      { name: "羅馬生菜", quantity: "120g" },
+      { name: "帕瑪森芝士", quantity: "20g" },
+      { name: "全麥麵包丁", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "三文魚煮熟切成塊狀",
+      "羅馬生菜撕碎",
+      "混合生菜、三文魚、麵包丁",
+      "淋上橄欖油和檸檬汁",
+      "撒上帕瑪森芝士，調味享用"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "羅馬生菜低卡高纖，增加飽腹感",
+      "全麥麵包丁增加纖維，促進消化"
+    ]
+  }
+];
+
+// Salad Recipes - Egg (簡單高蛋白沙律)
+const saladEgg: RecipeData[] = [
+  {
+    id: "s-e-1",
+    name: "蛋白凱撒沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 300,
+    protein: 38,
+    fat: 8,
+    carbs: 18,
+    totalWeight: 410,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "羅馬生菜", quantity: "120g" },
+      { name: "帕瑪森芝士", quantity: "20g" },
+      { name: "全麥麵包丁", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "羅馬生菜撕碎",
+      "混合生菜、蛋白、麵包丁",
+      "淋上橄欖油和檸檬汁",
+      "撒上帕瑪森芝士，調味享用"
+    ],
+    fatLossTips: [
+      "蛋白高蛋白低脂，完美減脂食材",
+      "羅馬生菜低卡高纖，增加飽腹感",
+      "全麥麵包丁增加纖維，促進消化"
+    ]
+  },
+  {
+    id: "s-e-2",
+    name: "菠菜蛋白沙律碗",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 310,
+    protein: 39,
+    fat: 9,
+    carbs: 16,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "菠菜", quantity: "120g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "核桃", quantity: "20g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "紅酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "菠菜焯水後冷卻",
+      "核桃切碎",
+      "混合菠菜、生菜、蛋白、洋蔥",
+      "淋上橄欖油和紅酒醋，撒上核桃"
+    ],
+    fatLossTips: [
+      "菠菜含鐵質，提升新陳代謝",
+      "蛋白高蛋白低脂，增加飽腹感",
+      "核桃含Omega-3，促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "s-e-3",
+    name: "雙蛋白藜麥沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 340,
+    protein: 40,
+    fat: 10,
+    carbs: 24,
+    totalWeight: 460,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "黑豆", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "蛋白煮熟切半",
+      "黑豆瀝乾",
+      "混合藜麥、蛋白、生菜、紅椒、黑豆",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "藜麥含完全蛋白質，營養豐富",
+      "蛋白高蛋白低脂，完美減脂食材",
+      "黑豆含纖維，促進消化"
+    ]
+  },
+  {
+    id: "s-e-4",
+    name: "番茄蛋白沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 290,
+    protein: 38,
+    fat: 8,
+    carbs: 16,
+    totalWeight: 410,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "番茄", quantity: "150g" },
+      { name: "生菜", quantity: "100g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "香芹", quantity: "20g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "番茄切塊",
+      "混合生菜、蛋白、番茄、洋蔥",
+      "淋上橄欖油和檸檬汁",
+      "撒上香芹，調味享用"
+    ],
+    fatLossTips: [
+      "番茄含茄紅素，強效抗氧化",
+      "蛋白高蛋白低脂，完美減脂食材",
+      "香芹含香豆素，促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "s-e-5",
+    name: "蛋白牛油果沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 330,
+    protein: 37,
+    fat: 12,
+    carbs: 18,
+    totalWeight: 430,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "番茄", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "牛油果切半，用叉子壓成泥狀",
+      "混合生菜、番茄、洋蔥",
+      "放上蛋白和牛油果泥",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "蛋白高蛋白低脂，完美減脂食材",
+      "牛油果含健康脂肪，促進代謝",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "s-e-6",
+    name: "蛋白青瓜優格沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 280,
+    protein: 38,
+    fat: 7,
+    carbs: 16,
+    totalWeight: 410,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "青瓜", quantity: "150g" },
+      { name: "希臘優格", quantity: "60g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "青瓜切成薄片",
+      "希臘優格混合檸檬汁",
+      "混合生菜、蛋白、青瓜、洋蔥",
+      "淋上優格醬，調味享用"
+    ],
+    fatLossTips: [
+      "蛋白高蛋白低脂，完美減脂食材",
+      "青瓜低卡高水分，增加飽腹感",
+      "希臘優格含益生菌，促進消化"
+    ]
+  },
+  {
+    id: "s-e-7",
+    name: "蛋白粟米沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 310,
+    protein: 38,
+    fat: 9,
+    carbs: 20,
+    totalWeight: 430,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "粟米", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "混合生菜、蛋白、粟米、紅椒、洋蔥",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "蛋白高蛋白低脂，完美減脂食材",
+      "粟米含纖維，促進消化",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-e-8",
+    name: "蛋白西蘭花沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 300,
+    protein: 39,
+    fat: 8,
+    carbs: 14,
+    totalWeight: 410,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "西蘭花", quantity: "120g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "大蒜", quantity: "3瓣（10g）" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "西蘭花焯水後冷卻",
+      "大蒜切碎",
+      "混合西蘭花、蛋白、生菜、紅椒",
+      "淋上蒜香橄欖油和檸檬汁"
+    ],
+    fatLossTips: [
+      "西蘭花含蘿蔔硫素，促進脂肪燃燒",
+      "蛋白高蛋白低脂，完美減脂食材",
+      "大蒜含硫化物，增強免疫力"
+    ]
+  },
+  {
+    id: "s-e-9",
+    name: "蛋白混合蔬菜沙律",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 320,
+    protein: 38,
+    fat: 10,
+    carbs: 18,
+    totalWeight: 440,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "所有蔬菜切成適當大小",
+      "混合所有材料",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "蛋白高蛋白低脂，完美減脂食材",
+      "多彩蔬菜提供豐富營養",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-e-10",
+    name: "蛋白生菜沙律碗",
+    protein_type: "egg",
+    category: "salad",
+    kcal: 290,
+    protein: 38,
+    fat: 8,
+    carbs: 16,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "生菜", quantity: "150g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "紅椒", quantity: "30g" },
+      { name: "日式醬油", quantity: "1湯匙（15ml）" },
+      { name: "米醋", quantity: "1茶匙（5ml）" },
+      { name: "白芝麻", quantity: "1茶匙（5g）" }
+    ],
+    steps: [
+      "蛋白煮熟切半",
+      "蔬菜切成條狀",
+      "用生菜葉包裹蛋白和蔬菜",
+      "淋上日式醬油和米醋",
+      "撒上白芝麻享用"
+    ],
+    fatLossTips: [
+      "生菜卷低卡高纖，增加飽腹感",
+      "蛋白高蛋白低脂，完美減脂食材",
+      "日式調味清淡，適合減脂"
+    ]
+  }
+];
+
+// Salad Recipes - Vegetarian (植物蛋白沙律碗)
+const saladVegetarian: RecipeData[] = [
+  {
+    id: "s-v-1",
+    name: "牛油果藜麥沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 360,
+    protein: 12,
+    fat: 14,
+    carbs: 42,
+    totalWeight: 480,
+    ingredients: [
+      { name: "藜麥", quantity: "100g" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "牛油果切半，用叉子壓成泥狀",
+      "混合生菜、番茄、洋蔥",
+      "放上藜麥和牛油果泥",
+      "淋上橄欖油和檸檬汁享用"
+    ],
+    fatLossTips: [
+      "藜麥含完全蛋白質，營養豐富",
+      "牛油果含健康脂肪，促進代謝",
+      "植物蛋白沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-2",
+    name: "鷹嘴豆混合沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 340,
+    protein: 14,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 460,
+    ingredients: [
+      { name: "鷹嘴豆", quantity: "100g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "鷹嘴豆瀝乾",
+      "混合生菜、番茄、黃瓜、紅椒",
+      "加入鷹嘴豆",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "鷹嘴豆含植物蛋白和纖維",
+      "多彩蔬菜提供豐富營養",
+      "植物蛋白沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-3",
+    name: "豆腐蔬菜沙律碗",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 320,
+    protein: 16,
+    fat: 10,
+    carbs: 32,
+    totalWeight: 450,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "日式醬油", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豆腐切成塊狀",
+      "混合生菜、番茄、黃瓜、紅椒",
+      "放上豆腐塊",
+      "淋上橄欖油和日式醬油",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "豆腐含植物蛋白，低脂高營養",
+      "多彩蔬菜提供豐富營養",
+      "植物蛋白沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-4",
+    name: "菠菜堅果沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 350,
+    protein: 13,
+    fat: 15,
+    carbs: 34,
+    totalWeight: 440,
+    ingredients: [
+      { name: "菠菜", quantity: "120g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "堅果混合", quantity: "40g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "紅酒醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "菠菜焯水後冷卻",
+      "堅果切碎",
+      "混合菠菜、生菜、番茄、洋蔥",
+      "淋上橄欖油和紅酒醋",
+      "撒上堅果享用"
+    ],
+    fatLossTips: [
+      "菠菜含鐵質，提升新陳代謝",
+      "堅果含Omega-3，促進脂肪燃燒",
+      "植物蛋白沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-5",
+    name: "番茄青瓜沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 280,
+    protein: 8,
+    fat: 9,
+    carbs: 36,
+    totalWeight: 420,
+    ingredients: [
+      { name: "番茄", quantity: "150g" },
+      { name: "青瓜", quantity: "150g" },
+      { name: "新鮮羅勒", quantity: "20g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "巴薩米克醋", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "番茄切塊",
+      "青瓜切成薄片",
+      "混合番茄、青瓜、洋蔥、羅勒",
+      "淋上橄欖油和巴薩米克醋",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "番茄含茄紅素，強效抗氧化",
+      "青瓜低卡高水分，增加飽腹感",
+      "清爽沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-6",
+    name: "雜菜健康沙律碗",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 330,
+    protein: 12,
+    fat: 11,
+    carbs: 40,
+    totalWeight: 480,
+    ingredients: [
+      { name: "混合生菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "所有蔬菜切成適當大小",
+      "混合所有材料",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "多彩蔬菜提供豐富營養",
+      "低卡高纖，增加飽腹感",
+      "健康沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-7",
+    name: "南瓜藜麥沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 340,
+    protein: 11,
+    fat: 10,
+    carbs: 44,
+    totalWeight: 470,
+    ingredients: [
+      { name: "南瓜", quantity: "120g" },
+      { name: "藜麥", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "南瓜烤熟冷卻",
+      "藜麥煮熟",
+      "混合生菜、南瓜、藜麥、紅椒、洋蔥",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "南瓜含β-胡蘿蔔素，抗氧化",
+      "藜麥含完全蛋白質，營養豐富",
+      "植物蛋白沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-8",
+    name: "牛油果粟米沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 350,
+    protein: 10,
+    fat: 14,
+    carbs: 40,
+    totalWeight: 460,
+    ingredients: [
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "粟米", quantity: "80g" },
+      { name: "混合生菜", quantity: "100g" },
+      { name: "紅椒", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛油果切塊",
+      "混合生菜、粟米、紅椒、洋蔥",
+      "放上牛油果塊",
+      "淋上橄欖油和檸檬汁",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "牛油果含健康脂肪，促進代謝",
+      "粟米含纖維，促進消化",
+      "植物蛋白沙律低卡高營養"
+    ]
+  },
+  {
+    id: "s-v-9",
+    name: "豆腐西蘭花沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 310,
+    protein: 15,
+    fat: 10,
+    carbs: 28,
+    totalWeight: 440,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "西蘭花", quantity: "120g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "大蒜", quantity: "3瓣（10g）" },
+      { name: "紅椒", quantity: "40g" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "檸檬汁", quantity: "1湯匙（15ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "豆腐切成塊狀",
+      "西蘭花焯水後冷卻",
+      "大蒜切碎",
+      "混合西蘭花、豆腐、生菜、紅椒",
+      "淋上蒜香橄欖油和檸檬汁"
+    ],
+    fatLossTips: [
+      "豆腐含植物蛋白，低脂高營養",
+      "西蘭花含蘿蔔硫素，促進脂肪燃燒",
+      "大蒜含硫化物，增強免疫力"
+    ]
+  },
+  {
+    id: "s-v-10",
+    name: "素食凱撒沙律",
+    protein_type: "vegetarian",
+    category: "salad",
+    kcal: 330,
+    protein: 11,
+    fat: 12,
+    carbs: 36,
+    totalWeight: 450,
+    ingredients: [
+      { name: "羅馬生菜", quantity: "120g" },
+      { name: "豆腐", quantity: "100g" },
+      { name: "帕瑪森芝士", quantity: "20g" },
+      { name: "全麥麵包丁", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1.5茶匙（7.5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "豆腐切成塊狀",
+      "羅馬生菜撕碎",
+      "混合生菜、豆腐、麵包丁",
+      "淋上橄欖油和檸檬汁",
+      "撒上帕瑪森芝士，調味享用"
+    ],
+    fatLossTips: [
+      "豆腐含植物蛋白，低脂高營養",
+      "羅馬生菜低卡高纖，增加飽腹感",
+      "全麥麵包丁增加纖維，促進消化"
+    ]
+  }
+];
+
 // Create the main recipes object
 export const recipes: Record<string, Record<string, RecipeData[]>> = {
   breakfast: {
@@ -4369,11 +6035,11 @@ export const recipes: Record<string, Record<string, RecipeData[]>> = {
   },
   salad: {
     chicken: saladChicken,
-    pork: [], // To be filled
-    beef: [], // To be filled
-    seafood: [], // To be filled
-    egg: [], // To be filled
-    vegetarian: [] // To be filled
+    pork: saladPork,
+    beef: saladBeef,
+    seafood: saladSeafood,
+    egg: saladEgg,
+    vegetarian: saladVegetarian
   },
   snack: {
     chicken: [], // To be filled
