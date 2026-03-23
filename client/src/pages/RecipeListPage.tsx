@@ -81,8 +81,6 @@ export function RecipeListPage() {
 
   const handleRecipeSelect = (recipeId: string) => {
     // Navigate to recipe detail page with recipe ID
-    console.log('NAV protein:', protein);
-    console.log('[NAV L3->RECIPE] navigating with:', { category, protein, recipeId });
     setLocation(`/diet/inspiration/home-cooking/${category}/${protein}/${recipeId}`);
   }
 

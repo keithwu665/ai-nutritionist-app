@@ -2,11 +2,12 @@ import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { getRecipeImageById } from "@/lib/recipeImages";
-import { getRecipeById } from "@/lib/recipeData";
+import { getRecipeById } from "@/lib/recipeDataReorganized";
 
 export default function RecipePage() {
   const params = useParams<{ recipeId: string }>();
   const recipeId = params.recipeId || "c1";
+  
   const recipe = getRecipeById(recipeId);
 
   if (!recipe) {
