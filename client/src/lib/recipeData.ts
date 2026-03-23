@@ -7,6 +7,8 @@
 export interface RecipeData {
   id: string;
   name: string;
+  protein_type: 'chicken' | 'pork' | 'beef' | 'seafood' | 'egg' | 'vegetarian';
+  category: 'breakfast' | 'lunch' | 'dinner' | 'salad' | 'snack' | 'soup';
   kcal: number;
   protein: number;
   fat: number;
@@ -24,6 +26,8 @@ export interface RecipeData {
 // Chicken Breakfast Recipes
 export const chickenBreakfastRecipes: Record<string, RecipeData> = {
   "c1": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c1",
     name: "香煎雞胸蛋白早餐碗",
     kcal: 320,
@@ -55,6 +59,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c2": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c2",
     name: "雞胸牛油果全麥吐司",
     kcal: 380,
@@ -85,6 +91,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c3": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c3",
     name: "雞肉菠菜蛋白捲",
     kcal: 310,
@@ -115,6 +123,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c4": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c4",
     name: "雞胸番茄沙律碗",
     kcal: 340,
@@ -146,6 +156,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c5": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c5",
     name: "雞肉藜麥早餐碗",
     kcal: 360,
@@ -177,6 +189,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c6": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c6",
     name: "雞胸蘑菇炒蛋",
     kcal: 330,
@@ -208,6 +222,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c7": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c7",
     name: "雞肉低脂芝士三文治",
     kcal: 350,
@@ -238,6 +254,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c8": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c8",
     name: "雞胸蔬菜卷餅",
     kcal: 320,
@@ -269,6 +287,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c9": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c9",
     name: "雞肉燕麥鹹粥",
     kcal: 340,
@@ -300,6 +320,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "c10": {
+    protein_type: "chicken",
+    category: "breakfast",
     id: "c10",
     name: "雞胸青瓜乳酪碗",
     kcal: 300,
@@ -335,6 +357,8 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
 // Pork Breakfast Recipes (Lean Pork)
 export const porkBreakfastRecipes: Record<string, RecipeData> = {
   "p1": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p1",
     name: "香煎瘦豬肉蛋白碗",
     kcal: 310,
@@ -366,6 +390,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p2": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p2",
     name: "豬里肌牛油果吐司",
     kcal: 360,
@@ -396,6 +422,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p3": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p3",
     name: "瘦肉菠菜蛋白炒",
     kcal: 300,
@@ -427,6 +455,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p4": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p4",
     name: "豬肉番茄早餐碗",
     kcal: 330,
@@ -458,6 +488,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p5": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p5",
     name: "豬肉生菜卷",
     kcal: 280,
@@ -489,6 +521,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p6": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p6",
     name: "瘦肉粟米蛋白粥",
     kcal: 320,
@@ -520,6 +554,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p7": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p7",
     name: "豬肉藜麥早餐碗",
     kcal: 350,
@@ -551,6 +587,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p8": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p8",
     name: "豬肉蘑菇炒蛋白",
     kcal: 310,
@@ -582,6 +620,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p9": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p9",
     name: "豬肉全麥三文治",
     kcal: 340,
@@ -612,6 +652,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "p10": {
+    protein_type: "pork",
+    category: "breakfast",
     id: "p10",
     name: "豬肉青瓜乳酪碗",
     kcal: 290,
@@ -647,6 +689,8 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
 // Beef Breakfast Recipes
 export const beefBreakfastRecipes: Record<string, RecipeData> = {
   "b1": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b1",
     name: "牛肉早餐碗",
     kcal: 360,
@@ -678,6 +722,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b2": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b2",
     name: "牛肉全麥吐司",
     kcal: 390,
@@ -708,6 +754,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b3": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b3",
     name: "牛肉菠菜蛋白捲",
     kcal: 330,
@@ -738,6 +786,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b4": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b4",
     name: "牛肉番茄沙律碗",
     kcal: 370,
@@ -769,6 +819,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b5": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b5",
     name: "牛肉藜麥早餐碗",
     kcal: 380,
@@ -800,6 +852,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b6": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b6",
     name: "牛肉蘑菇炒蛋",
     kcal: 350,
@@ -831,6 +885,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b7": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b7",
     name: "牛肉低脂芝士三文治",
     kcal: 370,
@@ -861,6 +917,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b8": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b8",
     name: "牛肉蔬菜卷餅",
     kcal: 340,
@@ -892,6 +950,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b9": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b9",
     name: "牛肉燕麥鹹粥",
     kcal: 360,
@@ -923,6 +983,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "b10": {
+    protein_type: "beef",
+    category: "breakfast",
     id: "b10",
     name: "牛肉青瓜乳酪碗",
     kcal: 320,
@@ -958,6 +1020,8 @@ export const beefBreakfastRecipes: Record<string, RecipeData> = {
 // Seafood Breakfast Recipes
 export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
   "s1": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s1",
     name: "三文魚早餐碗",
     kcal: 340,
@@ -989,6 +1053,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s2": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s2",
     name: "三文魚全麥吐司",
     kcal: 380,
@@ -1019,6 +1085,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s3": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s3",
     name: "蝦仁菠菜蛋白捲",
     kcal: 310,
@@ -1049,6 +1117,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s4": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s4",
     name: "蝦仁番茄沙律碗",
     kcal: 330,
@@ -1080,6 +1150,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s5": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s5",
     name: "蝦仁藜麥早餐碗",
     kcal: 350,
@@ -1111,6 +1183,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s6": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s6",
     name: "蝦仁蘑菇炒蛋",
     kcal: 320,
@@ -1142,6 +1216,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s7": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s7",
     name: "蝦仁低脂芝士三文治",
     kcal: 340,
@@ -1172,6 +1248,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s8": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s8",
     name: "蝦仁蔬菜卷餅",
     kcal: 310,
@@ -1203,6 +1281,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s9": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s9",
     name: "蝦仁燕麥鹹粥",
     kcal: 330,
@@ -1234,6 +1314,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "s10": {
+    protein_type: "seafood",
+    category: "breakfast",
     id: "s10",
     name: "蝦仁青瓜乳酪碗",
     kcal: 300,
@@ -1269,6 +1351,8 @@ export const seafoodBreakfastRecipes: Record<string, RecipeData> = {
 // Egg Breakfast Recipes
 export const eggBreakfastRecipes: Record<string, RecipeData> = {
   "e1": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e1",
     name: "菠菜炒蛋早餐碗",
     kcal: 280,
@@ -1299,6 +1383,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e2": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e2",
     name: "蛋白全麥吐司",
     kcal: 320,
@@ -1329,6 +1415,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e3": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e3",
     name: "蛋白菠菜捲",
     kcal: 260,
@@ -1358,6 +1446,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e4": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e4",
     name: "蛋白番茄沙律碗",
     kcal: 290,
@@ -1389,6 +1479,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e5": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e5",
     name: "蛋藜麥早餐碗",
     kcal: 310,
@@ -1420,6 +1512,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e6": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e6",
     name: "蘑菇炒蛋",
     kcal: 280,
@@ -1449,6 +1543,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e7": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e7",
     name: "蛋低脂芝士三文治",
     kcal: 300,
@@ -1479,6 +1575,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e8": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e8",
     name: "蛋蔬菜卷餅",
     kcal: 270,
@@ -1510,6 +1608,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e9": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e9",
     name: "蛋燕麥鹹粥",
     kcal: 290,
@@ -1541,6 +1641,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "e10": {
+    protein_type: "egg",
+    category: "breakfast",
     id: "e10",
     name: "蛋青瓜乳酪碗",
     kcal: 260,
@@ -1576,6 +1678,8 @@ export const eggBreakfastRecipes: Record<string, RecipeData> = {
 // Vegetarian Breakfast Recipes
 export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
   "v1": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v1",
     name: "豆腐菠菜早餐碗",
     kcal: 260,
@@ -1606,6 +1710,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v2": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v2",
     name: "牛油果全麥吐司",
     kcal: 340,
@@ -1635,6 +1741,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v3": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v3",
     name: "菠菜豆腐捲",
     kcal: 240,
@@ -1663,6 +1771,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v4": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v4",
     name: "番茄沙律碗",
     kcal: 270,
@@ -1692,6 +1802,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v5": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v5",
     name: "藜麥早餐碗",
     kcal: 290,
@@ -1721,6 +1833,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v6": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v6",
     name: "蘑菇炒豆腐",
     kcal: 260,
@@ -1750,6 +1864,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v7": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v7",
     name: "低脂芝士三文治",
     kcal: 280,
@@ -1778,6 +1894,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v8": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v8",
     name: "蔬菜卷餅",
     kcal: 250,
@@ -1807,6 +1925,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v9": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v9",
     name: "燕麥鹹粥",
     kcal: 270,
@@ -1836,6 +1956,8 @@ export const vegetarianBreakfastRecipes: Record<string, RecipeData> = {
     ]
   },
   "v10": {
+    protein_type: "vegetarian",
+    category: "breakfast",
     id: "v10",
     name: "青瓜乳酪碗",
     kcal: 240,
@@ -1907,4 +2029,19 @@ export function getRecipeById(recipeId: string): RecipeData | null {
     ...Object.values(vegetarianBreakfastRecipes)
   ];
   return allRecipes.find(r => r.id === recipeId) || null;
+}
+
+export function getRecipesByProteinAndCategory(
+  protein_type: 'chicken' | 'pork' | 'beef' | 'seafood' | 'egg' | 'vegetarian',
+  category: 'breakfast' | 'lunch' | 'dinner' | 'salad' | 'snack' | 'soup' = 'breakfast'
+): RecipeData[] {
+  const allRecipes = [
+    ...Object.values(chickenBreakfastRecipes),
+    ...Object.values(porkBreakfastRecipes),
+    ...Object.values(beefBreakfastRecipes),
+    ...Object.values(seafoodBreakfastRecipes),
+    ...Object.values(eggBreakfastRecipes),
+    ...Object.values(vegetarianBreakfastRecipes)
+  ];
+  return allRecipes.filter(r => r.protein_type === protein_type && r.category === category);
 }
