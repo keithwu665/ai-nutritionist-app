@@ -6,9 +6,11 @@ export default function RecipeMethodSelection() {
   const [, navigate] = useLocation();
 
   // Extract category and protein from URL path
+  // URL: /diet/inspiration/home-cooking/breakfast/pork
+  // Segments: [0]=empty, [1]=diet, [2]=inspiration, [3]=home-cooking, [4]=breakfast, [5]=pork
   const pathSegments = window.location.pathname.split('/');
-  const category = pathSegments[5] || 'unknown';
-  const protein = pathSegments[6] || 'unknown';
+  const category = pathSegments[4] || 'unknown';
+  const protein = pathSegments[5] || 'unknown';
 
   const options = [
     {
@@ -32,8 +34,16 @@ export default function RecipeMethodSelection() {
   ];
 
   const handleOptionClick = (optionId: string) => {
+    // STEP 2: LOG NAVIGATION PAYLOAD
+    console.log('[NAVIGATION] sending params:', {
+      category: category,
+      protein: protein,
+      optionId: optionId
+    });
+    
     if (optionId === 'recipe-page') {
       // Navigate to recipe list page
+      console.log('[NAVIGATION] navigating to recipes with protein:', protein);
       navigate(
         `/diet/inspiration/home-cooking/${category}/${protein}/recipes`
       );

@@ -19,8 +19,12 @@ export function RecipeListPage() {
   const [, setLocation] = useLocation();
   const params = useParams<{ category: string; protein: string }>();
   
-  const category = params.category || 'breakfast';
-  const protein = params.protein || 'chicken';
+  // Extract category and protein from URL path
+  // URL: /diet/inspiration/home-cooking/breakfast/pork/recipes
+  // Segments: [0]=empty, [1]=diet, [2]=inspiration, [3]=home-cooking, [4]=breakfast, [5]=pork, [6]=recipes
+  const pathSegments = window.location.pathname.split('/');
+  const category = pathSegments[4] || params.category || 'breakfast';
+  const protein = pathSegments[5] || params.protein || 'chicken';
   
   // Map URL protein to recipe protein_type
   const proteinType = proteinMap[protein] || 'chicken';
