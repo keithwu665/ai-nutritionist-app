@@ -1,6 +1,7 @@
 import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
+import { getRecipeImageById } from "@/lib/recipeImages";
 
 interface RecipeData {
   name: string;
@@ -8,7 +9,6 @@ interface RecipeData {
   protein: number;
   fat: number;
   carbs: number;
-  image: string;
   ingredients: string[];
   steps: string[];
   fatLossTips: string[];
@@ -22,7 +22,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 42,
     fat: 8,
     carbs: 18,
-    image: "🍳",
     ingredients: ["雞胸150g", "蛋白2個", "番茄", "菠菜", "洋蔥", "橄欖油1茶匙", "鹽和黑椒"],
     steps: [
       "將雞胸切成小塊，用中火煎至半熟",
@@ -43,7 +42,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 38,
     fat: 12,
     carbs: 28,
-    image: "🥑",
     ingredients: ["雞胸100g", "全麥吐司2片", "牛油果1/2個", "番茄", "檸檬", "黑椒"],
     steps: [
       "將雞胸煮熟後切成薄片",
@@ -64,7 +62,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 40,
     fat: 9,
     carbs: 15,
-    image: "🌯",
     ingredients: ["雞胸100g", "蛋白3個", "菠菜一把", "起司20g", "洋蔥", "橄欖油"],
     steps: [
       "將蛋白打成蛋液",
@@ -85,7 +82,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 39,
     fat: 10,
     carbs: 20,
-    image: "🥗",
     ingredients: ["雞胸120g", "番茄2個", "生菜", "小黃瓜", "紫洋蔥", "橄欖油1湯匙", "醋"],
     steps: [
       "將雞胸煮熟後切成塊狀",
@@ -106,7 +102,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 36,
     fat: 11,
     carbs: 32,
-    image: "🍚",
     ingredients: ["雞胸100g", "藜麥50g", "彩椒", "黑豆", "玉米", "橄欖油", "檸檬"],
     steps: [
       "藜麥按包裝指示煮熟",
@@ -127,7 +122,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 41,
     fat: 10,
     carbs: 12,
-    image: "🍄",
     ingredients: ["雞胸100g", "蛋2個", "蘑菇150g", "洋蔥", "大蒜", "橄欖油1茶匙"],
     steps: [
       "雞胸切成小塊，先炒至半熟",
@@ -148,7 +142,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 37,
     fat: 11,
     carbs: 26,
-    image: "🥪",
     ingredients: ["雞胸100g", "全麥麵包2片", "低脂芝士1片", "番茄", "生菜", "黃芥末"],
     steps: [
       "雞胸煮熟後切成薄片",
@@ -169,7 +162,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 38,
     fat: 9,
     carbs: 22,
-    image: "🌮",
     ingredients: ["雞胸100g", "全麥卷餅2張", "生菜", "番茄", "洋蔥", "青椒", "優格"],
     steps: [
       "雞胸煮熟後切成條狀",
@@ -190,7 +182,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 35,
     fat: 10,
     carbs: 30,
-    image: "🥣",
     ingredients: ["雞胸80g", "燕麥50g", "高湯500ml", "洋蔥", "胡蘿蔔", "香菇", "鹽"],
     steps: [
       "燕麥用高湯煮軟",
@@ -211,7 +202,6 @@ const mockRecipes: Record<string, RecipeData> = {
     protein: 40,
     fat: 8,
     carbs: 14,
-    image: "🥒",
     ingredients: ["雞胸120g", "希臘優格150g", "青瓜", "番茄", "洋蔥", "檸檬", "香草"],
     steps: [
       "雞胸煮熟後切成塊狀",
@@ -259,9 +249,14 @@ export default function RecipePage() {
         <div className="flex gap-4 items-start">
           {/* Recipe Image */}
           <div className="flex-shrink-0">
-            <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-xl flex items-center justify-center text-5xl shadow-sm">
-              {recipe.image}
-            </div>
+            <img
+              src={getRecipeImageById(recipeId)}
+              alt={recipe.name}
+              className="w-24 h-24 rounded-xl object-cover shadow-sm"
+              onError={(e) => {
+                e.currentTarget.src = "https://d2xsxph8kpxj0f.cloudfront.net/310419663029851344/btNuTCzqZzpzomYwWSYu4y/chicken-salad_2ee5ac36.jpg";
+              }}
+            />
           </div>
 
           {/* Nutrition Info Grid */}
