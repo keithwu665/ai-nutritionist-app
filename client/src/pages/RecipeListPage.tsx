@@ -36,6 +36,7 @@ export function RecipeListPage() {
     time: '15分鐘' // Default time, can be customized per recipe
   }));
 
+
   const handleRecipeSelect = (recipeId: string) => {
     // Navigate to recipe detail page with recipe ID
     setLocation(`/diet/inspiration/home-cooking/${category}/${protein}/${recipeId}`);
