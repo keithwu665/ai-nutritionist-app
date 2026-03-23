@@ -683,6 +683,1331 @@ const breakfastPork: RecipeData[] = [
   }
 ];
 
+const breakfastBeef: RecipeData[] = [
+  {
+    id: "b-b-1",
+    name: "香煎牛肉蛋白早餐碗",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 330,
+    protein: 44,
+    fat: 9,
+    carbs: 17,
+    totalWeight: 380,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "150g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "番茄", quantity: "80g" },
+      { name: "菠菜", quantity: "50g" },
+      { name: "洋蔥", quantity: "30g" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉切成小塊，用中火煎至半熟",
+      "加入蛋白攪拌均勻",
+      "加入番茄、菠菜和洋蔥",
+      "繼續煎至牛肉熟透，蛋白凝固",
+      "調味後盛碟享用"
+    ],
+    fatLossTips: [
+      "瘦牛肉含肌酸，增強肌肉力量",
+      "蛋白高蛋白低脂，完美減脂搭配",
+      "菠菜含鐵質，提升新陳代謝"
+    ]
+  },
+  {
+    id: "b-b-2",
+    name: "牛肉牛油果全麥吐司",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 390,
+    protein: 40,
+    fat: 13,
+    carbs: 29,
+    totalWeight: 430,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "全麥吐司", quantity: "2片（60g）" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "番茄", quantity: "60g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "黑椒", quantity: "0.5g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "瘦牛肉煮熟後切成薄片",
+      "全麥吐司放入烤麵包機烤至金黃",
+      "牛油果切半，用叉子壓成泥狀",
+      "在吐司上塗上牛油果泥",
+      "放上牛肉片和番茄片，淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "全麥吐司富含纖維，增加飽腹感",
+      "牛油果含健康脂肪，促進脂肪燃燒",
+      "瘦牛肉含鋅，提升免疫力"
+    ]
+  },
+  {
+    id: "b-b-3",
+    name: "牛肉菠菜蛋白炒",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 320,
+    protein: 42,
+    fat: 10,
+    carbs: 15,
+    totalWeight: 360,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "120g" },
+      { name: "菠菜", quantity: "100g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉切成薄片",
+      "用中火炒牛肉至半熟",
+      "加入洋蔥和大蒜炒香",
+      "加入菠菜繼續炒",
+      "打入蛋白液，炒至蛋白完全凝固"
+    ],
+    fatLossTips: [
+      "菠菜含葉綠素，促進脂肪分解",
+      "牛肉含肉鹼，加速脂肪代謝",
+      "蛋白高蛋白低脂，增加飽腹感"
+    ]
+  },
+  {
+    id: "b-b-4",
+    name: "牛肉番茄早餐碗",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 310,
+    protein: 41,
+    fat: 8,
+    carbs: 18,
+    totalWeight: 370,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "140g" },
+      { name: "番茄", quantity: "120g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "香草", quantity: "1g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉切成小塊",
+      "番茄切成塊狀",
+      "用中火炒牛肉至半熟",
+      "加入洋蔥、大蒜和番茄",
+      "燉至牛肉軟嫩，番茄出汁"
+    ],
+    fatLossTips: [
+      "番茄含番茄紅素，抗氧化效果強",
+      "瘦牛肉搭配番茄，營養互補",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-b-5",
+    name: "牛肉生菜卷",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 300,
+    protein: 39,
+    fat: 9,
+    carbs: 14,
+    totalWeight: 340,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "110g" },
+      { name: "生菜葉", quantity: "4片（80g）" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "20g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉煮熟後切成薄片",
+      "生菜葉洗淨瀝乾",
+      "番茄和黃瓜切成條狀",
+      "在生菜葉上鋪上牛肉、蔬菜",
+      "淋上檸檬汁，捲起享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "牛肉含維生素B12，促進能量代謝",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "b-b-6",
+    name: "牛肉燕麥鹹粥",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 340,
+    protein: 38,
+    fat: 10,
+    carbs: 32,
+    totalWeight: 420,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "燕麥", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "香菇", quantity: "40g" },
+      { name: "高湯", quantity: "300ml" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉切塊，用高湯煮熟",
+      "加入燕麥和切碎的蔬菜",
+      "煮至燕麥軟爛",
+      "調味即可",
+      "可根據口味加入黑椒"
+    ],
+    fatLossTips: [
+      "燕麥含β-葡聚糖，降低膽固醇",
+      "鹹粥飽腹感強，適合減脂",
+      "牛肉提供優質蛋白，促進肌肉生長"
+    ]
+  },
+  {
+    id: "b-b-7",
+    name: "牛肉藜麥早餐碗",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 360,
+    protein: 41,
+    fat: 11,
+    carbs: 28,
+    totalWeight: 410,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "120g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "瘦牛肉煮熟切成塊狀",
+      "蔬菜切成小塊",
+      "將所有材料混合",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完整蛋白質，營養豐富",
+      "牛肉搭配藜麥，蛋白質互補",
+      "檸檬汁促進脂肪分解和代謝"
+    ]
+  },
+  {
+    id: "b-b-8",
+    name: "牛肉蘑菇炒蛋白",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 320,
+    protein: 43,
+    fat: 9,
+    carbs: 14,
+    totalWeight: 360,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "120g" },
+      { name: "蘑菇", quantity: "100g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉切塊，蘑菇切片",
+      "炒牛肉至半熟",
+      "加入蘑菇和洋蔥繼續炒",
+      "打入蛋白液攪拌均勻",
+      "炒至蛋白完全凝固即可"
+    ],
+    fatLossTips: [
+      "蘑菇含多糖體，增強免疫力",
+      "牛肉搭配蛋白，蛋白質互補",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-b-9",
+    name: "牛肉全麥三文治",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 350,
+    protein: 39,
+    fat: 12,
+    carbs: 25,
+    totalWeight: 400,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "全麥麵包", quantity: "2片（60g）" },
+      { name: "低脂芝士", quantity: "1片（20g）" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" },
+      { name: "黃芥末", quantity: "1茶匙（5g）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉煮熟切成薄片",
+      "全麥麵包輕輕烤一下",
+      "在麵包上塗黃芥末",
+      "鋪上生菜、牛肉片、番茄和芝士",
+      "蓋上另一片麵包即可"
+    ],
+    fatLossTips: [
+      "低脂芝士提供鈣質，不增加脂肪",
+      "全麥麵包富含纖維，增加飽腹感",
+      "牛肉含硒，提升代謝"
+    ]
+  },
+  {
+    id: "b-b-10",
+    name: "牛肉青瓜乳酪碗",
+    protein_type: "beef",
+    category: "breakfast",
+    kcal: 310,
+    protein: 42,
+    fat: 8,
+    carbs: 14,
+    totalWeight: 350,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "130g" },
+      { name: "希臘乳酪", quantity: "100g" },
+      { name: "黃瓜", quantity: "80g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "20g" },
+      { name: "檸檬", quantity: "1/2個（15g）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "瘦牛肉煮熟切成塊狀",
+      "黃瓜、番茄切塊",
+      "將希臘乳酪放入碗中",
+      "加入所有蔬菜和牛肉",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "希臘乳酪高蛋白低脂，完美減脂食材",
+      "黃瓜含水量高，低卡高纖",
+      "牛肉含維生素B12，促進能量代謝"
+    ]
+  }
+];
+
+const breakfastSeafood: RecipeData[] = [
+  {
+    id: "b-s-1",
+    name: "三文魚牛油果早餐碗",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 340,
+    protein: 40,
+    fat: 12,
+    carbs: 16,
+    totalWeight: 380,
+    ingredients: [
+      { name: "三文魚", quantity: "120g" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "番茄", quantity: "80g" },
+      { name: "菠菜", quantity: "50g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "三文魚煮熟或蒸熟後切成塊狀",
+      "牛油果切半，用叉子壓成泥狀",
+      "番茄和菠菜切成適當大小",
+      "將所有材料放入碗中",
+      "淋上檸檬汁和橄欖油，調味享用"
+    ],
+    fatLossTips: [
+      "三文魚含Omega-3脂肪酸，促進脂肪燃燒",
+      "牛油果含健康脂肪，增加飽腹感",
+      "菠菜含鐵質，提升新陳代謝"
+    ]
+  },
+  {
+    id: "b-s-2",
+    name: "蝦仁蛋白炒菠菜",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 300,
+    protein: 41,
+    fat: 8,
+    carbs: 12,
+    totalWeight: 340,
+    ingredients: [
+      { name: "蝦仁", quantity: "120g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "菠菜", quantity: "100g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蝦仁洗淨瀝乾",
+      "用中火炒蝦仁至變紅",
+      "加入洋蔥和大蒜炒香",
+      "加入菠菜繼續炒",
+      "打入蛋白液，炒至蛋白完全凝固"
+    ],
+    fatLossTips: [
+      "蝦仁低脂高蛋白，完美減脂食材",
+      "菠菜含葉綠素，促進脂肪分解",
+      "蛋白高蛋白低脂，增加飽腹感"
+    ]
+  },
+  {
+    id: "b-s-3",
+    name: "三文魚全麥吐司",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 370,
+    protein: 38,
+    fat: 11,
+    carbs: 27,
+    totalWeight: 410,
+    ingredients: [
+      { name: "三文魚", quantity: "100g" },
+      { name: "全麥吐司", quantity: "2片（60g）" },
+      { name: "低脂乳酪", quantity: "2湯匙（30g）" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "三文魚煮熟或蒸熟後切成薄片",
+      "全麥吐司放入烤麵包機烤至金黃",
+      "在吐司上塗上低脂乳酪",
+      "放上三文魚片、番茄和黃瓜",
+      "淋上檸檬汁即可"
+    ],
+    fatLossTips: [
+      "全麥吐司富含纖維，增加飽腹感",
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "低脂乳酪提供鈣質，不增加脂肪"
+    ]
+  },
+  {
+    id: "b-s-4",
+    name: "蝦仁藜麥早餐碗",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 350,
+    protein: 39,
+    fat: 10,
+    carbs: 26,
+    totalWeight: 400,
+    ingredients: [
+      { name: "蝦仁", quantity: "120g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "蝦仁炒至變紅",
+      "蔬菜切成小塊",
+      "將所有材料混合",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完整蛋白質，營養豐富",
+      "蝦仁搭配藜麥，蛋白質互補",
+      "檸檬汁促進脂肪分解和代謝"
+    ]
+  },
+  {
+    id: "b-s-5",
+    name: "吞拿魚蛋白沙律",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 310,
+    protein: 42,
+    fat: 9,
+    carbs: 13,
+    totalWeight: 360,
+    ingredients: [
+      { name: "吞拿魚罐頭（水浸）", quantity: "100g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "吞拿魚罐頭瀝乾",
+      "蛋白煮熟後切成塊狀",
+      "生菜洗淨瀝乾",
+      "番茄和黃瓜切成塊",
+      "將所有材料混合，淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "吞拿魚低脂高蛋白，完美減脂食材",
+      "蛋白高蛋白低脂，增加飽腹感",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "b-s-6",
+    name: "蝦仁番茄早餐碗",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 320,
+    protein: 40,
+    fat: 8,
+    carbs: 17,
+    totalWeight: 370,
+    ingredients: [
+      { name: "蝦仁", quantity: "130g" },
+      { name: "番茄", quantity: "120g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "香草", quantity: "1g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蝦仁洗淨瀝乾",
+      "番茄切成塊狀",
+      "用中火炒蝦仁至變紅",
+      "加入洋蔥、大蒜和番茄",
+      "燉至蝦仁熟透，番茄出汁"
+    ],
+    fatLossTips: [
+      "番茄含番茄紅素，抗氧化效果強",
+      "蝦仁搭配番茄，營養互補",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-s-7",
+    name: "三文魚乳酪碗",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 330,
+    protein: 39,
+    fat: 11,
+    carbs: 15,
+    totalWeight: 370,
+    ingredients: [
+      { name: "三文魚", quantity: "110g" },
+      { name: "希臘乳酪", quantity: "100g" },
+      { name: "黃瓜", quantity: "80g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "20g" },
+      { name: "檸檬", quantity: "1/2個（15g）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "三文魚煮熟或蒸熟後切成塊狀",
+      "黃瓜、番茄切塊",
+      "將希臘乳酪放入碗中",
+      "加入所有蔬菜和三文魚",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "希臘乳酪高蛋白低脂，完美減脂食材",
+      "黃瓜含水量高，低卡高纖",
+      "三文魚含Omega-3，促進脂肪燃燒"
+    ]
+  },
+  {
+    id: "b-s-8",
+    name: "蝦仁燕麥鹹粥",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 340,
+    protein: 37,
+    fat: 9,
+    carbs: 31,
+    totalWeight: 410,
+    ingredients: [
+      { name: "蝦仁", quantity: "100g" },
+      { name: "燕麥", quantity: "50g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "香菇", quantity: "40g" },
+      { name: "高湯", quantity: "300ml" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蝦仁洗淨瀝乾",
+      "用高湯煮蝦仁至變紅",
+      "加入燕麥和切碎的蔬菜",
+      "煮至燕麥軟爛",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "燕麥含β-葡聚糖，降低膽固醇",
+      "鹹粥飽腹感強，適合減脂",
+      "蝦仁提供優質蛋白，促進肌肉生長"
+    ]
+  },
+  {
+    id: "b-s-9",
+    name: "吞拿魚卷餅",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 330,
+    protein: 38,
+    fat: 10,
+    carbs: 22,
+    totalWeight: 380,
+    ingredients: [
+      { name: "吞拿魚罐頭（水浸）", quantity: "100g" },
+      { name: "全麥卷餅", quantity: "1張（50g）" },
+      { name: "生菜", quantity: "50g" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "低脂乳酪", quantity: "2湯匙（30g）" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "吞拿魚罐頭瀝乾",
+      "全麥卷餅鋪平",
+      "在卷餅上塗上低脂乳酪",
+      "鋪上生菜、吞拿魚、番茄和黃瓜",
+      "淋上檸檬汁，捲起享用"
+    ],
+    fatLossTips: [
+      "全麥卷餅富含纖維，增加飽腹感",
+      "吞拿魚低脂高蛋白，完美減脂食材",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "b-s-10",
+    name: "三文魚菠菜蛋卷",
+    protein_type: "seafood",
+    category: "breakfast",
+    kcal: 340,
+    protein: 40,
+    fat: 12,
+    carbs: 14,
+    totalWeight: 370,
+    ingredients: [
+      { name: "三文魚", quantity: "100g" },
+      { name: "蛋", quantity: "2個" },
+      { name: "菠菜", quantity: "80g" },
+      { name: "洋蔥", quantity: "30g" },
+      { name: "大蒜", quantity: "1瓣（5g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "三文魚切成小塊",
+      "菠菜洗淨瀝乾",
+      "用中火炒三文魚至半熟",
+      "加入菠菜和洋蔥炒香",
+      "打入蛋液，卷起後炒至蛋液完全凝固"
+    ],
+    fatLossTips: [
+      "菠菜含葉綠素，促進脂肪分解",
+      "三文魚含Omega-3，促進脂肪燃燒",
+      "蛋含膽鹼，增強大腦功能"
+    ]
+  }
+];
+
+const breakfastEgg: RecipeData[] = [
+  {
+    id: "b-e-1",
+    name: "蛋白菠菜早餐碗",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 280,
+    protein: 38,
+    fat: 7,
+    carbs: 14,
+    totalWeight: 340,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "菠菜", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "洋蔥", quantity: "30g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "菠菜洗淨瀝乾",
+      "番茄切成塊狀",
+      "用中火炒洋蔥和大蒜",
+      "加入菠菜和番茄炒香",
+      "打入蛋白液，炒至完全凝固"
+    ],
+    fatLossTips: [
+      "蛋白低脂高蛋白，完美減脂食材",
+      "菠菜含鐵質，提升新陳代謝",
+      "番茄低卡高纖，促進消化"
+    ]
+  },
+  {
+    id: "b-e-2",
+    name: "蛋白牛油果吐司",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 320,
+    protein: 36,
+    fat: 10,
+    carbs: 24,
+    totalWeight: 380,
+    ingredients: [
+      { name: "蛋白", quantity: "2個" },
+      { name: "全麥吐司", quantity: "2片（60g）" },
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "番茄", quantity: "60g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "黑椒", quantity: "0.5g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟後切成片狀",
+      "全麥吐司放入烤麵包機烤至金黃",
+      "牛油果切半，用叉子壓成泥狀",
+      "在吐司上塗上牛油果泥",
+      "放上蛋白片和番茄片，淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "全麥吐司富含纖維，增加飽腹感",
+      "牛油果含健康脂肪，促進脂肪燃燒",
+      "蛋白低脂高蛋白，增加飽腹感"
+    ]
+  },
+  {
+    id: "b-e-3",
+    name: "雙蛋白藜麥碗",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 310,
+    protein: 40,
+    fat: 8,
+    carbs: 22,
+    totalWeight: 370,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "蛋白煮熟後切成塊狀",
+      "蔬菜切成小塊",
+      "將所有材料混合",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完整蛋白質，營養豐富",
+      "蛋白搭配藜麥，蛋白質互補",
+      "檸檬汁促進脂肪分解和代謝"
+    ]
+  },
+  {
+    id: "b-e-4",
+    name: "番茄蛋白早餐碗",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 290,
+    protein: 39,
+    fat: 7,
+    carbs: 15,
+    totalWeight: 360,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "番茄", quantity: "120g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "香草", quantity: "1g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "番茄切成塊狀",
+      "用中火炒洋蔥和大蒜",
+      "加入番茄燉至出汁",
+      "打入蛋白液攪拌均勻",
+      "炒至蛋白完全凝固"
+    ],
+    fatLossTips: [
+      "番茄含番茄紅素，抗氧化效果強",
+      "蛋白搭配番茄，營養互補",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-e-5",
+    name: "蛋白生菜卷",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 270,
+    protein: 37,
+    fat: 7,
+    carbs: 12,
+    totalWeight: 330,
+    ingredients: [
+      { name: "蛋白", quantity: "2個" },
+      { name: "生菜葉", quantity: "4片（80g）" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "20g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟後切成片狀",
+      "生菜葉洗淨瀝乾",
+      "番茄和黃瓜切成條狀",
+      "在生菜葉上鋪上蛋白、蔬菜",
+      "淋上檸檬汁，捲起享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "蛋白低脂高蛋白，完美減脂食材",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "b-e-6",
+    name: "蛋白燕麥粥",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 300,
+    protein: 36,
+    fat: 7,
+    carbs: 28,
+    totalWeight: 380,
+    ingredients: [
+      { name: "蛋白", quantity: "2個" },
+      { name: "燕麥", quantity: "50g" },
+      { name: "牛奶（低脂）", quantity: "200ml" },
+      { name: "香蕉", quantity: "1/2根（50g）" },
+      { name: "藍莓", quantity: "30g" },
+      { name: "蜂蜜", quantity: "1茶匙（5g）" },
+      { name: "鹽", quantity: "0.5g" }
+    ],
+    steps: [
+      "燕麥加入牛奶煮至軟爛",
+      "蛋白煮熟後切成小塊",
+      "香蕉切成片狀",
+      "將燕麥粥倒入碗中",
+      "加入蛋白、香蕉、藍莓和蜂蜜"
+    ],
+    fatLossTips: [
+      "燕麥含β-葡聚糖，降低膽固醇",
+      "蛋白低脂高蛋白，增加飽腹感",
+      "藍莓含抗氧化物，促進脂肪分解"
+    ]
+  },
+  {
+    id: "b-e-7",
+    name: "蛋白乳酪碗",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 310,
+    protein: 40,
+    fat: 9,
+    carbs: 13,
+    totalWeight: 360,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "希臘乳酪", quantity: "100g" },
+      { name: "黃瓜", quantity: "80g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "紅洋蔥", quantity: "20g" },
+      { name: "檸檬", quantity: "1/2個（15g）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟後切成塊狀",
+      "黃瓜、番茄切塊",
+      "將希臘乳酪放入碗中",
+      "加入所有蔬菜和蛋白",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "希臘乳酪高蛋白低脂，完美減脂食材",
+      "黃瓜含水量高，低卡高纖",
+      "蛋白低脂高蛋白，增加飽腹感"
+    ]
+  },
+  {
+    id: "b-e-8",
+    name: "蘑菇蛋白炒",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 290,
+    protein: 39,
+    fat: 8,
+    carbs: 12,
+    totalWeight: 350,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "蘑菇", quantity: "100g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蘑菇切片",
+      "用中火炒洋蔥和大蒜",
+      "加入蘑菇繼續炒",
+      "打入蛋白液攪拌均勻",
+      "炒至蛋白完全凝固即可"
+    ],
+    fatLossTips: [
+      "蘑菇含多糖體，增強免疫力",
+      "蛋白搭配蘑菇，蛋白質互補",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-e-9",
+    name: "蛋白全麥三文治",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 320,
+    protein: 37,
+    fat: 10,
+    carbs: 23,
+    totalWeight: 380,
+    ingredients: [
+      { name: "蛋白", quantity: "2個" },
+      { name: "全麥麵包", quantity: "2片（60g）" },
+      { name: "低脂芝士", quantity: "1片（20g）" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" },
+      { name: "黃芥末", quantity: "1茶匙（5g）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟後切成片狀",
+      "全麥麵包輕輕烤一下",
+      "在麵包上塗黃芥末",
+      "鋪上生菜、蛋白片、番茄和芝士",
+      "蓋上另一片麵包即可"
+    ],
+    fatLossTips: [
+      "低脂芝士提供鈣質，不增加脂肪",
+      "全麥麵包富含纖維，增加飽腹感",
+      "蛋白低脂高蛋白，完美減脂食材"
+    ]
+  },
+  {
+    id: "b-e-10",
+    name: "蛋白蔬菜卷餅",
+    protein_type: "egg",
+    category: "breakfast",
+    kcal: 300,
+    protein: 38,
+    fat: 8,
+    carbs: 20,
+    totalWeight: 360,
+    ingredients: [
+      { name: "蛋白", quantity: "2個" },
+      { name: "全麥卷餅", quantity: "1張（50g）" },
+      { name: "生菜", quantity: "50g" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "低脂乳酪", quantity: "2湯匙（30g）" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟後切成片狀",
+      "全麥卷餅鋪平",
+      "在卷餅上塗上低脂乳酪",
+      "鋪上生菜、蛋白、番茄和黃瓜",
+      "淋上檸檬汁，捲起享用"
+    ],
+    fatLossTips: [
+      "全麥卷餅富含纖維，增加飽腹感",
+      "蛋白低脂高蛋白，完美減脂食材",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  }
+];
+
+const breakfastVegetarian: RecipeData[] = [
+  {
+    id: "b-v-1",
+    name: "牛油果藜麥早餐碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 340,
+    protein: 12,
+    fat: 14,
+    carbs: 38,
+    totalWeight: 400,
+    ingredients: [
+      { name: "牛油果", quantity: "1個（120g）" },
+      { name: "藜麥", quantity: "60g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "牛油果切半，用叉子壓成泥狀",
+      "蔬菜切成小塊",
+      "將所有材料混合",
+      "淋上檸檬汁，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完整蛋白質，營養豐富",
+      "牛油果含健康脂肪，促進脂肪燃燒",
+      "檸檬汁促進脂肪分解和代謝"
+    ]
+  },
+  {
+    id: "b-v-2",
+    name: "燕麥堅果碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 330,
+    protein: 11,
+    fat: 13,
+    carbs: 40,
+    totalWeight: 390,
+    ingredients: [
+      { name: "燕麥", quantity: "60g" },
+      { name: "牛奶（低脂）", quantity: "200ml" },
+      { name: "杏仁", quantity: "20g" },
+      { name: "核桃", quantity: "15g" },
+      { name: "藍莓", quantity: "50g" },
+      { name: "蜂蜜", quantity: "1茶匙（5g）" },
+      { name: "肉桂粉", quantity: "0.5g" }
+    ],
+    steps: [
+      "燕麥加入牛奶煮至軟爛",
+      "堅果切碎",
+      "將燕麥粥倒入碗中",
+      "加入堅果、藍莓和蜂蜜",
+      "灑上肉桂粉即可"
+    ],
+    fatLossTips: [
+      "燕麥含β-葡聚糖，降低膽固醇",
+      "堅果含健康脂肪，增加飽腹感",
+      "藍莓含抗氧化物，促進脂肪分解"
+    ]
+  },
+  {
+    id: "b-v-3",
+    name: "菠菜蘑菇植物蛋早餐碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 310,
+    protein: 13,
+    fat: 10,
+    carbs: 35,
+    totalWeight: 380,
+    ingredients: [
+      { name: "植物蛋", quantity: "100g" },
+      { name: "菠菜", quantity: "80g" },
+      { name: "蘑菇", quantity: "100g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "植物蛋切成塊狀",
+      "蘑菇切片",
+      "用中火炒洋蔥和大蒜",
+      "加入蘑菇、菠菜和植物蛋",
+      "炒至所有材料熟透即可"
+    ],
+    fatLossTips: [
+      "植物蛋低脂高蛋白，完美素食選擇",
+      "菠菜含鐵質，提升新陳代謝",
+      "蘑菇含多糖體，增強免疫力"
+    ]
+  },
+  {
+    id: "b-v-4",
+    name: "豆腐蔬菜碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 300,
+    protein: 14,
+    fat: 9,
+    carbs: 32,
+    totalWeight: 370,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "豆腐切成塊狀",
+      "番茄和黃瓜切成小塊",
+      "用中火炒洋蔥和大蒜",
+      "加入豆腐和蔬菜",
+      "炒至所有材料熟透即可"
+    ],
+    fatLossTips: [
+      "豆腐低脂高蛋白，完美素食蛋白",
+      "番茄含番茄紅素，抗氧化效果強",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-v-5",
+    name: "藜麥沙律碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 320,
+    protein: 11,
+    fat: 11,
+    carbs: 38,
+    totalWeight: 390,
+    ingredients: [
+      { name: "藜麥", quantity: "60g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "藜麥煮熟後冷卻",
+      "生菜洗淨瀝乾",
+      "蔬菜切成適當大小",
+      "將所有材料混合",
+      "淋上檸檬汁和橄欖油，調味享用"
+    ],
+    fatLossTips: [
+      "藜麥含完整蛋白質，營養豐富",
+      "生菜低卡高纖，增加飽腹感",
+      "檸檬汁促進脂肪分解和代謝"
+    ]
+  },
+  {
+    id: "b-v-6",
+    name: "牛油果全麥吐司",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 330,
+    protein: 10,
+    fat: 12,
+    carbs: 36,
+    totalWeight: 380,
+    ingredients: [
+      { name: "牛油果", quantity: "1/2個（60g）" },
+      { name: "全麥吐司", quantity: "2片（60g）" },
+      { name: "番茄", quantity: "80g" },
+      { name: "生菜", quantity: "30g" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "黑椒", quantity: "0.5g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "全麥吐司放入烤麵包機烤至金黃",
+      "牛油果切半，用叉子壓成泥狀",
+      "番茄切成片狀",
+      "在吐司上塗上牛油果泥",
+      "放上生菜和番茄片，淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "全麥吐司富含纖維，增加飽腹感",
+      "牛油果含健康脂肪，促進脂肪燃燒",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "b-v-7",
+    name: "豆腐番茄早餐碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 310,
+    protein: 13,
+    fat: 9,
+    carbs: 34,
+    totalWeight: 380,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "番茄", quantity: "120g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "大蒜", quantity: "2瓣（10g）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "香草", quantity: "1g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "豆腐切成塊狀",
+      "番茄切成塊狀",
+      "用中火炒洋蔥和大蒜",
+      "加入豆腐和番茄",
+      "燉至番茄出汁，豆腐吸收味道"
+    ],
+    fatLossTips: [
+      "豆腐低脂高蛋白，完美素食蛋白",
+      "番茄含番茄紅素，抗氧化效果強",
+      "低油烹飪方式，減少熱量攝入"
+    ]
+  },
+  {
+    id: "b-v-8",
+    name: "植物蛋白早餐卷",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 320,
+    protein: 12,
+    fat: 10,
+    carbs: 36,
+    totalWeight: 380,
+    ingredients: [
+      { name: "植物蛋", quantity: "100g" },
+      { name: "全麥卷餅", quantity: "1張（50g）" },
+      { name: "生菜", quantity: "50g" },
+      { name: "番茄", quantity: "60g" },
+      { name: "黃瓜", quantity: "50g" },
+      { name: "低脂乳酪", quantity: "2湯匙（30g）" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "植物蛋煮熟後切成片狀",
+      "全麥卷餅鋪平",
+      "在卷餅上塗上低脂乳酪",
+      "鋪上生菜、植物蛋、番茄和黃瓜",
+      "淋上檸檬汁，捲起享用"
+    ],
+    fatLossTips: [
+      "全麥卷餅富含纖維，增加飽腹感",
+      "植物蛋低脂高蛋白，完美素食選擇",
+      "檸檬汁幫助消化，加快代謝"
+    ]
+  },
+  {
+    id: "b-v-9",
+    name: "蔬菜燕麥粥",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 300,
+    protein: 10,
+    fat: 8,
+    carbs: 42,
+    totalWeight: 400,
+    ingredients: [
+      { name: "燕麥", quantity: "60g" },
+      { name: "牛奶（低脂）", quantity: "200ml" },
+      { name: "紅蘿蔔", quantity: "50g" },
+      { name: "玉米", quantity: "40g" },
+      { name: "豌豆", quantity: "40g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "燕麥加入牛奶煮至軟爛",
+      "蔬菜切成小塊",
+      "加入蔬菜繼續煮",
+      "煮至蔬菜軟熟",
+      "調味後盛碟享用"
+    ],
+    fatLossTips: [
+      "燕麥含β-葡聚糖，降低膽固醇",
+      "蔬菜低卡高纖，增加飽腹感",
+      "鹹粥飽腹感強，適合減脂"
+    ]
+  },
+  {
+    id: "b-v-10",
+    name: "鷹嘴豆早餐碗",
+    protein_type: "vegetarian",
+    category: "breakfast",
+    kcal: 330,
+    protein: 12,
+    fat: 11,
+    carbs: 40,
+    totalWeight: 390,
+    ingredients: [
+      { name: "鷹嘴豆", quantity: "100g" },
+      { name: "番茄", quantity: "80g" },
+      { name: "黃瓜", quantity: "60g" },
+      { name: "紅洋蔥", quantity: "30g" },
+      { name: "香菜", quantity: "10g" },
+      { name: "檸檬汁", quantity: "1茶匙（5ml）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "鷹嘴豆煮熟或使用罐頭鷹嘴豆",
+      "蔬菜切成小塊",
+      "將所有材料混合",
+      "淋上檸檬汁和橄欖油",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "鷹嘴豆含豐富纖維，增加飽腹感",
+      "植物蛋白質完整，營養豐富",
+      "低脂高纖，完美素食選擇"
+    ]
+  }
+];
+
 // Lunch Recipes (正餐)
 const lunchChicken: RecipeData[] = [
   {
@@ -1356,10 +2681,10 @@ export const recipes: Record<string, Record<string, RecipeData[]>> = {
   breakfast: {
     chicken: breakfastChicken,
     pork: breakfastPork,
-    beef: [], // To be filled
-    seafood: [], // To be filled
-    egg: [], // To be filled
-    vegetarian: [] // To be filled
+    beef: breakfastBeef,
+    seafood: breakfastSeafood,
+    egg: breakfastEgg,
+    vegetarian: breakfastVegetarian
   },
   lunch: {
     chicken: lunchChicken,
