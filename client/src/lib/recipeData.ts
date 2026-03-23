@@ -332,49 +332,49 @@ export const chickenBreakfastRecipes: Record<string, RecipeData> = {
   }
 };
 
-// Pork Breakfast Recipes
+// Pork Breakfast Recipes (Lean Pork)
 export const porkBreakfastRecipes: Record<string, RecipeData> = {
   "p1": {
     id: "p1",
-    name: "香煎豬扒早餐碗",
-    kcal: 350,
-    protein: 40,
-    fat: 12,
-    carbs: 18,
-    totalWeight: 400,
+    name: "香煎瘦豬肉蛋白碗",
+    kcal: 310,
+    protein: 44,
+    fat: 7,
+    carbs: 16,
+    totalWeight: 380,
     ingredients: [
-      { name: "豬扒", quantity: "120g" },
-      { name: "蛋", quantity: "1個" },
+      { name: "瘦豬肉", quantity: "140g" },
+      { name: "蛋白", quantity: "2個" },
       { name: "番茄", quantity: "80g" },
       { name: "菠菜", quantity: "50g" },
-      { name: "洋蔥", quantity: "30g" },
+      { name: "洋蔥", quantity: "25g" },
       { name: "橄欖油", quantity: "1茶匙（5ml）" },
       { name: "鹽", quantity: "1g" },
       { name: "黑椒", quantity: "0.5g" }
     ],
     steps: [
-      "豬扒用中火煎至半熟",
-      "加入蛋煎至半熟",
+      "瘦豬肉切成小塊，用中火煎至半熟",
+      "加入蛋白攪拌均勻",
       "加入番茄、菠菜和洋蔥",
-      "繼續煎至豬肉熟透",
+      "繼續煎至豬肉熟透，蛋白凝固",
       "調味後盛碟享用"
     ],
     fatLossTips: [
-      "豬扒含豐富蛋白質，飽腹感強",
-      "菠菜含鐵質，提升新陳代謝",
-      "番茄低卡高纖，促進消化"
+      "瘦豬肉高蛋白低脂，飽腹感強",
+      "蛋白無脂肪，完美減肥食材",
+      "菠菜含鐵質，提升新陳代謝"
     ]
   },
   "p2": {
     id: "p2",
-    name: "豬肉全麥吐司",
-    kcal: 380,
-    protein: 36,
-    fat: 14,
+    name: "豬里肌牛油果吐司",
+    kcal: 360,
+    protein: 40,
+    fat: 11,
     carbs: 28,
-    totalWeight: 420,
+    totalWeight: 410,
     ingredients: [
-      { name: "豬扒", quantity: "100g" },
+      { name: "豬里肌", quantity: "110g" },
       { name: "全麥吐司", quantity: "2片（60g）" },
       { name: "牛油果", quantity: "1/2個（60g）" },
       { name: "番茄", quantity: "60g" },
@@ -383,91 +383,154 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
       { name: "鹽", quantity: "1g" }
     ],
     steps: [
-      "將豬扒煎熟後切成薄片",
+      "將豬里肌煎熟後切成薄片",
       "全麥吐司放入烤麵包機烤至金黃",
       "牛油果切半，用叉子壓成泥狀",
       "在吐司上塗上牛油果泥",
       "放上豬肉片和番茄片，淋上檸檬汁"
     ],
     fatLossTips: [
+      "豬里肌是瘦肉部位，脂肪含量低",
       "全麥吐司富含纖維，增加飽腹感",
-      "牛油果含健康脂肪，促進脂肪燃燒",
-      "檸檬汁幫助消化，加快代謝"
+      "牛油果含健康脂肪，促進脂肪燃燒"
     ]
   },
   "p3": {
     id: "p3",
-    name: "豬肉菠菜蛋白捲",
-    kcal: 320,
-    protein: 38,
-    fat: 11,
-    carbs: 15,
-    totalWeight: 370,
+    name: "瘦肉菠菜蛋白炒",
+    kcal: 300,
+    protein: 42,
+    fat: 6,
+    carbs: 14,
+    totalWeight: 360,
     ingredients: [
-      { name: "豬扒", quantity: "100g" },
+      { name: "瘦豬肉", quantity: "130g" },
       { name: "蛋白", quantity: "3個" },
-      { name: "菠菜", quantity: "60g" },
-      { name: "起司", quantity: "20g" },
+      { name: "菠菜", quantity: "70g" },
       { name: "洋蔥", quantity: "25g" },
+      { name: "大蒜", quantity: "5g" },
       { name: "橄欖油", quantity: "1茶匙（5ml）" },
-      { name: "鹽", quantity: "1g" }
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
     ],
     steps: [
-      "將蛋白打成蛋液",
-      "在平底鍋倒入蛋液，搖晃至半熟",
-      "加入菠菜和洋蔥，繼續煮",
-      "放上豬肉片和起司",
-      "捲起蛋捲，切成適當大小"
+      "瘦豬肉切成小塊，先炒至半熟",
+      "加入洋蔥和大蒜爆香",
+      "加入菠菜炒軟",
+      "蛋白打散倒入，快速炒至熟透",
+      "調味後盛碟"
     ],
     fatLossTips: [
-      "蛋白卷低脂高蛋白，完美早餐",
-      "菠菜含葉綠素，幫助排毒",
-      "起司提供鈣質，強化骨骼"
+      "瘦豬肉高蛋白低脂，完美減肥食材",
+      "蛋白無脂肪，增加蛋白質攝入",
+      "菠菜含鐵質和葉綠素，促進代謝"
     ]
   },
   "p4": {
     id: "p4",
-    name: "豬肉番茄沙律碗",
-    kcal: 360,
-    protein: 37,
-    fat: 12,
+    name: "豬肉番茄早餐碗",
+    kcal: 330,
+    protein: 40,
+    fat: 8,
     carbs: 20,
-    totalWeight: 410,
+    totalWeight: 390,
     ingredients: [
-      { name: "豬扒", quantity: "120g" },
+      { name: "瘦豬肉", quantity: "130g" },
       { name: "番茄", quantity: "150g" },
       { name: "生菜", quantity: "50g" },
       { name: "小黃瓜", quantity: "60g" },
       { name: "紫洋蔥", quantity: "20g" },
-      { name: "橄欖油", quantity: "1湯匙（15ml）" },
+      { name: "橄欖油", quantity: "1茶匙（5ml）" },
       { name: "醋", quantity: "1湯匙（15ml）" },
       { name: "鹽", quantity: "1g" }
     ],
     steps: [
-      "將豬扒煎熟後切成塊狀",
+      "將瘦豬肉煎熟後切成塊狀",
       "番茄、小黃瓜切塊",
       "生菜撕成適當大小",
       "混合所有材料",
       "淋上橄欖油和醋調味"
     ],
     fatLossTips: [
+      "瘦豬肉高蛋白低脂，飽腹感強",
       "番茄含番茄紅素，強大抗氧化劑",
-      "生菜低卡高纖，完美減肥食材",
-      "醋幫助消化，穩定血糖"
+      "生菜低卡高纖，完美減肥食材"
     ]
   },
   "p5": {
     id: "p5",
-    name: "豬肉藜麥早餐碗",
-    kcal: 370,
-    protein: 34,
-    fat: 13,
-    carbs: 32,
-    totalWeight: 460,
+    name: "豬肉生菜卷",
+    kcal: 280,
+    protein: 38,
+    fat: 5,
+    carbs: 12,
+    totalWeight: 340,
     ingredients: [
-      { name: "豬扒", quantity: "100g" },
+      { name: "瘦豬肉", quantity: "120g" },
+      { name: "生菜葉", quantity: "4片（80g）" },
+      { name: "番茄", quantity: "60g" },
+      { name: "小黃瓜", quantity: "50g" },
+      { name: "紫洋蔥", quantity: "20g" },
+      { name: "低脂優格", quantity: "2湯匙（30g）" },
+      { name: "檸檬", quantity: "1/2個（30g）" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "瘦豬肉煎熟後切成條狀",
+      "生菜葉洗淨瀝乾",
+      "蔬菜切成條狀",
+      "在生菜葉上放豬肉和蔬菜",
+      "淋上優格和檸檬汁，捲起享用"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，完美減肥食材",
+      "瘦豬肉高蛋白低脂，飽腹感強",
+      "優格含益生菌，改善腸道健康"
+    ]
+  },
+  "p6": {
+    id: "p6",
+    name: "瘦肉粟米蛋白粥",
+    kcal: 320,
+    protein: 40,
+    fat: 6,
+    carbs: 28,
+    totalWeight: 480,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "粟米", quantity: "60g" },
+      { name: "米", quantity: "40g（乾）" },
+      { name: "高湯", quantity: "400ml" },
+      { name: "洋蔥", quantity: "25g" },
+      { name: "鹽", quantity: "2g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "米洗淨，用高湯煮軟",
+      "瘦豬肉切成小塊，加入煮",
+      "加入粟米和洋蔥",
+      "繼續煮至粥軟爛",
+      "蛋白打散倒入，快速攪拌至熟"
+    ],
+    fatLossTips: [
+      "瘦豬肉高蛋白低脂，完美減肥食材",
+      "粟米含纖維，促進消化",
+      "蛋白無脂肪，增加蛋白質攝入"
+    ]
+  },
+  "p7": {
+    id: "p7",
+    name: "豬肉藜麥早餐碗",
+    kcal: 350,
+    protein: 38,
+    fat: 9,
+    carbs: 32,
+    totalWeight: 440,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "110g" },
       { name: "藜麥", quantity: "50g（乾）" },
-      { name: "彩椒", quantity: "60g" },
+      { name: "彩椒", quantity: "70g" },
       { name: "黑豆", quantity: "40g（罐裝）" },
       { name: "玉米", quantity: "30g" },
       { name: "橄欖油", quantity: "1茶匙（5ml）" },
@@ -476,7 +539,7 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     ],
     steps: [
       "藜麥按包裝指示煮熟",
-      "豬扒切成小塊，用中火煎至熟透",
+      "瘦豬肉切成小塊，用中火煎至熟透",
       "彩椒切丁",
       "混合藜麥、豬肉、彩椒和黑豆",
       "淋上橄欖油和檸檬汁"
@@ -484,20 +547,20 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
     fatLossTips: [
       "藜麥是完全蛋白質，含所有必需胺基酸",
       "黑豆富含纖維，促進腸道健康",
-      "彩椒含維生素C，提升免疫力"
+      "瘦豬肉高蛋白低脂，飽腹感強"
     ]
   },
-  "p6": {
-    id: "p6",
-    name: "豬肉蘑菇炒蛋",
-    kcal: 340,
-    protein: 39,
-    fat: 12,
+  "p8": {
+    id: "p8",
+    name: "豬肉蘑菇炒蛋白",
+    kcal: 310,
+    protein: 42,
+    fat: 5,
     carbs: 12,
-    totalWeight: 390,
+    totalWeight: 360,
     ingredients: [
-      { name: "豬扒", quantity: "100g" },
-      { name: "蛋", quantity: "2個" },
+      { name: "瘦豬肉", quantity: "120g" },
+      { name: "蛋白", quantity: "3個" },
       { name: "蘑菇", quantity: "150g" },
       { name: "洋蔥", quantity: "30g" },
       { name: "大蒜", quantity: "5g" },
@@ -506,120 +569,58 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
       { name: "黑椒", quantity: "0.5g" }
     ],
     steps: [
-      "豬扒切成小塊，先炒至半熟",
+      "瘦豬肉切成小塊，先炒至半熟",
       "加入切片蘑菇和洋蔥",
-      "蛋打散，倒入鍋中",
-      "快速炒至蛋半熟",
+      "蛋白打散，倒入鍋中",
+      "快速炒至蛋白熟透",
       "加入大蒜和調味料完成"
     ],
     fatLossTips: [
       "蘑菇含維生素D，促進鈣質吸收",
-      "蛋含膽鹼，幫助脂肪代謝",
-      "大蒜含硫化物，增強免疫力"
+      "蛋白無脂肪，完美減肥食材",
+      "瘦豬肉高蛋白低脂，飽腹感強"
     ]
   },
-  "p7": {
-    id: "p7",
-    name: "豬肉低脂芝士三文治",
-    kcal: 360,
-    protein: 35,
-    fat: 13,
+  "p9": {
+    id: "p9",
+    name: "豬肉全麥三文治",
+    kcal: 340,
+    protein: 38,
+    fat: 8,
     carbs: 26,
-    totalWeight: 420,
+    totalWeight: 400,
     ingredients: [
-      { name: "豬扒", quantity: "100g" },
+      { name: "瘦豬肉", quantity: "110g" },
       { name: "全麥麵包", quantity: "2片（60g）" },
       { name: "低脂芝士", quantity: "1片（20g）" },
-      { name: "番茄", quantity: "60g" },
-      { name: "生菜", quantity: "30g" },
+      { name: "番茄", quantity: "70g" },
+      { name: "生菜", quantity: "40g" },
       { name: "黃芥末", quantity: "1湯匙（15g）" },
       { name: "鹽", quantity: "1g" }
     ],
     steps: [
-      "豬扒煎熟後切成薄片",
+      "瘦豬肉煎熟後切成薄片",
       "全麥麵包輕輕烤一下",
       "在麵包上塗黃芥末",
       "放上生菜、番茄、豬肉和低脂芝士",
       "蓋上另一片麵包即可"
     ],
     fatLossTips: [
-      "低脂芝士提供鈣質，同時控制熱量",
-      "黃芥末無熱量，增加風味",
-      "全麥麵包提供複雜碳水化合物"
-    ]
-  },
-  "p8": {
-    id: "p8",
-    name: "豬肉蔬菜卷餅",
-    kcal: 330,
-    protein: 36,
-    fat: 11,
-    carbs: 22,
-    totalWeight: 400,
-    ingredients: [
-      { name: "豬扒", quantity: "100g" },
-      { name: "全麥卷餅", quantity: "2張（80g）" },
-      { name: "生菜", quantity: "40g" },
-      { name: "番茄", quantity: "60g" },
-      { name: "洋蔥", quantity: "25g" },
-      { name: "青椒", quantity: "40g" },
-      { name: "低脂優格", quantity: "2湯匙（30g）" },
-      { name: "鹽", quantity: "1g" }
-    ],
-    steps: [
-      "豬扒煎熟後切成條狀",
-      "全麥卷餅微波加熱",
-      "蔬菜切成條狀",
-      "在卷餅上放生菜、蔬菜和豬肉",
-      "淋上低脂優格，捲起享用"
-    ],
-    fatLossTips: [
-      "全麥卷餅富含纖維，促進消化",
-      "優格含益生菌，改善腸道健康",
-      "生蔬菜提供豐富微量營養素"
-    ]
-  },
-  "p9": {
-    id: "p9",
-    name: "豬肉燕麥鹹粥",
-    kcal: 350,
-    protein: 33,
-    fat: 12,
-    carbs: 30,
-    totalWeight: 530,
-    ingredients: [
-      { name: "豬扒", quantity: "80g" },
-      { name: "燕麥", quantity: "50g（乾）" },
-      { name: "高湯", quantity: "500ml" },
-      { name: "洋蔥", quantity: "30g" },
-      { name: "胡蘿蔔", quantity: "40g" },
-      { name: "香菇", quantity: "50g" },
-      { name: "鹽", quantity: "2g" },
-      { name: "黑椒", quantity: "0.5g" }
-    ],
-    steps: [
-      "燕麥用高湯煮軟",
-      "豬扒切成小塊，加入煮",
-      "加入切碎的洋蔥、胡蘿蔔和香菇",
-      "繼續煮至所有材料軟爛",
-      "調味後盛碟"
-    ],
-    fatLossTips: [
-      "燕麥含β-葡聚糖，降低膽固醇",
-      "鹹粥比甜粥更適合減肥",
-      "蔬菜提供飽腹感，減少進食量"
+      "瘦豬肉高蛋白低脂，飽腹感強",
+      "全麥麵包富含纖維，增加飽腹感",
+      "低脂芝士提供鈣質，同時控制熱量"
     ]
   },
   "p10": {
     id: "p10",
     name: "豬肉青瓜乳酪碗",
-    kcal: 310,
-    protein: 38,
-    fat: 10,
+    kcal: 290,
+    protein: 40,
+    fat: 5,
     carbs: 14,
-    totalWeight: 390,
+    totalWeight: 370,
     ingredients: [
-      { name: "豬扒", quantity: "120g" },
+      { name: "瘦豬肉", quantity: "130g" },
       { name: "希臘優格", quantity: "150g" },
       { name: "青瓜", quantity: "80g" },
       { name: "番茄", quantity: "60g" },
@@ -629,16 +630,16 @@ export const porkBreakfastRecipes: Record<string, RecipeData> = {
       { name: "鹽", quantity: "1g" }
     ],
     steps: [
-      "豬扒煎熟後切成塊狀",
+      "瘦豬肉煎熟後切成塊狀",
       "青瓜切成小塊",
       "番茄切丁",
       "在碗中混合優格、檸檬汁和香草",
       "加入豬肉和蔬菜，輕輕混合"
     ],
     fatLossTips: [
+      "瘦豬肉高蛋白低脂，飽腹感強",
       "希臘優格蛋白質高，脂肪低",
-      "青瓜含95%水分，超低卡",
-      "檸檬增加風味，無需額外鹽分"
+      "青瓜含95%水分，超低卡"
     ]
   }
 };
