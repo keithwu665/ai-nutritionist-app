@@ -141,37 +141,97 @@ export function Dashboard() {
     { id: 'tired', emoji: '😴', label: 'Tired' },
   ];
 
-  const recommendationList: RecommendationLike[] = useMemo(() => {
-    if (recommendationsData && Array.isArray(recommendationsData.diet)) {
-      return (recommendationsData.diet as RecommendationLike[]).slice(0, 2);
-    }
-    return [];
-  }, [recommendationsData, todayMood]);
-
-  const fallbackRecommendations: RecommendationLike[] = [
-    {
-      title: 'Diet',
-      description: 'Protein slightly low. Consider a harvest bowl or lean protein source for your next meal.',
-    },
-    {
-      title: 'Exercise',
-      description: 'Consistency is key. A light 20-minute walk is recommended today.',
-    },
-  ];
-
-  const displayRecommendations =
-    recommendationList.length > 0 ? recommendationList : fallbackRecommendations;
-
   // Get coach tone from profile for AI Advice variation
   const coachTone = dashboardData?.profile?.aiToneStyle || 'gentle';
-
-  const activities: ActivityLike[] = dashboardData?.today?.exercises ?? [];
-  const activityList: ActivityLike[] = activities || [];
 
   // Extract macro data (TODO: calculate from food logs when available)
   const proteinGrams = null;
   const carbsGrams = null;
   const fatsGrams = null;
+
+  // Generate Chinese advice based on real data and coach tone
+  const generateChineseAdvice = (): RecommendationLike[] => {
+    const advice: RecommendationLike[] = [];
+    const hasLowCalories = todayCalories < calorieTarget * 0.7;
+    const hasNoExercise = (dashboardData?.today?.exercises?.length ?? 0) === 0;
+    const hasLowProtein = proteinGrams === null || proteinGrams < 100;
+
+    // Diet advice based on coach tone
+    let dietAdvice = '';
+    if (coachTone === 'coach') {
+      if (hasLowCalories) {
+        dietAdvice = '熱量攝入不足。立即調整。每日需要增加 ' + Math.round(calorieTarget - todayCalories) + ' kcal。無藉口。';
+      } else if (hasLowProtein) {
+        dietAdvice = '蛋白質不足。必須補充。建議增加雞蛋、魚類或豆類。立即行動。';
+      } else {
+        dietAdvice = '飲食控制良好。保持這個狀態。繼續執行計劃。';
+      }
+    } else if (coachTone === 'hk_style') {
+      if (hasLowCalories) {
+        dietAdvice = '你而家嘅熱量…有啲少喎 😏 要加返 ' + Math.round(calorieTarget - todayCalories) + ' kcal，唔係咁難啦。';
+      } else if (hasLowProtein) {
+        dietAdvice = '蛋白質唔夠喎 🤔 食啲雞蛋、魚或豆類，補返啦。';
+      } else {
+        dietAdvice = '飲食幾好喎 😊 保持住就得啦，冇問題。';
+      }
+    } else {
+      // gentle tone
+      if (hasLowCalories) {
+        dietAdvice = '您今日的熱量攝入略低。建議增加 ' + Math.round(calorieTarget - todayCalories) + ' kcal 的營養食物。';
+      } else if (hasLowProtein) {
+        dietAdvice = '蛋白質攝入可以增加。建議下一餐加入雞蛋、魚類或豆類。';
+      } else {
+        dietAdvice = '飲食安排得很好。繼續保持這個習慣。';
+      }
+    }
+
+    advice.push({
+      title: '飲食',
+      description: dietAdvice,
+    });
+
+    // Exercise advice based on coach tone
+    let exerciseAdvice = '';
+    if (coachTone === 'coach') {
+      if (hasNoExercise) {
+        exerciseAdvice = '今日無運動。計劃失敗。立即行動。最少 20 分鐘運動。無藉口。';
+      } else {
+        exerciseAdvice = '運動完成。保持一致性。明日繼續。';
+      }
+    } else if (coachTone === 'hk_style') {
+      if (hasNoExercise) {
+        exerciseAdvice = '今日冇做運動喎 😏 快啲去行行路，最少 20 分鐘啦，加油！';
+      } else {
+        exerciseAdvice = '運動做得好喎 😊 保持住呢個習慣，明日再嚟啦。';
+      }
+    } else {
+      // gentle tone
+      if (hasNoExercise) {
+        exerciseAdvice = '今日還沒有運動記錄。建議進行一次輕鬆的 20 分鐘散步。';
+      } else {
+        exerciseAdvice = '運動記錄良好。持之以恆是成功的關鍵。';
+      }
+    }
+
+    advice.push({
+      title: '運動',
+      description: exerciseAdvice,
+    });
+
+    return advice;
+  };
+
+  const recommendationList: RecommendationLike[] = useMemo(() => {
+    if (recommendationsData && Array.isArray(recommendationsData.diet) && recommendationsData.diet.length > 0) {
+      return (recommendationsData.diet as RecommendationLike[]).slice(0, 2);
+    }
+    return generateChineseAdvice();
+  }, [recommendationsData, todayMood, coachTone, todayCalories, calorieTarget, proteinGrams, dashboardData?.today?.exercises]);
+
+  const displayRecommendations = recommendationList;
+
+  const activities: ActivityLike[] = dashboardData?.today?.exercises ?? [];
+  const activityList: ActivityLike[] = activities || [];
 
   const circleRadius = 70;
   const circleCircumference = 2 * Math.PI * circleRadius;
@@ -513,7 +573,7 @@ export function Dashboard() {
                     {item.title || (idx === 0 ? 'Diet' : 'Exercise')}
                   </h4>
                   <p className="text-xs leading-relaxed text-[#46483c]/80">
-                    {item.description || fallbackRecommendations[idx].description}
+                    {item.description}
                   </p>
                 </div>
               </div>
