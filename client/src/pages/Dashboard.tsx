@@ -402,7 +402,7 @@ export function Dashboard() {
             >
               Target Progress
             </h2>
-            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline">
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline" onClick={() => setLocation('/body')}>
               more
             </button>
           </div>
@@ -466,7 +466,7 @@ export function Dashboard() {
             >
               AI Advice
             </h2>
-            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline">
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline" onClick={() => setLocation('/ai-recommendations')}>
               more
             </button>
           </div>
@@ -501,7 +501,7 @@ export function Dashboard() {
             >
               Today Activity
             </h2>
-            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline">
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline" onClick={() => setLocation('/exercise')}>
               more
             </button>
           </div>
@@ -640,6 +640,7 @@ export function Dashboard() {
       <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-[3rem] bg-[#fcf9f4]/90 px-2 pb-6 pt-2 shadow-[0_-4px_32px_rgba(28,28,25,0.04)] backdrop-blur-md">
         <button
           type="button"
+          onClick={() => setLocation('/dashboard')}
           className="flex flex-col items-center justify-center rounded-full bg-[#f6dfc2] px-4 py-2 text-[#56642b] transition-transform duration-300 active:scale-90"
         >
           <span className="text-lg">▦</span>
@@ -648,6 +649,7 @@ export function Dashboard() {
 
         <button
           type="button"
+          onClick={() => setLocation('/body')}
           className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
         >
           <span className="text-lg">🧍</span>
@@ -656,6 +658,7 @@ export function Dashboard() {
 
         <button
           type="button"
+          onClick={() => setLocation('/exercise')}
           className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
         >
           <span className="text-lg">🏋️</span>
@@ -664,14 +667,16 @@ export function Dashboard() {
 
         <button
           type="button"
+          onClick={() => setLocation('/diet/inspiration/home-cooking')}
           className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
         >
-          <span className="text-lg">🍽️</span>
+          <span className="text-lg">🝴</span>
           <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Diet</span>
         </button>
 
         <button
           type="button"
+          onClick={() => setLocation('/settings')}
           className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
         >
           <span className="text-lg">👤</span>
