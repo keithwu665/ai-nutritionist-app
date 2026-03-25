@@ -62,17 +62,24 @@ export function Dashboard() {
     const today = new Date().toDateString();
     const stored = localStorage.getItem('userMoods');
 
-    if (!stored) return;
-
-    try {
-      const moods = JSON.parse(stored) as Record<string, string>;
-      setTodayMood(moods[today] || null);
-    } catch {
+    if (stored) {
+      try {
+        const moods = JSON.parse(stored) as Record<string, string>;
+        const moodForToday = moods[today] || null;
+        setTodayMood(moodForToday);
+        console.log('[Dashboard] Loaded mood from localStorage:', moodForToday);
+      } catch (e) {
+        console.error('[Dashboard] Failed to parse moods:', e);
+        setTodayMood(null);
+      }
+    } else {
+      console.log('[Dashboard] No moods in localStorage');
       setTodayMood(null);
     }
   }, []);
 
   const handleMoodSelect = (moodId: string) => {
+    console.log('[Dashboard] Mood selected:', moodId);
     setTodayMood(moodId);
 
     const today = new Date().toDateString();
@@ -82,7 +89,9 @@ export function Dashboard() {
       const moods = stored ? (JSON.parse(stored) as Record<string, string>) : {};
       moods[today] = moodId;
       localStorage.setItem('userMoods', JSON.stringify(moods));
-    } catch {
+      console.log('[Dashboard] Mood saved to localStorage:', moods);
+    } catch (e) {
+      console.error('[Dashboard] Failed to save mood:', e);
       const moods: Record<string, string> = { [today]: moodId };
       localStorage.setItem('userMoods', JSON.stringify(moods));
     }
