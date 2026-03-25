@@ -8,7 +8,7 @@ import { useAuth } from "./_core/hooks/useAuth";
 
 // Pages
 import Home from "./pages/Home";
-import { Dashboard } from "./pages/Dashboard";
+import { DashboardPage } from '@/pages/DashboardPage';
 import BodyMetrics from "./pages/BodyMetrics";
 import BodyMetricsAdd from "./pages/BodyMetricsAdd";
 import BodyMetricsImportCSV from "./pages/BodyMetricsImportCSV";
@@ -45,7 +45,7 @@ function Router() {
       </Route>
       <Route path={"/dashboard"}>
         <AppLayout>
-          <Dashboard />
+          <DashboardPage />
         </AppLayout>
       </Route>
       <Route path={"/body"}>
