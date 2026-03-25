@@ -142,95 +142,41 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="p-4 md:p-8 space-y-3 md:space-y-4 max-w-7xl mx-auto">
         
-        {/* Mood Check-in Section - Redesigned */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 md:p-8 shadow-sm border border-amber-100/50">
-          {/* Header Section */}
-          <div className="mb-6">
-            <p className="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1">GOOD MORNING</p>
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl md:text-3xl font-serif text-amber-900">Sophia</h2>
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-white/50 rounded-full transition-colors">
-                  <Bell className="w-5 h-5 text-amber-700" />
-                </button>
-                <button className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-orange-300 flex items-center justify-center text-white font-semibold text-sm hover:shadow-md transition-shadow">
-                  S
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Mood Selector */}
-          <div className="mb-6">
-            <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-4">TODAY MOOD</p>
-            <div className="flex gap-3 justify-between">
-              {[
-                { id: 'happy', emoji: '😊', label: 'Happy' },
-                { id: 'neutral', emoji: '😐', label: 'Normal' },
-                { id: 'sad', emoji: '😞', label: 'Sad' },
-                { id: 'angry', emoji: '😡', label: 'Angry' },
-                { id: 'tired', emoji: '😴', label: 'Tired' },
-              ].map((mood) => (
-                <button
-                  key={mood.id}
-                  onClick={() => handleMoodSelect(mood.id)}
-                  className={`flex flex-col items-center gap-2 transition-all duration-300 ${
-                    todayMood === mood.id
-                      ? 'scale-110'
-                      : 'opacity-60 hover:opacity-80'
-                  }`}
-                >
-                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center transition-all ${
-                    todayMood === mood.id
-                      ? 'bg-white shadow-lg ring-2 ring-amber-300'
-                      : 'bg-white/50 hover:bg-white/70'
-                  }`}>
-                    <span className="text-3xl md:text-4xl">{mood.emoji}</span>
-                  </div>
-                  <span className="text-xs font-medium text-amber-700">{mood.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Mood Record Button */}
-          <div className="flex gap-3 mb-6">
+        {/* Mood Check-in Section */}
+        <div className="bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-sm font-semibold text-foreground">今日心情</p>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation('/mood-log')}
-              className="flex-1 text-xs font-medium text-amber-700 hover:bg-white/50 border border-amber-200/50 rounded-full"
+              className="text-xs font-medium text-primary hover:bg-primary/10"
             >
               心情紀錄
             </Button>
           </div>
-
-          {/* Mood Records Section */}
-          <div>
-            <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">MOOD RECORDS</p>
-            <div className="flex gap-2 justify-between">
-              {[
-                { label: 'Happy', count: 12 },
-                { label: 'Normal', count: 8 },
-                { label: 'Sad', count: 2 },
-                { label: 'Angry', count: 1 },
-                { label: 'Tired', count: 5 },
-              ].map((record, idx) => (
-                <div key={idx} className="flex-1 text-center">
-                  <p className="text-xs text-amber-600 font-medium mb-1">{record.label}</p>
-                  <p className="text-sm font-semibold text-amber-900">{record.count}</p>
-                </div>
-              ))}
-            </div>
+          <div className="flex gap-2 justify-between">
+            {[
+              { id: 'happy', emoji: '😊', label: '開心' },
+              { id: 'neutral', emoji: '😐', label: '普通' },
+              { id: 'sad', emoji: '😞', label: '低落' },
+              { id: 'angry', emoji: '😡', label: '煩躁' },
+              { id: 'tired', emoji: '😴', label: '疲倦' },
+            ].map((mood) => (
+              <button
+                key={mood.id}
+                onClick={() => handleMoodSelect(mood.id)}
+                className={`flex-1 flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                  todayMood === mood.id
+                    ? 'bg-primary/10 border border-primary'
+                    : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                <span className="text-lg md:text-xl">{mood.emoji}</span>
+                <span className="text-xs font-medium text-foreground">{mood.label}</span>
+              </button>
+            ))}
           </div>
-        </div>
-
-        {/* Daily Inspiration Quote */}
-        <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-6 md:p-8 border border-rose-100/50 text-center">
-          <p className="text-xs font-medium text-rose-600 uppercase tracking-wide mb-3">DAILY INTENTION</p>
-          <p className="text-lg md:text-xl font-serif text-rose-900 italic leading-relaxed">
-            "Nourishing the body is an act of gratitude for the soul's temporary home."
-          </p>
         </div>
         
         {/* Hero Calorie Card - Emerald Green */}
