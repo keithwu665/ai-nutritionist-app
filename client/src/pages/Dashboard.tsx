@@ -149,6 +149,12 @@ export function Dashboard() {
   const carbsGrams = null;
   const fatsGrams = null;
 
+  // TODO: Add hydration and sleep data to dashboard.getData query when schema is updated
+  const hydrationCurrent = null; // TODO: bind to real data
+  const hydrationGoal = null; // TODO: bind to real data
+  const sleepHours = null; // TODO: bind to real data
+  const sleepGoal = null; // TODO: bind to real data
+
   // Generate Chinese advice based on real data and coach tone
   const generateChineseAdvice = (): RecommendationLike[] => {
     const advice: RecommendationLike[] = [];
@@ -678,7 +684,9 @@ export function Dashboard() {
             >
               Hydration Pulse
             </h3>
-            <p className="text-sm text-[#46483c]/80">1.8L of 2.5L goal</p>
+            <p className="text-sm text-[#46483c]/80">
+              {hydrationCurrent && hydrationGoal ? `${hydrationCurrent}L of ${hydrationGoal}L goal` : '— L of — L goal'}
+            </p>
           </div>
 
           <div className="flex -space-x-2">
@@ -707,11 +715,15 @@ export function Dashboard() {
                 Sleep
               </h3>
               <div className="flex items-baseline gap-2">
-                <span className="text-sm font-bold text-[#1c1c19]">7h 30m</span>
-                <span className="text-[10px] text-[#46483c]/70">7.5h of 8.0h goal</span>
+                <span className="text-sm font-bold text-[#1c1c19]">
+                  {sleepHours ? `${sleepHours}h` : '— h'}
+                </span>
+                <span className="text-[10px] text-[#46483c]/70">
+                  {sleepHours && sleepGoal ? `${sleepHours}h of ${sleepGoal}h goal` : '— h of — h goal'}
+                </span>
               </div>
               <div className="mt-1 h-1 w-24 overflow-hidden rounded-full bg-[#7e947f]/10">
-                <div className="h-full w-[93%] rounded-full bg-[#7e947f]" />
+                <div className="h-full rounded-full bg-[#7e947f]" style={{ width: sleepHours && sleepGoal ? `${Math.min(100, (sleepHours / sleepGoal) * 100)}%` : '0%' }} />
               </div>
             </div>
           </div>
