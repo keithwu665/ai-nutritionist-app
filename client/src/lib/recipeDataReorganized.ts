@@ -6007,6 +6007,1705 @@ const saladVegetarian: RecipeData[] = [
   }
 ];
 
+// Snack Recipes
+const snackChicken: RecipeData[] = [
+  {
+    id: "s-c-1",
+    name: "香煎雞胸小食盒",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 240,
+    protein: 38,
+    fat: 6,
+    carbs: 8,
+    totalWeight: 280,
+    ingredients: [
+      { name: "雞胸", quantity: "120g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "橄欖油", quantity: "1茶匙" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "雞胸切片，中火煎至熟",
+      "加入蔬菜繼續炒",
+      "調味後盛入小盒",
+      "冷卻後可帶走食用"
+    ],
+    fatLossTips: [
+      "高蛋白低脂，適合健身後食用",
+      "攜帶方便，隨時補充能量",
+      "無添加糖分，健康零食選擇"
+    ]
+  },
+  {
+    id: "s-c-2",
+    name: "雞肉蛋白能量球",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 180,
+    protein: 32,
+    fat: 5,
+    carbs: 6,
+    totalWeight: 200,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "燕麥", quantity: "30g" },
+      { name: "蛋白", quantity: "1個" },
+      { name: "鹽", quantity: "0.5g" }
+    ],
+    steps: [
+      "雞胸煮熟後絞碎",
+      "混合燕麥和蛋白",
+      "揉成球狀",
+      "冷藏後食用"
+    ],
+    fatLossTips: [
+      "方便攜帶的高蛋白小食",
+      "燕麥提供持久能量",
+      "無油炸，低脂健康"
+    ]
+  },
+  {
+    id: "s-c-3",
+    name: "雞胸蔬菜串",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 200,
+    protein: 35,
+    fat: 4,
+    carbs: 10,
+    totalWeight: 250,
+    ingredients: [
+      { name: "雞胸", quantity: "110g" },
+      { name: "彩椒", quantity: "60g" },
+      { name: "洋蔥", quantity: "40g" },
+      { name: "橄欖油", quantity: "1茶匙" }
+    ],
+    steps: [
+      "雞胸切塊",
+      "蔬菜切段",
+      "串在竹籤上",
+      "烤或煎至熟透"
+    ],
+    fatLossTips: [
+      "蛋白質豐富，飽腹感強",
+      "蔬菜增加纖維，促進消化",
+      "低脂烹飪方式，健康輕食"
+    ]
+  },
+  {
+    id: "s-c-4",
+    name: "雞肉全麥卷餅",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 260,
+    protein: 36,
+    fat: 7,
+    carbs: 14,
+    totalWeight: 300,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "全麥卷餅", quantity: "1張" },
+      { name: "生菜", quantity: "40g" },
+      { name: "番茄", quantity: "50g" }
+    ],
+    steps: [
+      "雞胸煮熟切絲",
+      "全麥卷餅鋪平",
+      "加入雞肉、生菜、番茄",
+      "捲起享用"
+    ],
+    fatLossTips: [
+      "全麥纖維豐富，血糖穩定",
+      "攜帶方便的快手小食",
+      "蛋白質與碳水均衡"
+    ]
+  },
+  {
+    id: "s-c-5",
+    name: "雞肉低脂三文治",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 280,
+    protein: 34,
+    fat: 8,
+    carbs: 16,
+    totalWeight: 320,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "雞胸煮熟切片",
+      "全麥麵包烤至微焦",
+      "依序放入雞肉、番茄、生菜",
+      "對切享用"
+    ],
+    fatLossTips: [
+      "全麥麵包低GI，穩定血糖",
+      "新鮮蔬菜增加營養",
+      "低脂高蛋白的完美組合"
+    ]
+  },
+  {
+    id: "s-c-6",
+    name: "雞肉藜麥小碗",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 220,
+    protein: 33,
+    fat: 5,
+    carbs: 12,
+    totalWeight: 260,
+    ingredients: [
+      { name: "雞胸", quantity: "90g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "雞胸煮熟切粒",
+      "混合藜麥、雞肉、蔬菜",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "藜麥完全蛋白，營養豐富",
+      "低升糖指數，適合減脂",
+      "輕盈清爽的能量小食"
+    ]
+  },
+  {
+    id: "s-c-7",
+    name: "雞肉生菜包",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 180,
+    protein: 32,
+    fat: 4,
+    carbs: 8,
+    totalWeight: 220,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "胡蘿蔔", quantity: "30g" },
+      { name: "醬油", quantity: "1茶匙" }
+    ],
+    steps: [
+      "雞胸煮熟切絲",
+      "生菜葉鋪平",
+      "加入雞肉、胡蘿蔔絲",
+      "淋上醬油後包起"
+    ],
+    fatLossTips: [
+      "生菜低卡高纖，增加飽腹感",
+      "無澱粉包裝，極低碳水",
+      "清爽健康的輕食選擇"
+    ]
+  },
+  {
+    id: "s-c-8",
+    name: "雞肉蛋白捲",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 200,
+    protein: 36,
+    fat: 5,
+    carbs: 6,
+    totalWeight: 240,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "蔬菜", quantity: "50g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白打成蛋皮",
+      "雞胸切絲",
+      "蛋皮鋪平放入雞肉和蔬菜",
+      "捲起切段"
+    ],
+    fatLossTips: [
+      "蛋白零脂肪，純蛋白質",
+      "雞肉增加飽腹感",
+      "低卡高營養的完美小食"
+    ]
+  },
+  {
+    id: "s-c-9",
+    name: "雞肉小沙律盒",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 210,
+    protein: 34,
+    fat: 6,
+    carbs: 10,
+    totalWeight: 280,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "番茄", quantity: "40g" },
+      { name: "橄欖油醋", quantity: "1湯匙" }
+    ],
+    steps: [
+      "雞胸煮熟切粒",
+      "生菜洗淨",
+      "混合所有材料",
+      "淋上橄欖油醋"
+    ],
+    fatLossTips: [
+      "新鮮蔬菜增加纖維",
+      "雞肉提供優質蛋白",
+      "低脂健康的沙律小食"
+    ]
+  },
+  {
+    id: "s-c-10",
+    name: "雞肉乳酪碗",
+    protein_type: "chicken",
+    category: "snack",
+    kcal: 250,
+    protein: 37,
+    fat: 9,
+    carbs: 8,
+    totalWeight: 300,
+    ingredients: [
+      { name: "雞胸", quantity: "100g" },
+      { name: "低脂乳酪", quantity: "40g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "堅果", quantity: "15g" }
+    ],
+    steps: [
+      "雞胸煮熟切粒",
+      "乳酪切塊",
+      "混合雞肉、乳酪、蔬菜",
+      "撒上堅果"
+    ],
+    fatLossTips: [
+      "乳酪提供鈣質和蛋白質",
+      "堅果增加健康脂肪",
+      "營養均衡的能量小食"
+    ]
+  }
+];
+
+const snackPork: RecipeData[] = [
+  {
+    id: "s-p-1",
+    name: "低脂叉燒小食盒",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 260,
+    protein: 36,
+    fat: 8,
+    carbs: 10,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "120g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "醬油", quantity: "1茶匙" },
+      { name: "薑", quantity: "5g" }
+    ],
+    steps: [
+      "豬肉切片",
+      "用醬油和薑醃製",
+      "烤至半熟",
+      "配蔬菜盛盒"
+    ],
+    fatLossTips: [
+      "亞洲風味的輕食小食",
+      "瘦肉低脂高蛋白",
+      "薑提升代謝效果"
+    ]
+  },
+  {
+    id: "s-p-2",
+    name: "豬肉生菜包",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 200,
+    protein: 33,
+    fat: 6,
+    carbs: 8,
+    totalWeight: 260,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "胡蘿蔔", quantity: "40g" },
+      { name: "醬油", quantity: "1茶匙" }
+    ],
+    steps: [
+      "豬肉煮熟切絲",
+      "生菜葉鋪平",
+      "加入豬肉和胡蘿蔔",
+      "淋上醬油包起"
+    ],
+    fatLossTips: [
+      "清爽亞洲風味",
+      "低碳水高蛋白",
+      "生菜增加飽腹感"
+    ]
+  },
+  {
+    id: "s-p-3",
+    name: "豬里肌三文治",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 280,
+    protein: 34,
+    fat: 9,
+    carbs: 16,
+    totalWeight: 320,
+    ingredients: [
+      { name: "豬里肌", quantity: "100g" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "豬里肌煮熟切片",
+      "全麥麵包烤至微焦",
+      "依序放入豬肉、番茄、生菜",
+      "對切享用"
+    ],
+    fatLossTips: [
+      "豬里肌瘦肉部位",
+      "全麥麵包穩定血糖",
+      "西方風味的輕食"
+    ]
+  },
+  {
+    id: "s-p-4",
+    name: "豬肉蛋白捲",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 220,
+    protein: 35,
+    fat: 7,
+    carbs: 8,
+    totalWeight: 280,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "蔬菜", quantity: "50g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白打成蛋皮",
+      "豬肉切絲",
+      "蛋皮鋪平放入豬肉和蔬菜",
+      "捲起切段"
+    ],
+    fatLossTips: [
+      "蛋白零脂肪",
+      "豬肉提供B族維生素",
+      "亞洲風味小食"
+    ]
+  },
+  {
+    id: "s-p-5",
+    name: "豬肉青瓜小碗",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 190,
+    protein: 32,
+    fat: 5,
+    carbs: 10,
+    totalWeight: 260,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "青瓜", quantity: "100g" },
+      { name: "醬油", quantity: "1茶匙" },
+      { name: "芝麻", quantity: "5g" }
+    ],
+    steps: [
+      "豬肉煮熟",
+      "青瓜切片",
+      "混合豬肉和青瓜",
+      "淋上醬油撒芝麻"
+    ],
+    fatLossTips: [
+      "青瓜低卡高水分",
+      "清爽開胃",
+      "夏季最佳輕食"
+    ]
+  },
+  {
+    id: "s-p-6",
+    name: "豬肉藜麥小食",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 240,
+    protein: 34,
+    fat: 7,
+    carbs: 14,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "90g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "豬肉煮熟切粒",
+      "混合藜麥、豬肉、蔬菜",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "藜麥完全蛋白",
+      "豬肉提供鐵質",
+      "營養均衡的小食"
+    ]
+  },
+  {
+    id: "s-p-7",
+    name: "豬肉蘋果沙律",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 210,
+    protein: 33,
+    fat: 6,
+    carbs: 12,
+    totalWeight: 280,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "蘋果", quantity: "80g" },
+      { name: "生菜", quantity: "60g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "豬肉煮熟切粒",
+      "蘋果切丁",
+      "混合豬肉、蘋果、生菜",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "蘋果提供纖維",
+      "甜味天然低卡",
+      "清爽開胃的組合"
+    ]
+  },
+  {
+    id: "s-p-8",
+    name: "豬肉芝麻卷",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 270,
+    protein: 35,
+    fat: 10,
+    carbs: 12,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "全麥卷餅", quantity: "1張" },
+      { name: "芝麻醬", quantity: "1茶匙" },
+      { name: "蔬菜", quantity: "60g" }
+    ],
+    steps: [
+      "豬肉煮熟切絲",
+      "卷餅鋪平",
+      "塗上芝麻醬",
+      "加入豬肉和蔬菜捲起"
+    ],
+    fatLossTips: [
+      "芝麻醬提供健康脂肪",
+      "亞洲風味卷餅",
+      "營養豐富的小食"
+    ]
+  },
+  {
+    id: "s-p-9",
+    name: "豬肉低脂漢堡",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 290,
+    protein: 36,
+    fat: 10,
+    carbs: 18,
+    totalWeight: 320,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "110g" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "豬肉絞碎做成漢堡排",
+      "煎至熟透",
+      "全麥麵包烤至微焦",
+      "組合成漢堡"
+    ],
+    fatLossTips: [
+      "全麥麵包低GI",
+      "瘦豬肉低脂",
+      "健康版漢堡"
+    ]
+  },
+  {
+    id: "s-p-10",
+    name: "豬肉飯團",
+    protein_type: "pork",
+    category: "snack",
+    kcal: 250,
+    protein: 32,
+    fat: 6,
+    carbs: 20,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦豬肉", quantity: "100g" },
+      { name: "糙米飯", quantity: "80g" },
+      { name: "海苔", quantity: "1張" },
+      { name: "蔬菜", quantity: "40g" }
+    ],
+    steps: [
+      "豬肉煮熟切粒",
+      "糙米飯冷卻",
+      "混合豬肉和蔬菜",
+      "用海苔包裹成團"
+    ],
+    fatLossTips: [
+      "糙米提供纖維",
+      "攜帶方便",
+      "亞洲經典小食"
+    ]
+  }
+];
+
+const snackBeef: RecipeData[] = [
+  {
+    id: "s-b-1",
+    name: "牛肉能量小碗",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 280,
+    protein: 38,
+    fat: 10,
+    carbs: 10,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "120g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "橄欖油", quantity: "1茶匙" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉切粒",
+      "中火煎至半熟",
+      "加入蔬菜",
+      "調味盛碗"
+    ],
+    fatLossTips: [
+      "牛肉鐵質豐富",
+      "西方風味蛋白小食",
+      "能量補充最佳選擇"
+    ]
+  },
+  {
+    id: "s-b-2",
+    name: "牛肉蛋白卷餅",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 270,
+    protein: 36,
+    fat: 9,
+    carbs: 14,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "全麥卷餅", quantity: "1張" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "醬料", quantity: "1湯匙" }
+    ],
+    steps: [
+      "牛肉煮熟切絲",
+      "卷餅鋪平",
+      "加入牛肉和蔬菜",
+      "淋上醬料捲起"
+    ],
+    fatLossTips: [
+      "西方風味卷餅",
+      "全麥纖維豐富",
+      "高蛋白低脂"
+    ]
+  },
+  {
+    id: "s-b-3",
+    name: "牛肉三文治",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 300,
+    protein: 37,
+    fat: 11,
+    carbs: 16,
+    totalWeight: 320,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "110g" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "牛肉煮熟切片",
+      "全麥麵包烤至微焦",
+      "依序放入牛肉、番茄、生菜",
+      "對切享用"
+    ],
+    fatLossTips: [
+      "牛肉蛋白質最豐富",
+      "全麥麵包低GI",
+      "西方經典小食"
+    ]
+  },
+  {
+    id: "s-b-4",
+    name: "牛肉藜麥小碗",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 250,
+    protein: 35,
+    fat: 8,
+    carbs: 12,
+    totalWeight: 280,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "牛肉煮熟切粒",
+      "混合所有材料",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "藜麥完全蛋白",
+      "牛肉提供鐵質",
+      "營養均衡小食"
+    ]
+  },
+  {
+    id: "s-b-5",
+    name: "牛肉芝士小食",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 290,
+    protein: 38,
+    fat: 12,
+    carbs: 8,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "110g" },
+      { name: "低脂芝士", quantity: "30g" },
+      { name: "蔬菜", quantity: "50g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "牛肉煮熟",
+      "芝士切片",
+      "混合牛肉、芝士、蔬菜",
+      "冷卻享用"
+    ],
+    fatLossTips: [
+      "芝士提供鈣質",
+      "牛肉高蛋白",
+      "西方風味組合"
+    ]
+  },
+  {
+    id: "s-b-6",
+    name: "牛肉生菜包",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 220,
+    protein: 35,
+    fat: 7,
+    carbs: 8,
+    totalWeight: 260,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "胡蘿蔔", quantity: "40g" },
+      { name: "醬油", quantity: "1茶匙" }
+    ],
+    steps: [
+      "牛肉煮熟切絲",
+      "生菜葉鋪平",
+      "加入牛肉和胡蘿蔔",
+      "淋上醬油包起"
+    ],
+    fatLossTips: [
+      "生菜低卡",
+      "牛肉高蛋白",
+      "清爽健康"
+    ]
+  },
+  {
+    id: "s-b-7",
+    name: "牛肉蛋白球",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 240,
+    protein: 36,
+    fat: 8,
+    carbs: 8,
+    totalWeight: 280,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "110g" },
+      { name: "燕麥", quantity: "30g" },
+      { name: "蛋白", quantity: "1個" },
+      { name: "鹽", quantity: "0.5g" }
+    ],
+    steps: [
+      "牛肉煮熟絞碎",
+      "混合燕麥和蛋白",
+      "揉成球狀",
+      "冷藏享用"
+    ],
+    fatLossTips: [
+      "攜帶方便",
+      "高蛋白無脂",
+      "能量補充最佳"
+    ]
+  },
+  {
+    id: "s-b-8",
+    name: "牛肉青瓜沙律",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 210,
+    protein: 33,
+    fat: 6,
+    carbs: 10,
+    totalWeight: 260,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "青瓜", quantity: "100g" },
+      { name: "番茄", quantity: "40g" },
+      { name: "橄欖油醋", quantity: "1湯匙" }
+    ],
+    steps: [
+      "牛肉煮熟切粒",
+      "青瓜切片",
+      "混合牛肉、青瓜、番茄",
+      "淋上橄欖油醋"
+    ],
+    fatLossTips: [
+      "清爽開胃",
+      "低脂高蛋白",
+      "夏季最佳小食"
+    ]
+  },
+  {
+    id: "s-b-9",
+    name: "牛肉飯團",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 270,
+    protein: 34,
+    fat: 8,
+    carbs: 20,
+    totalWeight: 300,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "100g" },
+      { name: "糙米飯", quantity: "80g" },
+      { name: "海苔", quantity: "1張" },
+      { name: "蔬菜", quantity: "40g" }
+    ],
+    steps: [
+      "牛肉煮熟切粒",
+      "糙米飯冷卻",
+      "混合牛肉和蔬菜",
+      "用海苔包裹成團"
+    ],
+    fatLossTips: [
+      "糙米提供纖維",
+      "攜帶方便",
+      "營養完整"
+    ]
+  },
+  {
+    id: "s-b-10",
+    name: "牛肉低脂漢堡",
+    protein_type: "beef",
+    category: "snack",
+    kcal: 310,
+    protein: 38,
+    fat: 12,
+    carbs: 18,
+    totalWeight: 330,
+    ingredients: [
+      { name: "瘦牛肉", quantity: "120g" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "牛肉絞碎做成漢堡排",
+      "煎至熟透",
+      "全麥麵包烤至微焦",
+      "組合成漢堡"
+    ],
+    fatLossTips: [
+      "牛肉蛋白最豐富",
+      "全麥麵包低GI",
+      "健康版漢堡"
+    ]
+  }
+];
+
+const snackSeafood: RecipeData[] = [
+  {
+    id: "s-s-1",
+    name: "三文魚小食盒",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 250,
+    protein: 34,
+    fat: 10,
+    carbs: 8,
+    totalWeight: 280,
+    ingredients: [
+      { name: "三文魚", quantity: "100g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "檸檬", quantity: "1個" },
+      { name: "橄欖油", quantity: "1茶匙" }
+    ],
+    steps: [
+      "三文魚蒸熟",
+      "蔬菜切片",
+      "混合三文魚和蔬菜",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "三文魚Omega-3豐富",
+      "清爽輕食",
+      "冷食最佳"
+    ]
+  },
+  {
+    id: "s-s-2",
+    name: "蝦仁蛋白碗",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 200,
+    protein: 36,
+    fat: 4,
+    carbs: 6,
+    totalWeight: 240,
+    ingredients: [
+      { name: "蝦仁", quantity: "120g" },
+      { name: "蛋白", quantity: "2個" },
+      { name: "蔬菜", quantity: "50g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蝦仁煮熟",
+      "蛋白煮熟",
+      "混合蝦仁、蛋白、蔬菜",
+      "冷卻享用"
+    ],
+    fatLossTips: [
+      "蝦仁低脂高蛋白",
+      "蛋白零脂肪",
+      "極低卡小食"
+    ]
+  },
+  {
+    id: "s-s-3",
+    name: "吞拿魚三文治",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 270,
+    protein: 33,
+    fat: 9,
+    carbs: 16,
+    totalWeight: 300,
+    ingredients: [
+      { name: "吞拿魚罐頭", quantity: "100g" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "吞拿魚瀝乾",
+      "全麥麵包烤至微焦",
+      "依序放入吞拿魚、番茄、生菜",
+      "對切享用"
+    ],
+    fatLossTips: [
+      "吞拿魚方便快手",
+      "全麥麵包低GI",
+      "高蛋白輕食"
+    ]
+  },
+  {
+    id: "s-s-4",
+    name: "三文魚牛油果卷",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 280,
+    protein: 32,
+    fat: 12,
+    carbs: 12,
+    totalWeight: 300,
+    ingredients: [
+      { name: "三文魚", quantity: "90g" },
+      { name: "牛油果", quantity: "50g" },
+      { name: "全麥卷餅", quantity: "1張" },
+      { name: "生菜", quantity: "40g" }
+    ],
+    steps: [
+      "三文魚蒸熟",
+      "牛油果切片",
+      "卷餅鋪平加入所有材料",
+      "捲起享用"
+    ],
+    fatLossTips: [
+      "三文魚Omega-3",
+      "牛油果健康脂肪",
+      "營養完整小食"
+    ]
+  },
+  {
+    id: "s-s-5",
+    name: "蝦仁藜麥小碗",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 220,
+    protein: 33,
+    fat: 5,
+    carbs: 12,
+    totalWeight: 260,
+    ingredients: [
+      { name: "蝦仁", quantity: "100g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "蝦仁煮熟",
+      "混合所有材料",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "藜麥完全蛋白",
+      "蝦仁低脂",
+      "清爽健康"
+    ]
+  },
+  {
+    id: "s-s-6",
+    name: "吞拿魚生菜包",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 190,
+    protein: 32,
+    fat: 5,
+    carbs: 8,
+    totalWeight: 240,
+    ingredients: [
+      { name: "吞拿魚罐頭", quantity: "100g" },
+      { name: "生菜", quantity: "80g" },
+      { name: "胡蘿蔔", quantity: "40g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "吞拿魚瀝乾",
+      "生菜葉鋪平",
+      "加入吞拿魚和胡蘿蔔",
+      "淋上檸檬汁包起"
+    ],
+    fatLossTips: [
+      "吞拿魚方便快手",
+      "生菜低卡",
+      "極低脂小食"
+    ]
+  },
+  {
+    id: "s-s-7",
+    name: "三文魚飯團",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 260,
+    protein: 31,
+    fat: 8,
+    carbs: 20,
+    totalWeight: 300,
+    ingredients: [
+      { name: "三文魚", quantity: "90g" },
+      { name: "糙米飯", quantity: "80g" },
+      { name: "海苔", quantity: "1張" },
+      { name: "蔬菜", quantity: "40g" }
+    ],
+    steps: [
+      "三文魚蒸熟",
+      "糙米飯冷卻",
+      "混合三文魚和蔬菜",
+      "用海苔包裹成團"
+    ],
+    fatLossTips: [
+      "三文魚Omega-3",
+      "糙米提供纖維",
+      "攜帶方便"
+    ]
+  },
+  {
+    id: "s-s-8",
+    name: "蝦仁青瓜沙律",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 180,
+    protein: 32,
+    fat: 4,
+    carbs: 8,
+    totalWeight: 240,
+    ingredients: [
+      { name: "蝦仁", quantity: "100g" },
+      { name: "青瓜", quantity: "100g" },
+      { name: "番茄", quantity: "40g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蝦仁煮熟",
+      "青瓜切片",
+      "混合蝦仁、青瓜、番茄",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "蝦仁低脂",
+      "青瓜低卡",
+      "清爽開胃"
+    ]
+  },
+  {
+    id: "s-s-9",
+    name: "海鮮小沙律",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 210,
+    protein: 33,
+    fat: 6,
+    carbs: 10,
+    totalWeight: 280,
+    ingredients: [
+      { name: "混合海鮮", quantity: "100g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "番茄", quantity: "40g" },
+      { name: "橄欖油醋", quantity: "1湯匙" }
+    ],
+    steps: [
+      "海鮮煮熟",
+      "生菜洗淨",
+      "混合所有材料",
+      "淋上橄欖油醋"
+    ],
+    fatLossTips: [
+      "多種海鮮營養豐富",
+      "低脂高蛋白",
+      "清爽健康"
+    ]
+  },
+  {
+    id: "s-s-10",
+    name: "吞拿魚乳酪碗",
+    protein_type: "seafood",
+    category: "snack",
+    kcal: 240,
+    protein: 35,
+    fat: 8,
+    carbs: 8,
+    totalWeight: 280,
+    ingredients: [
+      { name: "吞拿魚罐頭", quantity: "100g" },
+      { name: "低脂乳酪", quantity: "40g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "堅果", quantity: "10g" }
+    ],
+    steps: [
+      "吞拿魚瀝乾",
+      "乳酪切塊",
+      "混合吞拿魚、乳酪、蔬菜",
+      "撒上堅果"
+    ],
+    fatLossTips: [
+      "吞拿魚方便快手",
+      "乳酪提供鈣質",
+      "營養均衡"
+    ]
+  }
+];
+
+const snackEgg: RecipeData[] = [
+  {
+    id: "s-e-1",
+    name: "蛋白能量球",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 160,
+    protein: 32,
+    fat: 2,
+    carbs: 6,
+    totalWeight: 200,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "燕麥", quantity: "30g" },
+      { name: "蜂蜜", quantity: "1茶匙" },
+      { name: "鹽", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "混合燕麥和蜂蜜",
+      "揉成球狀",
+      "冷藏享用"
+    ],
+    fatLossTips: [
+      "蛋白零脂肪",
+      "超低卡高蛋白",
+      "方便攜帶"
+    ]
+  },
+  {
+    id: "s-e-2",
+    name: "雙蛋白小食盒",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 180,
+    protein: 34,
+    fat: 3,
+    carbs: 8,
+    totalWeight: 240,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "蔬菜切片",
+      "混合蛋白和蔬菜",
+      "調味盛盒"
+    ],
+    fatLossTips: [
+      "蛋白超低脂",
+      "蔬菜增加纖維",
+      "極低卡小食"
+    ]
+  },
+  {
+    id: "s-e-3",
+    name: "蛋白牛油果碗",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 220,
+    protein: 33,
+    fat: 9,
+    carbs: 8,
+    totalWeight: 260,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "牛油果", quantity: "50g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "牛油果切片",
+      "混合蛋白、牛油果、番茄",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "蛋白高蛋白",
+      "牛油果健康脂肪",
+      "營養均衡"
+    ]
+  },
+  {
+    id: "s-e-4",
+    name: "蛋白全麥吐司",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 240,
+    protein: 32,
+    fat: 6,
+    carbs: 16,
+    totalWeight: 280,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "蛋白煎成蛋皮",
+      "全麥麵包烤至微焦",
+      "依序放入蛋白、番茄、生菜",
+      "享用"
+    ],
+    fatLossTips: [
+      "全麥麵包低GI",
+      "蛋白零脂肪",
+      "簡單快手小食"
+    ]
+  },
+  {
+    id: "s-e-5",
+    name: "蛋白沙律",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 190,
+    protein: 33,
+    fat: 4,
+    carbs: 10,
+    totalWeight: 260,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "生菜洗淨",
+      "混合蛋白、生菜、番茄",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "蛋白超低脂",
+      "蔬菜增加纖維",
+      "清爽開胃"
+    ]
+  },
+  {
+    id: "s-e-6",
+    name: "蛋白卷餅",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 210,
+    protein: 32,
+    fat: 5,
+    carbs: 14,
+    totalWeight: 280,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "全麥卷餅", quantity: "1張" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "醬料", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蛋白煎成蛋皮",
+      "卷餅鋪平",
+      "加入蛋白和蔬菜",
+      "淋上醬料捲起"
+    ],
+    fatLossTips: [
+      "蛋白零脂肪",
+      "全麥纖維豐富",
+      "簡單快手"
+    ]
+  },
+  {
+    id: "s-e-7",
+    name: "蛋白乳酪碗",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 230,
+    protein: 35,
+    fat: 8,
+    carbs: 8,
+    totalWeight: 280,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "低脂乳酪", quantity: "40g" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "堅果", quantity: "10g" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "乳酪切塊",
+      "混合蛋白、乳酪、蔬菜",
+      "撒上堅果"
+    ],
+    fatLossTips: [
+      "乳酪提供鈣質",
+      "蛋白高蛋白",
+      "營養完整"
+    ]
+  },
+  {
+    id: "s-e-8",
+    name: "蛋白飯團",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 240,
+    protein: 31,
+    fat: 5,
+    carbs: 20,
+    totalWeight: 300,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "糙米飯", quantity: "80g" },
+      { name: "海苔", quantity: "1張" },
+      { name: "蔬菜", quantity: "40g" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "糙米飯冷卻",
+      "混合蛋白和蔬菜",
+      "用海苔包裹成團"
+    ],
+    fatLossTips: [
+      "糙米提供纖維",
+      "蛋白高蛋白",
+      "攜帶方便"
+    ]
+  },
+  {
+    id: "s-e-9",
+    name: "蛋白蔬菜碗",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 170,
+    protein: 32,
+    fat: 3,
+    carbs: 10,
+    totalWeight: 260,
+    ingredients: [
+      { name: "蛋白", quantity: "4個" },
+      { name: "混合蔬菜", quantity: "100g" },
+      { name: "鹽", quantity: "1g" },
+      { name: "黑椒", quantity: "0.5g" }
+    ],
+    steps: [
+      "蛋白煮熟",
+      "蔬菜切片",
+      "混合蛋白和蔬菜",
+      "調味享用"
+    ],
+    fatLossTips: [
+      "蛋白超低脂",
+      "蔬菜增加纖維",
+      "極低卡健康"
+    ]
+  },
+  {
+    id: "s-e-10",
+    name: "蛋白小三文治",
+    protein_type: "egg",
+    category: "snack",
+    kcal: 220,
+    protein: 30,
+    fat: 6,
+    carbs: 16,
+    totalWeight: 280,
+    ingredients: [
+      { name: "蛋白", quantity: "3個" },
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "番茄", quantity: "50g" },
+      { name: "生菜", quantity: "30g" }
+    ],
+    steps: [
+      "蛋白煎成蛋皮",
+      "全麥麵包烤至微焦",
+      "依序放入蛋白、番茄、生菜",
+      "對切享用"
+    ],
+    fatLossTips: [
+      "全麥麵包低GI",
+      "蛋白零脂肪",
+      "簡單快手"
+    ]
+  }
+];
+
+const snackVegetarian: RecipeData[] = [
+  {
+    id: "s-v-1",
+    name: "牛油果能量碗",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 240,
+    protein: 28,
+    fat: 12,
+    carbs: 16,
+    totalWeight: 280,
+    ingredients: [
+      { name: "牛油果", quantity: "100g" },
+      { name: "藜麥", quantity: "50g" },
+      { name: "蔬菜", quantity: "60g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "牛油果切粒",
+      "混合所有材料",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "牛油果健康脂肪",
+      "藜麥完全蛋白",
+      "營養豐富"
+    ]
+  },
+  {
+    id: "s-v-2",
+    name: "鷹嘴豆小食盒",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 220,
+    protein: 26,
+    fat: 8,
+    carbs: 18,
+    totalWeight: 280,
+    ingredients: [
+      { name: "鷹嘴豆", quantity: "100g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "橄欖油", quantity: "1茶匙" },
+      { name: "鹽", quantity: "1g" }
+    ],
+    steps: [
+      "鷹嘴豆煮熟",
+      "蔬菜切片",
+      "混合鷹嘴豆和蔬菜",
+      "淋上橄欖油"
+    ],
+    fatLossTips: [
+      "鷹嘴豆高纖維",
+      "植物蛋白豐富",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "s-v-3",
+    name: "豆腐蔬菜碗",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 200,
+    protein: 24,
+    fat: 8,
+    carbs: 14,
+    totalWeight: 260,
+    ingredients: [
+      { name: "豆腐", quantity: "120g" },
+      { name: "混合蔬菜", quantity: "80g" },
+      { name: "醬油", quantity: "1茶匙" },
+      { name: "薑", quantity: "5g" }
+    ],
+    steps: [
+      "豆腐切塊",
+      "蔬菜切片",
+      "混合豆腐和蔬菜",
+      "淋上醬油"
+    ],
+    fatLossTips: [
+      "豆腐低脂高蛋白",
+      "蔬菜增加纖維",
+      "清爽健康"
+    ]
+  },
+  {
+    id: "s-v-4",
+    name: "燕麥堅果碗",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 260,
+    protein: 26,
+    fat: 11,
+    carbs: 20,
+    totalWeight: 300,
+    ingredients: [
+      { name: "燕麥", quantity: "60g" },
+      { name: "堅果", quantity: "30g" },
+      { name: "水果", quantity: "80g" },
+      { name: "蜂蜜", quantity: "1茶匙" }
+    ],
+    steps: [
+      "燕麥煮熟",
+      "堅果切碎",
+      "水果切粒",
+      "混合所有材料淋蜂蜜"
+    ],
+    fatLossTips: [
+      "燕麥高纖維",
+      "堅果健康脂肪",
+      "能量補充"
+    ]
+  },
+  {
+    id: "s-v-5",
+    name: "藜麥能量碗",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 230,
+    protein: 28,
+    fat: 8,
+    carbs: 16,
+    totalWeight: 280,
+    ingredients: [
+      { name: "藜麥", quantity: "80g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "豆類", quantity: "40g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "藜麥煮熟",
+      "豆類煮熟",
+      "蔬菜切片",
+      "混合所有材料"
+    ],
+    fatLossTips: [
+      "藜麥完全蛋白",
+      "豆類高纖維",
+      "營養完整"
+    ]
+  },
+  {
+    id: "s-v-6",
+    name: "素食三文治",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 250,
+    protein: 24,
+    fat: 9,
+    carbs: 18,
+    totalWeight: 300,
+    ingredients: [
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "牛油果", quantity: "50g" },
+      { name: "番茄", quantity: "60g" },
+      { name: "生菜", quantity: "40g" }
+    ],
+    steps: [
+      "全麥麵包烤至微焦",
+      "牛油果切片",
+      "依序放入牛油果、番茄、生菜",
+      "對切享用"
+    ],
+    fatLossTips: [
+      "全麥麵包低GI",
+      "牛油果健康脂肪",
+      "植物營養豐富"
+    ]
+  },
+  {
+    id: "s-v-7",
+    name: "豆腐沙律",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 210,
+    protein: 22,
+    fat: 8,
+    carbs: 14,
+    totalWeight: 280,
+    ingredients: [
+      { name: "豆腐", quantity: "120g" },
+      { name: "混合生菜", quantity: "80g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "橄欖油醋", quantity: "1湯匙" }
+    ],
+    steps: [
+      "豆腐切塊",
+      "生菜洗淨",
+      "混合豆腐、生菜、番茄",
+      "淋上橄欖油醋"
+    ],
+    fatLossTips: [
+      "豆腐低脂",
+      "蔬菜增加纖維",
+      "清爽健康"
+    ]
+  },
+  {
+    id: "s-v-8",
+    name: "牛油果吐司",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 240,
+    protein: 22,
+    fat: 11,
+    carbs: 18,
+    totalWeight: 280,
+    ingredients: [
+      { name: "全麥麵包", quantity: "2片" },
+      { name: "牛油果", quantity: "80g" },
+      { name: "番茄", quantity: "50g" },
+      { name: "檸檬汁", quantity: "1茶匙" }
+    ],
+    steps: [
+      "全麥麵包烤至微焦",
+      "牛油果切片",
+      "依序放入牛油果和番茄",
+      "淋上檸檬汁"
+    ],
+    fatLossTips: [
+      "全麥麵包低GI",
+      "牛油果健康脂肪",
+      "簡單快手"
+    ]
+  },
+  {
+    id: "s-v-9",
+    name: "素食飯團",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 230,
+    protein: 20,
+    fat: 6,
+    carbs: 22,
+    totalWeight: 300,
+    ingredients: [
+      { name: "糙米飯", quantity: "100g" },
+      { name: "蔬菜", quantity: "80g" },
+      { name: "海苔", quantity: "1張" },
+      { name: "醬油", quantity: "1茶匙" }
+    ],
+    steps: [
+      "糙米飯冷卻",
+      "蔬菜切片",
+      "混合糙米飯和蔬菜",
+      "用海苔包裹成團"
+    ],
+    fatLossTips: [
+      "糙米高纖維",
+      "蔬菜營養豐富",
+      "攜帶方便"
+    ]
+  },
+  {
+    id: "s-v-10",
+    name: "蔬菜卷餅",
+    protein_type: "vegetarian",
+    category: "snack",
+    kcal: 220,
+    protein: 20,
+    fat: 8,
+    carbs: 18,
+    totalWeight: 280,
+    ingredients: [
+      { name: "全麥卷餅", quantity: "1張" },
+      { name: "混合蔬菜", quantity: "100g" },
+      { name: "豆腐", quantity: "50g" },
+      { name: "醬料", quantity: "1茶匙" }
+    ],
+    steps: [
+      "卷餅鋪平",
+      "蔬菜切片",
+      "加入蔬菜和豆腐",
+      "淋上醬料捲起"
+    ],
+    fatLossTips: [
+      "全麥纖維豐富",
+      "蔬菜營養完整",
+      "植物蛋白豐富"
+    ]
+  }
+];
+
 // Create the main recipes object
 export const recipes: Record<string, Record<string, RecipeData[]>> = {
   breakfast: {
@@ -6042,12 +7741,12 @@ export const recipes: Record<string, Record<string, RecipeData[]>> = {
     vegetarian: saladVegetarian
   },
   snack: {
-    chicken: [], // To be filled
-    pork: [], // To be filled
-    beef: [], // To be filled
-    seafood: [], // To be filled
-    egg: [], // To be filled
-    vegetarian: [] // To be filled
+    chicken: snackChicken,
+    pork: snackPork,
+    beef: snackBeef,
+    seafood: snackSeafood,
+    egg: snackEgg,
+    vegetarian: snackVegetarian
   },
   soup: {
     chicken: [], // To be filled
