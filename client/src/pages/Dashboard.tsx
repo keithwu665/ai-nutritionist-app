@@ -343,47 +343,35 @@ export function Dashboard({ viewModel, aiRecommendationsRef }: DashboardProps) {
           )}
         </section>
 
-        <section className="space-y-4">
-          <h2
-            className="text-2xl font-bold text-[#1c1c19]"
-            style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-          >
-            Hydration Pulse
-          </h2>
-          <div className="rounded-2xl bg-[#f6f3ee] p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#46483c]">{hydration.current}L of {hydration.goal}L</span>
-              <span className="text-sm font-semibold text-[#56642b]">{hydration.percent}%</span>
+        {/* HYDRATION SECTION */}
+        <div className="bg-gradient-to-r from-emerald-50/60 to-teal-50/50 rounded-3xl p-6 border border-emerald-100/35 shadow-md">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-emerald-700/65 tracking-widest uppercase mb-2">HYDRATION PULSE</p>
+              <p className="text-sm text-emerald-900/75">{hydration.current}L of {hydration.goal}L goal</p>
             </div>
-            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#e5e2dd]">
-              <div
-                className="h-full bg-gradient-to-r from-[#5ba3d0] to-[#3d7ca5] transition-all duration-500"
-                style={{ width: `${hydration.percent}%` }}
-              />
+            <div className="flex gap-1">
+              <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+              <div className="w-2 h-2 rounded-full bg-emerald-300"></div>
+              <div className="w-2 h-2 rounded-full bg-emerald-200"></div>
             </div>
           </div>
-        </section>
-
-        <section className="space-y-4">
-          <h2
-            className="text-2xl font-bold text-[#1c1c19]"
-            style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-          >
-            Sleep Quality
-          </h2>
-          <div className="rounded-2xl bg-[#f6f3ee] p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#46483c]">{sleep.hours}h of {sleep.goal}h goal</span>
-              <span className="text-sm font-semibold text-[#56642b]">{Math.round((sleep.hours / sleep.goal) * 100)}%</span>
+        </div>
+        {/* SLEEP SECTION */}
+        <div className="bg-gradient-to-r from-slate-50/60 to-blue-50/50 rounded-3xl p-6 border border-slate-100/35 shadow-md">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="text-3xl">🌙</span>
+              <div>
+                <p className="text-xs font-semibold text-slate-700/65 tracking-widest uppercase mb-2">SLEEP</p>
+                <p className="text-sm text-slate-900/75">{sleep.hours}h {Math.round((sleep.hours % 1) * 60)}m</p>
+              </div>
             </div>
-            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#e5e2dd]">
-              <div
-                className="h-full bg-gradient-to-r from-[#9d84b7] to-[#6b5b95] transition-all duration-500"
-                style={{ width: `${Math.round((sleep.hours / sleep.goal) * 100)}%` }}
-              />
+            <div className="w-8 h-8 rounded-full bg-slate-200/40 flex items-center justify-center">
+              <span className="text-xs text-slate-600">+</span>
             </div>
           </div>
-        </section>
+        </div>
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-around border-t border-[#e5e2dd] bg-[#ffffff] px-4 py-4">
