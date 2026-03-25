@@ -145,9 +145,9 @@ export function Dashboard() {
   const coachTone = dashboardData?.profile?.aiToneStyle || 'gentle';
 
   // Extract macro data (TODO: calculate from food logs when available)
-  const proteinGrams = null;
-  const carbsGrams = null;
-  const fatsGrams = null;
+  const proteinGrams = dashboardData?.today?.proteinTotal ? Math.round(Number(dashboardData.today.proteinTotal)) : null;
+  const carbsGrams = dashboardData?.today?.carbsTotal ? Math.round(Number(dashboardData.today.carbsTotal)) : null;
+  const fatsGrams = dashboardData?.today?.fatsTotal ? Math.round(Number(dashboardData.today.fatsTotal)) : null;
 
   // TODO: Add hydration and sleep data to dashboard.getData query when schema is updated
   const hydrationCurrent = null; // TODO: bind to real data

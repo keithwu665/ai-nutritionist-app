@@ -675,6 +675,11 @@ export const appRouter = router({
       const weekCalories = weekFood.reduce((sum, item) => sum + Number(item.calories), 0);
       const weekExerciseMinutes = weekExercises.reduce((sum, ex) => sum + ex.durationMinutes, 0);
 
+      // Calculate macro totals from today's food
+      const todayProteinTotal = todayFood.reduce((sum, item) => sum + (Number(item.proteinG) || 0), 0);
+      const todayFatsTotal = todayFood.reduce((sum, item) => sum + (Number(item.fatG) || 0), 0);
+      const todayCarbsTotal = todayFood.reduce((sum, item) => sum + (Number(item.carbsG) || 0), 0);
+
       // Calculate Fitasty usage ratio
       const fitastyProductNames = new Set(allFitastyProducts.map((p: any) => p.name.toLowerCase()));
       const todayFitastyCalories = todayFood.reduce((sum, item) => {
@@ -695,6 +700,9 @@ export const appRouter = router({
           exerciseMinutes: todayExercises.reduce((sum, ex) => sum + ex.durationMinutes, 0),
           fitastyCalories: todayFitastyCalories,
           fitastyRatio: todayFitastyRatio,
+          proteinTotal: todayProteinTotal,
+          carbsTotal: todayCarbsTotal,
+          fatsTotal: todayFatsTotal,
           exercises: todayExercises.map(ex => ({
             name: ex.type,
             duration: ex.durationMinutes,
