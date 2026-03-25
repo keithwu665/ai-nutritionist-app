@@ -109,12 +109,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/30 to-white pb-32 md:pb-8">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 to-white pb-32 md:pb-8">
       {/* HEADER SECTION */}
-      <div className="px-4 md:px-8 pt-6 pb-4 max-w-2xl mx-auto">
-        <p className="text-xs text-amber-700/50 font-medium mb-3 tracking-wide uppercase">{getDateString()}</p>
+      <div className="px-4 md:px-8 pt-8 pb-6 max-w-2xl mx-auto">
+        <p className="text-xs text-amber-700/40 font-medium mb-4 tracking-widest uppercase">{getDateString()}</p>
         <div className="flex items-start justify-between">
-          <h1 className="text-3xl md:text-4xl font-light text-amber-950 leading-tight">{getGreeting()}</h1>
+          <h1 className="text-4xl md:text-5xl font-light text-amber-950 leading-tight">{getGreeting()}</h1>
           <div className="flex items-center gap-4 ml-4">
             <button 
               className="p-2.5 hover:bg-amber-100/40 rounded-full transition-colors relative"
@@ -141,12 +141,12 @@ export default function Dashboard() {
       </div>
 
       {/* MAIN CONTENT */}
-      <div className="px-4 md:px-8 space-y-4 md:space-y-5 max-w-2xl mx-auto">
+      <div className="px-4 md:px-8 space-y-6 md:space-y-7 max-w-2xl mx-auto">
         
         {/* MOOD TRACKER SECTION */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <p className="text-sm font-medium text-amber-950/70 tracking-wide">TODAY MOOD</p>
+            <p className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">TODAY MOOD</p>
             <Button
               variant="ghost"
               size="sm"
@@ -156,7 +156,7 @@ export default function Dashboard() {
               MOOD RECORDS
             </Button>
           </div>
-          <div className="flex gap-2.5 justify-between">
+          <div className="flex gap-3 justify-between">
             {[
               { id: 'happy', emoji: '😊', label: 'Happy' },
               { id: 'neutral', emoji: '😐', label: 'Normal' },
@@ -167,48 +167,48 @@ export default function Dashboard() {
               <button
                 key={mood.id}
                 onClick={() => handleMoodSelect(mood.id)}
-                className={`flex-1 flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-all ${
+                className={`flex-1 flex flex-col items-center gap-2 py-4 px-2 rounded-2xl transition-all ${
                   todayMood === mood.id
-                    ? 'bg-amber-100/40 scale-110'
-                    : 'bg-white/60 hover:bg-white/80'
+                    ? 'bg-amber-100/50 scale-110 shadow-sm'
+                    : 'bg-white/70 hover:bg-white/90 border border-amber-50/50'
                 }`}
               >
-                <span className="text-2xl">{mood.emoji}</span>
-                <span className="text-xs font-medium text-amber-950/60">{mood.label}</span>
+                <span className="text-3xl">{mood.emoji}</span>
+                <span className="text-xs font-medium text-amber-950/70">{mood.label}</span>
               </button>
             ))}
           </div>
         </div>
 
         {/* DAILY INTENTION SECTION */}
-        <div className="bg-gradient-to-br from-rose-100/30 to-amber-50/20 rounded-3xl p-6 md:p-8 text-center">
-          <p className="text-sm md:text-base font-light text-amber-900/70 italic leading-relaxed mb-3">
+        <div className="bg-gradient-to-br from-rose-100/25 to-amber-50/15 rounded-3xl p-8 md:p-10 text-center border border-rose-100/20">
+          <p className="text-base md:text-lg font-light text-amber-900/70 italic leading-relaxed mb-4">
             "Nourishing the body is an act of gratitude for the soul's temporary home."
           </p>
           <p className="text-xs font-medium text-amber-700/50 tracking-widest uppercase">DAILY INTENTION</p>
         </div>
 
         {/* DAILY FUEL SECTION */}
-        <div className="bg-white/80 rounded-3xl p-5 md:p-6 border border-amber-100/40">
-          <div className="flex items-start justify-between mb-5">
-            <h2 className="text-lg font-medium text-amber-950">Daily Fuel</h2>
-            <p className="text-sm font-light text-amber-700/70">{Math.round(todayCalories)} / {Math.round(target)} kcal</p>
+        <div className="bg-white/85 rounded-3xl p-7 md:p-8 border border-amber-100/30 shadow-sm">
+          <div className="flex items-start justify-between mb-7">
+            <h2 className="text-xl font-medium text-amber-950">Daily Fuel</h2>
+            <p className="text-sm font-light text-amber-700/60">{Math.round(todayCalories)} / {Math.round(target)} kcal</p>
           </div>
           
           {/* Circular Progress */}
-          <div className="flex justify-center mb-6">
-            <div className="relative w-40 h-40 md:w-48 md:h-48">
+          <div className="flex justify-center mb-8">
+            <div className="relative w-48 h-48 md:w-56 md:h-56">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                 {/* Background circle */}
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#e8d4c4" strokeWidth="8" />
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#e8d4c4" strokeWidth="10" />
                 {/* Progress circle */}
                 <circle 
                   cx="60" 
                   cy="60" 
                   r="50" 
                   fill="none" 
-                  stroke="#9b8b6f" 
-                  strokeWidth="8"
+                  stroke="#a89968" 
+                  strokeWidth="10"
                   strokeDasharray={`${(caloriePercent / 100) * 314} 314`}
                   strokeLinecap="round"
                   className="transition-all duration-300"
@@ -216,8 +216,8 @@ export default function Dashboard() {
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <p className="text-4xl md:text-5xl font-light text-amber-950">{caloriePercent}%</p>
-                  <p className="text-xs text-amber-700/60 mt-1">completed</p>
+                  <p className="text-5xl md:text-6xl font-light text-amber-950">{caloriePercent}%</p>
+                  <p className="text-xs text-amber-700/50 mt-2">completed</p>
                 </div>
               </div>
             </div>
@@ -225,89 +225,89 @@ export default function Dashboard() {
         </div>
 
         {/* MACRO BREAKDOWN SECTION */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Protein Card */}
-          <div className="bg-amber-100/25 rounded-2xl p-4 border border-amber-200/30">
+          <div className="bg-amber-100/30 rounded-3xl p-6 border border-amber-200/30 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-0.5">PROTEIN</p>
-                <p className="text-2xl font-light text-amber-950">{Math.round(protein)}g</p>
-                <p className="text-xs text-amber-700/50 mt-1">Building blocks</p>
+                <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-1">PROTEIN</p>
+                <p className="text-3xl font-light text-amber-950">{Math.round(protein)}g</p>
+                <p className="text-xs text-amber-700/50 mt-2">Building blocks</p>
               </div>
-              <div className="w-1 h-12 bg-gradient-to-b from-amber-400 to-amber-200 rounded-full"></div>
+              <div className="w-1.5 h-16 bg-gradient-to-b from-amber-400 to-amber-200 rounded-full"></div>
             </div>
           </div>
 
           {/* Carbs & Fats Row */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-amber-50/60 rounded-2xl p-4 border border-amber-100/30">
-              <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-2">CARBS</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-amber-50/70 rounded-3xl p-5 border border-amber-100/30 shadow-sm">
+              <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-2">CARBS</p>
               <p className="text-2xl font-light text-amber-950">{Math.round(carbs)}g</p>
             </div>
-            <div className="bg-rose-50/40 rounded-2xl p-4 border border-rose-100/30">
-              <p className="text-xs font-medium text-rose-700/60 tracking-wide mb-2">FATS</p>
+            <div className="bg-rose-50/50 rounded-3xl p-5 border border-rose-100/30 shadow-sm">
+              <p className="text-xs font-semibold text-rose-700/60 tracking-widest uppercase mb-2">FATS</p>
               <p className="text-2xl font-light text-rose-950">{Math.round(fat)}g</p>
             </div>
           </div>
         </div>
 
         {/* BODY BALANCE SECTION */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/70 rounded-2xl p-4 border border-amber-100/20 text-center">
-            <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-2">WEIGHT</p>
-            <p className="text-xl font-light text-amber-950">{profile.weightKg}</p>
-            <p className="text-xs text-amber-700/40 mt-1">kg</p>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white/80 rounded-3xl p-5 border border-amber-100/20 text-center shadow-sm">
+            <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-2">WEIGHT</p>
+            <p className="text-2xl font-light text-amber-950">{profile.weightKg}</p>
+            <p className="text-xs text-amber-700/40 mt-1.5">kg</p>
           </div>
-          <div className="bg-white/70 rounded-2xl p-4 border border-amber-100/20 text-center">
-            <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-2">BODY FAT</p>
-            <p className="text-xl font-light text-amber-950">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
-            <p className="text-xs text-amber-700/40 mt-1">%</p>
+          <div className="bg-white/80 rounded-3xl p-5 border border-amber-100/20 text-center shadow-sm">
+            <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-2">BODY FAT</p>
+            <p className="text-2xl font-light text-amber-950">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
+            <p className="text-xs text-amber-700/40 mt-1.5">%</p>
           </div>
-          <div className="bg-white/70 rounded-2xl p-4 border border-amber-100/20 text-center">
-            <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-2">BMI</p>
-            <p className="text-xl font-light text-amber-950">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
-            <p className="text-xs text-amber-700/40 mt-1">kg/m²</p>
+          <div className="bg-white/80 rounded-3xl p-5 border border-amber-100/20 text-center shadow-sm">
+            <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-2">BMI</p>
+            <p className="text-2xl font-light text-amber-950">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
+            <p className="text-xs text-amber-700/40 mt-1.5">kg/m²</p>
           </div>
         </div>
 
         {/* TARGET PROGRESS SECTION */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-medium text-amber-950/70 tracking-wide">TARGET PROGRESS</h2>
+            <h2 className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">TARGET PROGRESS</h2>
             <button className="text-xs text-amber-700 hover:text-amber-900 font-medium">more</button>
           </div>
           
-          <div className="bg-white/80 rounded-2xl p-5 border border-amber-100/40">
-            <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-white/85 rounded-3xl p-6 border border-amber-100/30 shadow-sm">
+            <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center">
-                <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-1">START POINT</p>
-                <p className="text-lg font-light text-amber-950">{profile.weightKg}kg</p>
+                <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-1.5">START POINT</p>
+                <p className="text-xl font-light text-amber-950">{profile.weightKg}kg</p>
               </div>
               <div className="text-center">
-                <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-1">GOAL</p>
-                <p className="text-lg font-light text-amber-950">{profile.goalKg}kg</p>
+                <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-1.5">GOAL</p>
+                <p className="text-xl font-light text-amber-950">{profile.goalKg}kg</p>
               </div>
               <div className="text-center">
-                <p className="text-xs font-medium text-amber-700/60 tracking-wide mb-1">DAYS LEFT</p>
-                <p className="text-lg font-light text-amber-950">92</p>
+                <p className="text-xs font-semibold text-amber-700/60 tracking-widest uppercase mb-1.5">DAYS LEFT</p>
+                <p className="text-xl font-light text-amber-950">92</p>
               </div>
             </div>
             
-            <div className="w-full bg-amber-100/30 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-amber-100/30 rounded-full h-3 overflow-hidden">
               <div 
                 className="bg-amber-400 h-full rounded-full transition-all duration-300"
                 style={{ width: '35%' }}
               ></div>
             </div>
-            <p className="text-xs text-amber-700/50 mt-2 text-center">35% completed</p>
+            <p className="text-xs text-amber-700/50 mt-3 text-center">35% completed</p>
           </div>
         </div>
 
         {/* AI ADVICE SECTION */}
         {recs && (
-          <div className="space-y-3" ref={aiRecommendationsRef}>
+          <div className="space-y-4" ref={aiRecommendationsRef}>
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-sm font-medium text-amber-950/70 tracking-wide">AI ADVICE</h2>
+              <h2 className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">AI ADVICE</h2>
               <button 
                 onClick={() => setLocation('/ai-recommendations')}
                 className="text-xs text-amber-700 hover:text-amber-900 font-medium flex items-center gap-1"
@@ -317,22 +317,22 @@ export default function Dashboard() {
             </div>
 
             {/* Diet Recommendation */}
-            <div className="bg-white/70 rounded-2xl p-4 border border-amber-100/30">
-              <div className="flex items-start gap-3">
-                <div className="text-xl">🍽️</div>
+            <div className="bg-white/80 rounded-3xl p-5 border border-amber-100/30 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="text-2xl">🍽️</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-amber-950 mb-0.5">Diet</p>
+                  <p className="text-sm font-medium text-amber-950 mb-1">Diet</p>
                   <p className="text-xs text-amber-700/70 leading-relaxed">{recs.diet?.[0]?.message || '增加蛋白質攝入，保持營養均衡。'}</p>
                 </div>
               </div>
             </div>
 
             {/* Exercise Recommendation */}
-            <div className="bg-white/70 rounded-2xl p-4 border border-amber-100/30">
-              <div className="flex items-start gap-3">
-                <div className="text-xl">💪</div>
+            <div className="bg-white/80 rounded-3xl p-5 border border-amber-100/30 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="text-2xl">💪</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-amber-950 mb-0.5">Exercise</p>
+                  <p className="text-sm font-medium text-amber-950 mb-1">Exercise</p>
                   <p className="text-xs text-amber-700/70 leading-relaxed">{recs.exercise?.[0]?.message || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
                 </div>
               </div>
@@ -341,9 +341,9 @@ export default function Dashboard() {
         )}
 
         {/* TODAY ACTIVITY SECTION */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-medium text-amber-950/70 tracking-wide">TODAY ACTIVITY</h2>
+            <h2 className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">TODAY ACTIVITY</h2>
             <button 
               onClick={() => setLocation('/exercise')}
               className="text-xs text-amber-700 hover:text-amber-900 font-medium flex items-center gap-1"
@@ -353,14 +353,14 @@ export default function Dashboard() {
           </div>
 
           {dashData?.today.exercises && dashData.today.exercises.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {dashData.today.exercises.map((exercise, idx) => {
                 const { icon, label } = getExerciseDisplay(exercise.name);
                 return (
-                  <div key={idx} className="bg-white/70 rounded-2xl p-4 border border-amber-100/30">
+                  <div key={idx} className="bg-white/80 rounded-3xl p-5 border border-amber-100/30 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <span className="text-lg">{icon}</span>
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <span className="text-2xl">{icon}</span>
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-amber-950">{label}</p>
                           <p className="text-xs text-amber-700/60">{exercise.duration} min</p>
@@ -376,7 +376,7 @@ export default function Dashboard() {
               })}
             </div>
           ) : (
-            <div className="bg-white/70 rounded-2xl p-5 border border-amber-100/30 text-center">
+            <div className="bg-white/80 rounded-3xl p-6 border border-amber-100/30 text-center shadow-sm">
               <p className="text-sm text-amber-700/70 mb-2">No activity recorded today</p>
               <button 
                 onClick={() => setLocation('/exercise')}
@@ -389,10 +389,10 @@ export default function Dashboard() {
         </div>
 
         {/* HYDRATION SECTION */}
-        <div className="bg-gradient-to-r from-emerald-50/40 to-teal-50/30 rounded-2xl p-4 border border-emerald-100/30">
+        <div className="bg-gradient-to-r from-emerald-50/50 to-teal-50/40 rounded-3xl p-5 border border-emerald-100/30 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-emerald-700/60 tracking-wide mb-1">HYDRATION PULSE</p>
+              <p className="text-xs font-semibold text-emerald-700/60 tracking-widest uppercase mb-1.5">HYDRATION PULSE</p>
               <p className="text-sm text-emerald-900/70">1.8L of 2.5L goal</p>
             </div>
             <div className="flex gap-1">
@@ -404,12 +404,12 @@ export default function Dashboard() {
         </div>
 
         {/* SLEEP SECTION */}
-        <div className="bg-gradient-to-r from-slate-50/40 to-blue-50/30 rounded-2xl p-4 border border-slate-100/30">
+        <div className="bg-gradient-to-r from-slate-50/50 to-blue-50/40 rounded-3xl p-5 border border-slate-100/30 shadow-sm">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">🌙</span>
+            <div className="flex items-center gap-4">
+              <span className="text-2xl">🌙</span>
               <div>
-                <p className="text-xs font-medium text-slate-700/60 tracking-wide mb-0.5">SLEEP</p>
+                <p className="text-xs font-semibold text-slate-700/60 tracking-widest uppercase mb-1.5">SLEEP</p>
                 <p className="text-sm text-slate-900/70">7h 50m</p>
               </div>
             </div>
