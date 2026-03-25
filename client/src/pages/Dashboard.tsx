@@ -48,12 +48,12 @@ export function Dashboard() {
   const [todayMood, setTodayMood] = useState<string | null>(null);
 
   const { data: dashboardData } = trpc.dashboard.getData.useQuery();
-  const recommendationsData: RecommendationLike[] = []; // Placeholder for recommendations
-  const bodyMetrics = { weight: '55.0', bodyFat: '15.0', bmi: '21.5' }; // Placeholder for body metrics
-  const activities: ActivityLike[] = []; // Placeholder for activities
+  const { data: recommendationsData } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
+  const { data: bodyMetricsData } = trpc.bodyMetrics.latest.useQuery();
+  const { data: activitiesData } = trpc.dashboard.getData.useQuery();
 
   const todayCalories = Number(dashboardData?.today?.calories ?? 0);
-  const calorieTarget = 2000; // Default target
+  const calorieTarget = 2000; // Use default, can be calculated from profile if needed
   const caloriePercent =
     calorieTarget > 0 ? Math.max(0, Math.min(100, Math.round((todayCalories / calorieTarget) * 100))) : 0;
 
@@ -121,8 +121,7 @@ export function Dashboard() {
     todayMood === 'angry' ||
     todayMood === 'tired' ||
     todayCalories < calorieTarget * 0.8 ||
-    !activities ||
-    activities.length === 0;
+    (dashboardData?.today?.exercises?.length ?? 0) === 0;
 
   const moods = [
     { id: 'happy', emoji: '😊', label: 'Happy' },
@@ -133,11 +132,11 @@ export function Dashboard() {
   ];
 
   const recommendationList: RecommendationLike[] = useMemo(() => {
-    if (Array.isArray(recommendationsData)) {
-      return recommendationsData.slice(0, 2) as RecommendationLike[];
+    if (recommendationsData && Array.isArray(recommendationsData.diet)) {
+      return (recommendationsData.diet as RecommendationLike[]).slice(0, 2);
     }
     return [];
-  }, [recommendationsData]);
+  }, [recommendationsData, todayMood]);
 
   const fallbackRecommendations: RecommendationLike[] = [
     {
@@ -153,15 +152,34 @@ export function Dashboard() {
   const displayRecommendations =
     recommendationList.length > 0 ? recommendationList : fallbackRecommendations;
 
-  const activityList: ActivityLike[] = Array.isArray(activities) ? (activities as ActivityLike[]) : [];
+  // Get coach tone from profile for AI Advice variation
+  const coachTone = dashboardData?.profile?.aiToneStyle || 'gentle';
+
+  const activities: ActivityLike[] = dashboardData?.today?.exercises ?? [];
+  const activityList: ActivityLike[] = activities || [];
+
+  // Extract macro data from dashboard (if available in future)
+  const proteinGrams = 0; // Placeholder - not in current dashboard data
+  const carbsGrams = 0; // Placeholder - not in current dashboard data
+  const fatsGrams = 0; // Placeholder - not in current dashboard data
 
   const circleRadius = 70;
   const circleCircumference = 2 * Math.PI * circleRadius;
   const progressOffset = circleCircumference - (caloriePercent / 100) * circleCircumference;
 
-  const bodyWeight = bodyMetrics?.weight ?? '55.0';
-  const bodyFat = bodyMetrics?.bodyFat ?? '15.0';
-  const bmi = bodyMetrics?.bmi ?? '21.5';
+  // Target progress - use profile goal if available
+  const targetStartWeight = dashboardData?.profile?.weightKg ? Number(dashboardData.profile.weightKg) : 0;
+  const targetGoalWeight = dashboardData?.profile?.goalKg ? Number(dashboardData.profile.goalKg) : 0;
+  const targetDaysRemaining = dashboardData?.profile?.goalDays ?? 0;
+  const currentWeight = bodyMetricsData?.weightKg ? Number(bodyMetricsData.weightKg) : targetStartWeight;
+  const targetProgressPercent = targetStartWeight > 0 && targetGoalWeight > 0 && targetStartWeight !== targetGoalWeight
+    ? Math.max(0, Math.min(100, Math.round(((targetStartWeight - currentWeight) / Math.abs(targetStartWeight - targetGoalWeight)) * 100)))
+    : 0;
+  const targetDifference = Math.abs(currentWeight - targetGoalWeight);
+
+  const bodyWeight = bodyMetricsData?.weightKg ?? '—';
+  const bodyFat = bodyMetricsData?.bodyFatPercent ?? '—';
+  const bmi = bodyMetricsData ? (Number(bodyMetricsData.weightKg) / ((Number(dashboardData?.profile?.heightCm ?? 170) / 100) ** 2)).toFixed(1) : '—';
 
   return (
     <div className="min-h-screen bg-[#fcf9f4] pb-32 text-[#1c1c19]">
@@ -347,7 +365,7 @@ export function Dashboard() {
                 className="text-xl text-[#251a08]"
                 style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
               >
-                125g
+                {proteinGrams > 0 ? proteinGrams : '—'}g
               </span>
               <div className="mt-2 h-1.5 w-24 overflow-hidden rounded-full bg-[#251a08]/10">
                 <div className="h-full w-[70%] rounded-full bg-[#251a08]" />
@@ -361,7 +379,7 @@ export function Dashboard() {
               className="block text-xl text-[#1c1c19]"
               style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
             >
-              210g
+              {carbsGrams > 0 ? carbsGrams : '—'}g
             </span>
             <div className="h-1 w-full overflow-hidden rounded-full bg-[#c6c8b8]/30">
               <div className="h-full w-[60%] rounded-full bg-[#8a9a5b]" />
@@ -374,7 +392,7 @@ export function Dashboard() {
               className="block text-xl text-[#1c1c19]"
               style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
             >
-              62g
+              {fatsGrams > 0 ? fatsGrams : '—'}g
             </span>
             <div className="h-1 w-full overflow-hidden rounded-full bg-[#c6c8b8]/30">
               <div className="h-full w-[45%] rounded-full bg-[#d27d5b]" />
@@ -416,7 +434,7 @@ export function Dashboard() {
                     className="text-lg font-bold text-[#1c1c19]"
                     style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
                   >
-                    55.0kg
+                    {targetStartWeight > 0 ? targetStartWeight : '—'}kg
                   </p>
                 </div>
                 <div className="space-y-0.5 text-right">
@@ -425,21 +443,21 @@ export function Dashboard() {
                     className="text-lg font-bold text-[#56642b]"
                     style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
                   >
-                    3.0kg
+                    {targetGoalWeight > 0 ? Math.abs(targetStartWeight - targetGoalWeight) : '—'}kg
                   </p>
                 </div>
               </div>
 
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e5e2dd]">
-                <div className="h-full w-[35%] rounded-full bg-[#8a9a5b]" />
+                <div className="h-full rounded-full bg-[#8a9a5b]" style={{ width: `${targetProgressPercent}%` }} />
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-semibold uppercase tracking-tight text-[#56642b]">
-                  35% Completed
+                  {targetProgressPercent}% Completed
                 </span>
                 <span className="text-[10px] uppercase tracking-tight text-[#46483c]/70">
-                  Difference 3.6kg
+                  Difference {targetDifference.toFixed(1)}kg
                 </span>
               </div>
             </div>
@@ -449,7 +467,7 @@ export function Dashboard() {
                 className="text-4xl font-bold leading-none text-[#1c1c19]"
                 style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
               >
-                92
+                {targetDaysRemaining > 0 ? targetDaysRemaining : '—'}
               </p>
               <p className="mt-1 whitespace-nowrap text-[9px] uppercase tracking-tighter text-[#46483c]/60">
                 Days Remaining
