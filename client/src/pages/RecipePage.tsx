@@ -26,7 +26,7 @@ export default function RecipePage() {
     );
   }
 
-  const handleAddToDiet = async () => {
+  const handleAddToDiet = async (): Promise<void> => {
     try {
       window.location.href = "/food";
     } catch (error) {
@@ -103,7 +103,7 @@ export default function RecipePage() {
         <div className="bg-card rounded-xl border border-border p-4 space-y-3">
           <h2 className="font-semibold text-foreground">材料</h2>
           <div className="flex flex-wrap gap-2">
-            {recipe.ingredients.map((ingredient, idx) => (
+            {recipe.ingredients.map((ingredient: { name: string; quantity: string }, idx: number) => (
               <div
                 key={idx}
                 className="inline-flex items-center gap-2 bg-accent/50 rounded-full px-3 py-1 text-sm text-foreground"
@@ -119,7 +119,7 @@ export default function RecipePage() {
         <div className="bg-card rounded-xl border border-border p-4 space-y-3">
           <h2 className="font-semibold text-foreground">做法</h2>
           <div className="space-y-2">
-            {recipe.steps.map((step, idx) => (
+            {recipe.steps.map((step: string, idx: number) => (
               <div key={idx} className="flex gap-3">
                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary">
                   {idx + 1}
@@ -137,7 +137,7 @@ export default function RecipePage() {
             減脂貼士
           </h2>
           <div className="space-y-2">
-            {recipe.fatLossTips.map((tip, idx) => (
+            {recipe.fatLossTips.map((tip: string, idx: number) => (
               <div key={idx} className="flex gap-3">
                 <span className="text-green-600 font-bold">✓</span>
                 <p className="text-sm text-foreground">{tip}</p>

@@ -1,425 +1,683 @@
-import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Bell, User } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, Bell, User, ChevronRight } from 'lucide-react';
-import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
-import { getExerciseDisplay } from '@/lib/exerciseMapping';
+import { useAuth } from '@/_core/hooks/useAuth';
 
+type RecommendationLike = {
+  title?: string;
+  description?: string;
+};
 
-export default function Dashboard() {
+type ActivityLike = {
+  id?: string | number;
+  name?: string;
+  duration?: number | string;
+  distance?: number | string;
+};
+
+type MetricCardProps = {
+  label: string;
+  value: string | number;
+  unit?: string;
+  note?: string;
+};
+
+function MetricCard({ label, value, unit = '', note = '' }: MetricCardProps) {
+  return (
+    <div className="flex min-h-[110px] flex-col justify-between rounded-2xl bg-[#f6f3ee] p-4 shadow-sm">
+      <span className="text-[10px] uppercase tracking-widest text-[#46483c]/70">{label}</span>
+      <div className="mt-2">
+        <span
+          className="text-xl font-bold text-[#1c1c19]"
+          style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+        >
+          {value}
+        </span>
+        {unit ? <span className="ml-0.5 text-[10px] text-[#46483c]/70">{unit}</span> : null}
+      </div>
+      {note ? <p className="mt-2 text-[9px] font-medium italic text-[#56642b]/80">{note}</p> : <div />}
+    </div>
+  );
+}
+
+export function Dashboard() {
   const [, setLocation] = useLocation();
-  const [todayMood, setTodayMood] = useState<string | null>(null);
+  const { user } = useAuth();
   const aiRecommendationsRef = useRef<HTMLDivElement>(null);
-  const profileQuery = trpc.profile.get.useQuery();
-  const { data: profile, isLoading: profileLoading, error: profileError } = profileQuery;
-  const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
-  const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
-  const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
+  const [todayMood, setTodayMood] = useState<string | null>(null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('[Dashboard] Profile query state:', { profileLoading, profile, profileError });
-  }, [profileLoading, profile, profileError]);
+  const { data: dashboardData } = trpc.dashboard.getData.useQuery();
+  const recommendationsData: RecommendationLike[] = []; // Placeholder for recommendations
+  const bodyMetrics = { weight: '55.0', bodyFat: '15.0', bmi: '21.5' }; // Placeholder for body metrics
+  const activities: ActivityLike[] = []; // Placeholder for activities
 
-  // Load mood from localStorage on mount
+  const todayCalories = Number(dashboardData?.today?.calories ?? 0);
+  const calorieTarget = 2000; // Default target
+  const caloriePercent =
+    calorieTarget > 0 ? Math.max(0, Math.min(100, Math.round((todayCalories / calorieTarget) * 100))) : 0;
+
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    const moods = JSON.parse(localStorage.getItem('userMoods') || '{}');
-    setTodayMood(moods[today] || null);
+    const today = new Date().toDateString();
+    const stored = localStorage.getItem('userMoods');
+
+    if (!stored) return;
+
+    try {
+      const moods = JSON.parse(stored) as Record<string, string>;
+      setTodayMood(moods[today] || null);
+    } catch {
+      setTodayMood(null);
+    }
   }, []);
 
-  useEffect(() => {
-    if (profileLoading) return;
-    if (!profile) {
-      setLocation('/onboarding');
+  const handleMoodSelect = (moodId: string) => {
+    setTodayMood(moodId);
+
+    const today = new Date().toDateString();
+    const stored = localStorage.getItem('userMoods');
+
+    try {
+      const moods = stored ? (JSON.parse(stored) as Record<string, string>) : {};
+      moods[today] = moodId;
+      localStorage.setItem('userMoods', JSON.stringify(moods));
+    } catch {
+      const moods: Record<string, string> = { [today]: moodId };
+      localStorage.setItem('userMoods', JSON.stringify(moods));
     }
-  }, [profileLoading, profile, setLocation]);
-
-  const handleMoodSelect = (mood: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const moods = JSON.parse(localStorage.getItem('userMoods') || '{}');
-    moods[today] = mood;
-    localStorage.setItem('userMoods', JSON.stringify(moods));
-    setTodayMood(mood);
   };
-
-  // Only show loading if profile is actually loading and we don't have any data
-  const isLoading = profileLoading && !profile;
-
-  if (isLoading) {
-    return (
-      <div className="p-4 md:p-8 flex justify-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!profile) return null;
-
-  const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
-  const tdee = calculateTDEE(bmr, profile.activityLevel);
-  const goalKg = profile.goalKg ? Number(profile.goalKg) : 0;
-  const goalDays = profile.goalDays ? Number(profile.goalDays) : 0;
-  const calorieCalc = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, goalKg, goalDays, profile.gender, profile.calorieMode || 'safe');
-  let target = Number(calorieCalc?.originalCalories) || 2000;
-  if (!isFinite(target) || target <= 0) {
-    target = 2000;
-  }
-
-  const todayCalories = dashData?.today.calories ?? 0;
-  const todayExercise = dashData?.today.exerciseCalories ?? 0;
-  const netCalories = todayCalories - todayExercise;
-  const caloriePercent = target > 0 ? Math.round((todayCalories / target) * 100) : 0;
-  const remaining = Math.max(0, target - todayCalories);
-
-  // Get macros - use default values if not available
-  const protein = 126;
-  const fat = 43;
-  const carbs = 113;
-  const totalMacros = protein + fat + carbs;
-
-  // Notification badge logic
-  const hasNegativeMood = todayMood === 'sad' || todayMood === 'angry' || todayMood === 'tired';
-  const hasProteinDeficit = protein < 30;
-  const noExerciseToday = todayExercise === 0;
-  const hasCalorieGap = remaining > 100;
-  const shouldShowNotification = hasNegativeMood || hasProteinDeficit || noExerciseToday || hasCalorieGap;
 
   const getDateString = () => {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    const weekDay = ['日', '一', '二', '三', '四', '五', '六'][now.getDay()];
-    return `${year}年${month}月${day}日 · 星期${weekDay}`;
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const weekday = weekdays[now.getDay()];
+    return `${year}年${month}月${day}日 · ${weekday}`;
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    const name = profile?.displayName || '';
-    const greeting = hour < 12 ? '早晨' : hour < 18 ? '午安' : '晚安';
-    const emoji = hour < 12 ? '🌤️' : hour < 18 ? '☀️' : '🌙';
-    
-    if (name) {
-      return `${greeting}，${name}！${emoji}`;
-    }
-    return `${greeting}！${emoji}`;
+  const getWeekdayOnly = () => {
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return weekdays[new Date().getDay()];
   };
+
+  const getGreetingLabel = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const getGreetingCn = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return '午安';
+    if (hour < 18) return '下午好';
+    return '晚安';
+  };
+
+  const shouldShowNotification =
+    todayMood === 'sad' ||
+    todayMood === 'angry' ||
+    todayMood === 'tired' ||
+    todayCalories < calorieTarget * 0.8 ||
+    !activities ||
+    activities.length === 0;
+
+  const moods = [
+    { id: 'happy', emoji: '😊', label: 'Happy' },
+    { id: 'neutral', emoji: '😐', label: 'Normal' },
+    { id: 'sad', emoji: '😔', label: 'Sad' },
+    { id: 'angry', emoji: '😡', label: 'Angry' },
+    { id: 'tired', emoji: '😴', label: 'Tired' },
+  ];
+
+  const recommendationList: RecommendationLike[] = useMemo(() => {
+    if (Array.isArray(recommendationsData)) {
+      return recommendationsData.slice(0, 2) as RecommendationLike[];
+    }
+    return [];
+  }, [recommendationsData]);
+
+  const fallbackRecommendations: RecommendationLike[] = [
+    {
+      title: 'Diet',
+      description: 'Protein slightly low. Consider a harvest bowl or lean protein source for your next meal.',
+    },
+    {
+      title: 'Exercise',
+      description: 'Consistency is key. A light 20-minute walk is recommended today.',
+    },
+  ];
+
+  const displayRecommendations =
+    recommendationList.length > 0 ? recommendationList : fallbackRecommendations;
+
+  const activityList: ActivityLike[] = Array.isArray(activities) ? (activities as ActivityLike[]) : [];
+
+  const circleRadius = 70;
+  const circleCircumference = 2 * Math.PI * circleRadius;
+  const progressOffset = circleCircumference - (caloriePercent / 100) * circleCircumference;
+
+  const bodyWeight = bodyMetrics?.weight ?? '55.0';
+  const bodyFat = bodyMetrics?.bodyFat ?? '15.0';
+  const bmi = bodyMetrics?.bmi ?? '21.5';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/40 to-white pb-32 md:pb-8">
-      {/* HEADER SECTION */}
-      <div className="px-4 md:px-8 pt-10 pb-8 max-w-2xl mx-auto">
-        <p className="text-xs text-amber-700/35 font-medium mb-5 tracking-widest uppercase letter-spacing-wider">{getDateString()}</p>
-        <div className="flex items-start justify-between">
-          <h1 className="text-5xl md:text-6xl font-light text-amber-950 leading-tight">{getGreeting()}</h1>
-          <div className="flex items-center gap-4 ml-4">
-            <button 
-              className="p-2.5 hover:bg-amber-100/40 rounded-full transition-colors relative"
-              onClick={() => {
-                aiRecommendationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              title="View AI recommendations"
+    <div className="min-h-screen bg-[#fcf9f4] pb-32 text-[#1c1c19]">
+      <header className="w-full px-6 pb-4 pt-8">
+        <div className="mx-auto max-w-md space-y-6">
+          <div className="space-y-1">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#7d7d72]/70">{getDateString()}</p>
+            <p
+              className="text-2xl font-bold italic text-[#56642b]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
             >
-              <Bell className="h-5 w-5 text-amber-700" />
-              {shouldShowNotification && (
-                <div className="absolute top-1 right-1 w-2 h-2 bg-rose-400 rounded-full animate-pulse"></div>
-              )}
-            </button>
-            <button 
-              className="p-2.5 hover:bg-amber-100/40 rounded-full transition-colors"
-              onClick={() => setLocation('/settings')}
-            >
-              <div className="w-8 h-8 bg-amber-200/60 rounded-full flex items-center justify-center">
-                <User className="h-4 w-4 text-amber-700" />
-              </div>
-            </button>
+              {getWeekdayOnly()}
+            </p>
           </div>
-        </div>
-      </div>
 
-      {/* MAIN CONTENT */}
-      <div className="px-4 md:px-8 space-y-6 md:space-y-7 max-w-2xl mx-auto">
-        
-        {/* MOOD TRACKER SECTION */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <p className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">TODAY MOOD</p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/mood-log')}
-              className="text-xs font-medium text-amber-700 hover:bg-amber-100/30 h-auto py-1 px-2"
-            >
-              MOOD RECORDS
-            </Button>
-          </div>
-          <div className="flex gap-3.5 justify-between">
-            {[
-              { id: 'happy', emoji: '😊', label: 'Happy' },
-              { id: 'neutral', emoji: '😐', label: 'Normal' },
-              { id: 'sad', emoji: '😞', label: 'Sad' },
-              { id: 'angry', emoji: '😡', label: 'Angry' },
-              { id: 'tired', emoji: '😴', label: 'Tired' },
-            ].map((mood) => (
+          <div className="flex items-center justify-between rounded-2xl bg-[#f6f3ee]/90 p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="text-xs uppercase tracking-widest text-[#5f6155]">{getGreetingLabel()}</span>
+                <div className="flex items-center gap-2">
+                  <h1
+                    className="text-2xl font-bold text-[#1c1c19]"
+                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+                  >
+                    {user?.name || 'User'}
+                  </h1>
+                  <span className="text-[#56642b]/80">☀️</span>
+                </div>
+                <p className="mt-1 text-sm text-[#7b6a5e]">
+                  {getGreetingCn()}，{user?.name || 'User'}！
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
               <button
-                key={mood.id}
-                onClick={() => handleMoodSelect(mood.id)}
-                className={`flex-1 flex flex-col items-center gap-2.5 py-5 px-2.5 rounded-3xl transition-all duration-200 ${
-                  todayMood === mood.id
-                    ? 'bg-amber-100/60 scale-110 shadow-md'
-                    : 'bg-white/75 hover:bg-white/95 border border-amber-50/60'
-                }`}
+                type="button"
+                className="relative rounded-full p-2 transition-colors hover:bg-[#ebe8e3]"
+                onClick={() => {
+                  aiRecommendationsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                title="View AI recommendations"
               >
-                <span className="text-4xl">{mood.emoji}</span>
-                <span className="text-xs font-medium text-amber-950/75">{mood.label}</span>
+                <Bell className="h-5 w-5 text-[#46483c]" />
+                {shouldShowNotification ? (
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-[#fcf9f4] bg-[#ba1a1a]" />
+                ) : null}
               </button>
-            ))}
-          </div>
-        </div>
 
-        {/* DAILY INTENTION SECTION */}
-        <div className="bg-gradient-to-br from-rose-100/30 to-amber-50/20 rounded-3xl p-10 md:p-12 text-center border border-rose-100/25 shadow-xs">
-          <p className="text-lg md:text-xl font-light text-amber-900/75 italic leading-relaxed mb-5">
-            "Nourishing the body is an act of gratitude for the soul's temporary home."
-          </p>
-          <p className="text-xs font-semibold text-amber-700/50 tracking-widest uppercase">DAILY INTENTION</p>
-        </div>
-
-        {/* DAILY FUEL SECTION */}
-        <div className="bg-white/90 rounded-3xl p-8 md:p-10 border border-amber-100/25 shadow-md">
-          <div className="flex items-start justify-between mb-8">
-            <h2 className="text-2xl font-medium text-amber-950">Daily Fuel</h2>
-            <p className="text-sm font-light text-amber-700/65">{Math.round(todayCalories)} / {Math.round(target)} kcal</p>
-          </div>
-          
-          {/* Circular Progress */}
-          <div className="flex justify-center mb-10">
-            <div className="relative w-56 h-56 md:w-64 md:h-64">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                {/* Background circle */}
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#e8d4c4" strokeWidth="11" />
-                {/* Progress circle */}
-                <circle 
-                  cx="60" 
-                  cy="60" 
-                  r="50" 
-                  fill="none" 
-                  stroke="#a89968" 
-                  strokeWidth="11"
-                  strokeDasharray={`${(caloriePercent / 100) * 314} 314`}
-                  strokeLinecap="round"
-                  className="transition-all duration-500"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-6xl md:text-7xl font-light text-amber-950">{caloriePercent}%</p>
-                  <p className="text-xs text-amber-700/50 mt-3">completed</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* MACRO BREAKDOWN SECTION */}
-        <div className="space-y-4">
-          {/* Protein Card */}
-          <div className="bg-amber-100/35 rounded-3xl p-7 border border-amber-200/35 shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-1.5">PROTEIN</p>
-                <p className="text-3xl font-light text-amber-950">{Math.round(protein)}g</p>
-                <p className="text-xs text-amber-700/55 mt-2.5">Building blocks</p>
-              </div>
-              <div className="w-2 h-16 bg-gradient-to-b from-amber-400 to-amber-200 rounded-full"></div>
-            </div>
-          </div>
-
-          {/* Carbs & Fats Row */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-amber-50/75 rounded-3xl p-6 border border-amber-100/35 shadow-md">
-              <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2.5">CARBS</p>
-              <p className="text-2xl font-light text-amber-950">{Math.round(carbs)}g</p>
-            </div>
-            <div className="bg-rose-50/60 rounded-3xl p-6 border border-rose-100/35 shadow-md">
-              <p className="text-xs font-semibold text-rose-700/65 tracking-widest uppercase mb-2.5">FATS</p>
-              <p className="text-2xl font-light text-rose-950">{Math.round(fat)}g</p>
-            </div>
-          </div>
-        </div>
-
-        {/* BODY BALANCE SECTION */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="bg-white/90 rounded-3xl p-6 border border-amber-100/20 text-center shadow-md">
-            <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2.5">WEIGHT</p>
-            <p className="text-2xl font-light text-amber-950">{profile.weightKg}</p>
-            <p className="text-xs text-amber-700/45 mt-2">kg</p>
-          </div>
-          <div className="bg-white/90 rounded-3xl p-6 border border-amber-100/20 text-center shadow-md">
-            <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2.5">BODY FAT</p>
-            <p className="text-2xl font-light text-amber-950">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
-            <p className="text-xs text-amber-700/45 mt-2">%</p>
-          </div>
-          <div className="bg-white/90 rounded-3xl p-6 border border-amber-100/20 text-center shadow-md">
-            <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2.5">BMI</p>
-            <p className="text-2xl font-light text-amber-950">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
-            <p className="text-xs text-amber-700/45 mt-2">kg/m²</p>
-          </div>
-        </div>
-
-        {/* TARGET PROGRESS SECTION */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">TARGET PROGRESS</h2>
-            <button className="text-xs text-amber-700 hover:text-amber-900 font-medium">more</button>
-          </div>
-          
-          <div className="bg-white/90 rounded-3xl p-7 border border-amber-100/25 shadow-md">
-            <div className="grid grid-cols-3 gap-4 mb-7">
-              <div className="text-center">
-                <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2">START POINT</p>
-                <p className="text-xl font-light text-amber-950">{profile.weightKg}kg</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2">GOAL</p>
-                <p className="text-xl font-light text-amber-950">{profile.goalKg}kg</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-semibold text-amber-700/65 tracking-widest uppercase mb-2">DAYS LEFT</p>
-                <p className="text-xl font-light text-amber-950">92</p>
-              </div>
-            </div>
-            
-            <div className="w-full bg-amber-100/30 rounded-full h-3.5 overflow-hidden">
-              <div 
-                className="bg-amber-400 h-full rounded-full transition-all duration-500"
-                style={{ width: '35%' }}
-              ></div>
-            </div>
-            <p className="text-xs text-amber-700/55 mt-3.5 text-center">35% completed</p>
-          </div>
-        </div>
-
-        {/* AI ADVICE SECTION */}
-        {recs && (
-          <div className="space-y-4" ref={aiRecommendationsRef}>
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">AI ADVICE</h2>
-              <button 
-                onClick={() => setLocation('/ai-recommendations')}
-                className="text-xs text-amber-700 hover:text-amber-900 font-medium flex items-center gap-1"
+              <button
+                type="button"
+                className="h-10 w-10 overflow-hidden rounded-full border-2 border-[#8a9a5b]/20 transition-opacity hover:opacity-90"
+                onClick={() => setLocation('/settings')}
+                title="Profile"
               >
-                more <ChevronRight className="h-3 w-3" />
+                <div className="flex h-full w-full items-center justify-center bg-[#d9eaa3]/30">
+                  <User className="h-4 w-4 text-[#56642b]" />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <section className="mb-2 mt-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#5f6155]/70">Today Mood</h3>
+              <button
+                type="button"
+                className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8a9a5b] transition-opacity hover:opacity-70"
+                onClick={() => setLocation('/mood-log')}
+              >
+                Mood Record
               </button>
             </div>
 
-            {/* Diet Recommendation */}
-            <div className="bg-white/90 rounded-3xl p-6 border border-amber-100/25 shadow-md">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">🍽️</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-amber-950 mb-1.5">Diet</p>
-                  <p className="text-xs text-amber-700/75 leading-relaxed">{recs.diet?.[0]?.message || '增加蛋白質攝入，保持營養均衡。'}</p>
-                </div>
-              </div>
-            </div>
+            <div className="flex justify-between gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {moods.map((mood) => {
+                const isActive = todayMood === mood.id;
 
-            {/* Exercise Recommendation */}
-            <div className="bg-white/90 rounded-3xl p-6 border border-amber-100/25 shadow-md">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">💪</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-amber-950 mb-1.5">Exercise</p>
-                  <p className="text-xs text-amber-700/75 leading-relaxed">{recs.exercise?.[0]?.message || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TODAY ACTIVITY SECTION */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-semibold text-amber-950/70 tracking-widest uppercase">TODAY ACTIVITY</h2>
-            <button 
-              onClick={() => setLocation('/exercise')}
-              className="text-xs text-amber-700 hover:text-amber-900 font-medium flex items-center gap-1"
-            >
-              more <ChevronRight className="h-3 w-3" />
-            </button>
-          </div>
-
-          {dashData?.today.exercises && dashData.today.exercises.length > 0 ? (
-            <div className="space-y-3">
-              {dashData.today.exercises.map((exercise, idx) => {
-                const { icon, label } = getExerciseDisplay(exercise.name);
                 return (
-                  <div key={idx} className="bg-white/90 rounded-3xl p-6 border border-amber-100/25 shadow-md">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1 min-w-0">
-                        <span className="text-3xl">{icon}</span>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-amber-950">{label}</p>
-                          <p className="text-xs text-amber-700/65">{exercise.duration} min</p>
-                        </div>
-                      </div>
-                      <div className="text-right ml-2">
-                        <p className="text-lg font-light text-amber-950">{exercise.calories}</p>
-                        <p className="text-xs text-amber-700/65">kcal</p>
-                      </div>
-                    </div>
-                  </div>
+                  <button
+                    key={mood.id}
+                    type="button"
+                    onClick={() => handleMoodSelect(mood.id)}
+                    className={`flex min-w-[64px] flex-col items-center gap-1.5 rounded-xl border p-3 transition-all active:scale-95 ${
+                      isActive
+                        ? 'border-[#7e947f]/30 bg-[#8a9a5b]/10'
+                        : 'border-transparent bg-[#ffffff]/60 hover:bg-[#ebe8e3]'
+                    }`}
+                  >
+                    <span className="text-xl">{mood.emoji}</span>
+                    <span className="text-[10px] font-medium text-[#46483c]">{mood.label}</span>
+                  </button>
                 );
               })}
             </div>
+          </section>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-md space-y-8 px-6 pt-2">
+        <section className="relative overflow-hidden rounded-2xl bg-[#d27d5b]/10 p-8 text-center">
+          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#d27d5b]/5 blur-2xl" />
+          <p
+            className="text-lg italic leading-relaxed text-[#924a2c]"
+            style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+          >
+            &quot;Nourishing the body is an act of gratitude for the soul&apos;s temporary home.&quot;
+          </p>
+          <p className="mt-4 text-xs uppercase tracking-widest text-[#464646]/60">Daily Intention</p>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-end justify-between px-2">
+            <h2
+              className="text-3xl font-bold text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              Daily Fuel
+            </h2>
+            <div className="text-right">
+              <span
+                className="text-2xl font-bold text-[#56642b]"
+                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+              >
+                {Math.round(todayCalories).toLocaleString()}
+              </span>
+              <span className="ml-1 text-sm text-[#46483c]/80">
+                / {Math.round(calorieTarget).toLocaleString()} kcal
+              </span>
+            </div>
+          </div>
+
+          <div className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-2xl bg-[#ffffff]">
+            <svg className="h-40 w-40 -rotate-90" viewBox="0 0 160 160">
+              <circle
+                cx="80"
+                cy="80"
+                r={circleRadius}
+                fill="transparent"
+                stroke="#e5e2dd"
+                strokeWidth="12"
+              />
+              <circle
+                cx="80"
+                cy="80"
+                r={circleRadius}
+                fill="transparent"
+                stroke="url(#dashboardFuelGradient)"
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={circleCircumference}
+                strokeDashoffset={progressOffset}
+                className="transition-all duration-700"
+              />
+              <defs>
+                <linearGradient id="dashboardFuelGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#56642b" />
+                  <stop offset="100%" stopColor="#8a9a5b" />
+                </linearGradient>
+              </defs>
+            </svg>
+
+            <div className="absolute flex flex-col items-center">
+              <span
+                className="text-4xl text-[#1c1c19]"
+                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+              >
+                {caloriePercent}%
+              </span>
+              <span className="text-[10px] uppercase tracking-tight text-[#46483c]/70">Consumed</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-2 gap-4">
+          <div className="col-span-2 flex items-center justify-between rounded-2xl bg-[#f6dfc2] p-6">
+            <div>
+              <h3 className="font-bold text-[#251a08]">Protein</h3>
+              <p className="text-sm text-[#251a08]/70">Building blocks</p>
+            </div>
+            <div className="text-right">
+              <span
+                className="text-xl text-[#251a08]"
+                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+              >
+                125g
+              </span>
+              <div className="mt-2 h-1.5 w-24 overflow-hidden rounded-full bg-[#251a08]/10">
+                <div className="h-full w-[70%] rounded-full bg-[#251a08]" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-2xl bg-[#ebe8e3] p-6">
+            <h3 className="font-bold text-[#1c1c19]">Carbs</h3>
+            <span
+              className="block text-xl text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              210g
+            </span>
+            <div className="h-1 w-full overflow-hidden rounded-full bg-[#c6c8b8]/30">
+              <div className="h-full w-[60%] rounded-full bg-[#8a9a5b]" />
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-2xl bg-[#ebe8e3] p-6">
+            <h3 className="font-bold text-[#1c1c19]">Fats</h3>
+            <span
+              className="block text-xl text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              62g
+            </span>
+            <div className="h-1 w-full overflow-hidden rounded-full bg-[#c6c8b8]/30">
+              <div className="h-full w-[45%] rounded-full bg-[#d27d5b]" />
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="px-2">
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#46483c]/60">Body Balance</h3>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <MetricCard label="Weight" value={bodyWeight} unit="kg" note="• Stable" />
+            <MetricCard label="Body Fat" value={bodyFat} unit="%" note="• Consistent" />
+            <MetricCard label="BMI" value={bmi} unit="kg/m²" note="• Optimal" />
+          </div>
+        </section>
+
+        <section className="mt-8 space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h2
+              className="text-2xl font-bold text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              Target Progress
+            </h2>
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline">
+              more
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between rounded-2xl bg-[#f6f3ee] p-6">
+            <div className="mr-6 flex-1 space-y-4">
+              <div className="flex items-end justify-between">
+                <div className="space-y-0.5">
+                  <p className="text-[10px] uppercase tracking-widest text-[#46483c]/70">Start from</p>
+                  <p
+                    className="text-lg font-bold text-[#1c1c19]"
+                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+                  >
+                    55.0kg
+                  </p>
+                </div>
+                <div className="space-y-0.5 text-right">
+                  <p className="text-[10px] uppercase tracking-widest text-[#46483c]/70">Goal</p>
+                  <p
+                    className="text-lg font-bold text-[#56642b]"
+                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+                  >
+                    3.0kg
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e5e2dd]">
+                <div className="h-full w-[35%] rounded-full bg-[#8a9a5b]" />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-tight text-[#56642b]">
+                  35% Completed
+                </span>
+                <span className="text-[10px] uppercase tracking-tight text-[#46483c]/70">
+                  Difference 3.6kg
+                </span>
+              </div>
+            </div>
+
+            <div className="border-l border-[#c6c8b8]/40 pl-6 text-center">
+              <p
+                className="text-4xl font-bold leading-none text-[#1c1c19]"
+                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+              >
+                92
+              </p>
+              <p className="mt-1 whitespace-nowrap text-[9px] uppercase tracking-tighter text-[#46483c]/60">
+                Days Remaining
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section ref={aiRecommendationsRef} className="mt-8 space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h2
+              className="text-2xl font-bold text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              AI Advice
+            </h2>
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline">
+              more
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {displayRecommendations.slice(0, 2).map((item, idx) => (
+              <div key={idx} className="flex items-start gap-4 rounded-2xl bg-[#f6f3ee] p-5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#56642b]/10">
+                  <span className="text-xl text-[#56642b]">{idx === 0 ? '🍽️' : '💪'}</span>
+                </div>
+                <div className="space-y-1">
+                  <h4
+                    className="text-base font-bold text-[#1c1c19]"
+                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+                  >
+                    {item.title || (idx === 0 ? 'Diet' : 'Exercise')}
+                  </h4>
+                  <p className="text-xs leading-relaxed text-[#46483c]/80">
+                    {item.description || fallbackRecommendations[idx].description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h2
+              className="text-2xl font-bold text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              Today Activity
+            </h2>
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline">
+              more
+            </button>
+          </div>
+
+          {activityList.length > 0 ? (
+            <>
+              {activityList.slice(0, 1).map((activity, idx) => (
+                <div
+                  key={`activity-primary-${activity.id ?? idx}`}
+                  className="flex items-center justify-between rounded-2xl bg-[#f6f3ee] p-5"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#56642b]/10">
+                      <span className="text-2xl text-[#56642b]">🚶</span>
+                    </div>
+                    <div className="space-y-0.5">
+                      <h4
+                        className="text-lg font-bold text-[#1c1c19]"
+                        style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+                      >
+                        {activity.name || 'Daily Walk'}
+                      </h4>
+                      <p className="text-xs text-[#46483c]/70">
+                        {activity.duration || 20} mins
+                        {activity.distance ? ` • ${activity.distance} km` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#56642b] text-white shadow-sm transition-transform active:scale-95"
+                  >
+                    +
+                  </button>
+                </div>
+              ))}
+
+              {activityList.slice(1, 3).map((activity, idx) => (
+                <div
+                  key={`activity-secondary-${activity.id ?? idx}`}
+                  className="group mt-4 flex items-center gap-4 rounded-xl bg-[#f6f3ee] p-3 transition-shadow hover:shadow-sm"
+                >
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-[#e5e2dd] text-3xl">
+                    🥗
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between">
+                      <h4 className="font-bold text-[#1c1c19]">{activity.name || 'Harvest Activity'}</h4>
+                      <span className="text-xs text-[#46483c]/70">08:30 AM</span>
+                    </div>
+                    <p className="mt-1 text-sm italic text-[#46483c]/80">
+                      {activity.duration ? `${activity.duration} mins completed` : 'Balanced daily movement'}
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <span className="rounded-full bg-[#f6dfc2] px-3 py-0.5 text-[10px] font-bold uppercase tracking-tight text-[#251a08]">
+                        Active
+                      </span>
+                      <span className="rounded-full bg-[#d9eaa3] px-3 py-0.5 text-[10px] font-bold uppercase tracking-tight text-[#161f00]">
+                        Healthy
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
           ) : (
-            <div className="bg-white/90 rounded-3xl p-7 border border-amber-100/25 text-center shadow-md">
-              <p className="text-sm text-amber-700/70 mb-2">No activity recorded today</p>
-              <button 
+            <div className="rounded-2xl bg-[#f6f3ee] p-5 text-center">
+              <p className="mb-4 text-sm text-[#46483c]/70">No activity recorded today</p>
+              <button
+                type="button"
                 onClick={() => setLocation('/exercise')}
-                className="text-xs text-amber-700 hover:text-amber-900 font-medium"
+                className="rounded-full bg-[#56642b] px-5 py-2 text-white hover:bg-[#4a5625]"
               >
                 + Add Activity
               </button>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* HYDRATION SECTION */}
-        <div className="bg-gradient-to-r from-emerald-50/60 to-teal-50/50 rounded-3xl p-6 border border-emerald-100/35 shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold text-emerald-700/65 tracking-widest uppercase mb-2">HYDRATION PULSE</p>
-              <p className="text-sm text-emerald-900/75">1.8L of 2.5L goal</p>
+        <section className="flex items-center justify-between rounded-xl border-l-4 border-[#56642b] bg-[#f6f3ee] p-8">
+          <div className="space-y-1">
+            <h3
+              className="text-xl text-[#1c1c19]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              Hydration Pulse
+            </h3>
+            <p className="text-sm text-[#46483c]/80">1.8L of 2.5L goal</p>
+          </div>
+
+          <div className="flex -space-x-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#56642b]/20">
+              <span className="text-sm text-[#56642b]">💧</span>
             </div>
-            <div className="flex gap-1">
-              <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-              <div className="w-2 h-2 rounded-full bg-emerald-300"></div>
-              <div className="w-2 h-2 rounded-full bg-emerald-200"></div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fcf9f4] bg-[#56642b]/40">
+              <span className="text-sm text-[#56642b]">💧</span>
+            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fcf9f4] bg-[#56642b] text-white">
+              +
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* SLEEP SECTION */}
-        <div className="bg-gradient-to-r from-slate-50/60 to-blue-50/50 rounded-3xl p-6 border border-slate-100/35 shadow-md">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="text-3xl">🌙</span>
-              <div>
-                <p className="text-xs font-semibold text-slate-700/65 tracking-widest uppercase mb-2">SLEEP</p>
-                <p className="text-sm text-slate-900/75">7h 50m</p>
+        <section className="flex items-center justify-between rounded-xl border-l-4 border-[#7e947f] bg-[#f6f3ee] p-8">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#7e947f]/10">
+              <span className="text-2xl text-[#7e947f]">🌙</span>
+            </div>
+            <div className="space-y-0.5">
+              <h3
+                className="text-xl text-[#1c1c19]"
+                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+              >
+                Sleep
+              </h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-sm font-bold text-[#1c1c19]">7h 30m</span>
+                <span className="text-[10px] text-[#46483c]/70">7.5h of 8.0h goal</span>
+              </div>
+              <div className="mt-1 h-1 w-24 overflow-hidden rounded-full bg-[#7e947f]/10">
+                <div className="h-full w-[93%] rounded-full bg-[#7e947f]" />
               </div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-slate-200/40 flex items-center justify-center">
-              <span className="text-xs text-slate-600">+</span>
-            </div>
           </div>
-        </div>
 
-      </div>
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7e947f] text-white shadow-sm transition-transform active:scale-95"
+          >
+            +
+          </button>
+        </section>
+      </main>
+
+      <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-[3rem] bg-[#fcf9f4]/90 px-2 pb-6 pt-2 shadow-[0_-4px_32px_rgba(28,28,25,0.04)] backdrop-blur-md">
+        <button
+          type="button"
+          className="flex flex-col items-center justify-center rounded-full bg-[#f6dfc2] px-4 py-2 text-[#56642b] transition-transform duration-300 active:scale-90"
+        >
+          <span className="text-lg">▦</span>
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Dashboard</span>
+        </button>
+
+        <button
+          type="button"
+          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
+        >
+          <span className="text-lg">🧍</span>
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Body</span>
+        </button>
+
+        <button
+          type="button"
+          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
+        >
+          <span className="text-lg">🏋️</span>
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Exercise</span>
+        </button>
+
+        <button
+          type="button"
+          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
+        >
+          <span className="text-lg">🍽️</span>
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Diet</span>
+        </button>
+
+        <button
+          type="button"
+          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
+        >
+          <span className="text-lg">👤</span>
+          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Profile</span>
+        </button>
+      </nav>
     </div>
   );
 }
