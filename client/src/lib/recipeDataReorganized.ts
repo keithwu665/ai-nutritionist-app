@@ -7706,6 +7706,1826 @@ const snackVegetarian: RecipeData[] = [
   }
 ];
 
+// Soup Recipes (湯類)
+const soupChicken: RecipeData[] = [
+  {
+    id: "soup_c1",
+    name: "雞肉蔬菜清湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 180,
+    protein: 28,
+    fat: 3,
+    carbs: 8,
+    totalWeight: 450,
+    ingredients: [
+      { name: "雞胸肉", quantity: "150g" },
+      { name: "紅蘿蔔", quantity: "80g" },
+      { name: "冬瓜", quantity: "100g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "雞肉切塊焯水",
+      "清湯煮沸放入雞肉",
+      "加入蔬菜和薑片",
+      "中火煮20分鐘",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "清湯低脂清爽",
+      "蔬菜纖維豐富",
+      "雞肉高蛋白"
+    ]
+  },
+  {
+    id: "soup_c2",
+    name: "雞肉冬瓜湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 160,
+    protein: 26,
+    fat: 2,
+    carbs: 6,
+    totalWeight: 500,
+    ingredients: [
+      { name: "雞胸肉", quantity: "140g" },
+      { name: "冬瓜", quantity: "200g" },
+      { name: "薏米", quantity: "20g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米提前浸泡",
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入雞肉、冬瓜、薏米",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "冬瓜利尿消腫",
+      "薏米健脾祛濕",
+      "低卡高蛋白"
+    ]
+  },
+  {
+    id: "soup_c3",
+    name: "雞肉玉米湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 200,
+    protein: 27,
+    fat: 4,
+    carbs: 12,
+    totalWeight: 480,
+    ingredients: [
+      { name: "雞胸肉", quantity: "150g" },
+      { name: "玉米", quantity: "100g" },
+      { name: "紅蘿蔔", quantity: "60g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入雞肉和玉米",
+      "煮15分鐘",
+      "加入紅蘿蔔再煮5分鐘"
+    ],
+    fatLossTips: [
+      "玉米纖維豐富",
+      "營養均衡搭配",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "soup_c4",
+    name: "雞肉香菇湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 170,
+    protein: 28,
+    fat: 3,
+    carbs: 5,
+    totalWeight: 420,
+    ingredients: [
+      { name: "雞胸肉", quantity: "150g" },
+      { name: "香菇", quantity: "120g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "香菇切片",
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入雞肉、香菇、薑片",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "香菇免疫力強",
+      "低脂高蛋白",
+      "清淡易消化"
+    ]
+  },
+  {
+    id: "soup_c5",
+    name: "雞肉番茄湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 190,
+    protein: 27,
+    fat: 3,
+    carbs: 10,
+    totalWeight: 460,
+    ingredients: [
+      { name: "雞胸肉", quantity: "150g" },
+      { name: "番茄", quantity: "150g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "番茄切塊",
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入雞肉、番茄、洋蔥",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "番茄抗氧化",
+      "酸性促消化",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_c6",
+    name: "雞肉黑木耳湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 150,
+    protein: 26,
+    fat: 2,
+    carbs: 4,
+    totalWeight: 440,
+    ingredients: [
+      { name: "雞胸肉", quantity: "140g" },
+      { name: "黑木耳", quantity: "30g" },
+      { name: "紅棗", quantity: "3個" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "黑木耳提前泡軟",
+      "紅棗去核",
+      "雞肉切塊焯水",
+      "清湯煮沸加入所有材料",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "黑木耳清血管",
+      "紅棗補氣血",
+      "滋補低脂"
+    ]
+  },
+  {
+    id: "soup_c7",
+    name: "雞肉絲瓜湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 140,
+    protein: 25,
+    fat: 2,
+    carbs: 3,
+    totalWeight: 420,
+    ingredients: [
+      { name: "雞胸肉", quantity: "130g" },
+      { name: "絲瓜", quantity: "150g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "絲瓜削皮切塊",
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入雞肉和薑片",
+      "煮10分鐘加絲瓜再煮5分鐘"
+    ],
+    fatLossTips: [
+      "絲瓜清熱利尿",
+      "低卡高纖維",
+      "清爽清淡"
+    ]
+  },
+  {
+    id: "soup_c8",
+    name: "雞肉蘿蔔湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 175,
+    protein: 27,
+    fat: 3,
+    carbs: 7,
+    totalWeight: 480,
+    ingredients: [
+      { name: "雞胸肉", quantity: "150g" },
+      { name: "白蘿蔔", quantity: "150g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "白蘿蔔切塊",
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入雞肉、蘿蔔、薑片",
+      "煮22分鐘調味"
+    ],
+    fatLossTips: [
+      "蘿蔔助消化",
+      "清熱潤肺",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_c9",
+    name: "雞肉海帶湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 160,
+    protein: 27,
+    fat: 2,
+    carbs: 5,
+    totalWeight: 450,
+    ingredients: [
+      { name: "雞胸肉", quantity: "140g" },
+      { name: "海帶", quantity: "40g" },
+      { name: "豆腐", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "海帶提前泡軟切段",
+      "豆腐切塊",
+      "雞肉切塊焯水",
+      "清湯煮沸加入所有材料",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "海帶含碘豐富",
+      "豆腐植物蛋白",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_c10",
+    name: "雞肉薏米湯",
+    protein_type: "chicken",
+    category: "soup",
+    kcal: 185,
+    protein: 26,
+    fat: 3,
+    carbs: 11,
+    totalWeight: 500,
+    ingredients: [
+      { name: "雞胸肉", quantity: "140g" },
+      { name: "薏米", quantity: "40g" },
+      { name: "紅豆", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米和紅豆提前浸泡",
+      "雞肉切塊焯水",
+      "清湯煮沸",
+      "加入薏米、紅豆、雞肉",
+      "煮25分鐘調味"
+    ],
+    fatLossTips: [
+      "薏米祛濕健脾",
+      "紅豆補血益氣",
+      "滋補養生湯"
+    ]
+  }
+];
+
+const soupPork: RecipeData[] = [
+  {
+    id: "soup_p1",
+    name: "豬肉蔬菜湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 200,
+    protein: 26,
+    fat: 6,
+    carbs: 9,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "150g" },
+      { name: "冬瓜", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "70g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉和蔬菜",
+      "中火煮20分鐘",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "豬肉里肌低脂",
+      "蔬菜纖維豐富",
+      "清淡營養湯"
+    ]
+  },
+  {
+    id: "soup_p2",
+    name: "豬肉冬瓜薏米湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 190,
+    protein: 25,
+    fat: 5,
+    carbs: 12,
+    totalWeight: 520,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "140g" },
+      { name: "冬瓜", quantity: "180g" },
+      { name: "薏米", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米提前浸泡",
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉、冬瓜、薏米",
+      "煮25分鐘調味"
+    ],
+    fatLossTips: [
+      "冬瓜利尿消腫",
+      "薏米祛濕健脾",
+      "低脂清爽湯"
+    ]
+  },
+  {
+    id: "soup_p3",
+    name: "豬肉玉米湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 220,
+    protein: 26,
+    fat: 7,
+    carbs: 14,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "150g" },
+      { name: "玉米", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉和玉米",
+      "煮15分鐘",
+      "加入紅蘿蔔再煮6分鐘"
+    ],
+    fatLossTips: [
+      "玉米纖維豐富",
+      "營養均衡搭配",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "soup_p4",
+    name: "豬肉香菇湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 210,
+    protein: 27,
+    fat: 6,
+    carbs: 6,
+    totalWeight: 460,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "150g" },
+      { name: "香菇", quantity: "130g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "香菇切片",
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉、香菇、薑片",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "香菇免疫力強",
+      "豬肉營養豐富",
+      "清淡易消化"
+    ]
+  },
+  {
+    id: "soup_p5",
+    name: "豬肉番茄湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 215,
+    protein: 26,
+    fat: 6,
+    carbs: 11,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "150g" },
+      { name: "番茄", quantity: "160g" },
+      { name: "洋蔥", quantity: "60g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "番茄切塊",
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉、番茄、洋蔥",
+      "煮22分鐘調味"
+    ],
+    fatLossTips: [
+      "番茄抗氧化",
+      "酸性促消化",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_p6",
+    name: "豬肉黑木耳湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 195,
+    protein: 25,
+    fat: 5,
+    carbs: 5,
+    totalWeight: 460,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "140g" },
+      { name: "黑木耳", quantity: "35g" },
+      { name: "紅棗", quantity: "4個" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "黑木耳提前泡軟",
+      "紅棗去核",
+      "豬肉切塊焯水",
+      "清湯煮沸加入所有材料",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "黑木耳清血管",
+      "紅棗補氣血",
+      "滋補營養湯"
+    ]
+  },
+  {
+    id: "soup_p7",
+    name: "豬肉絲瓜湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 185,
+    protein: 24,
+    fat: 5,
+    carbs: 4,
+    totalWeight: 450,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "130g" },
+      { name: "絲瓜", quantity: "160g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "絲瓜削皮切塊",
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉和薑片",
+      "煮10分鐘加絲瓜再煮5分鐘"
+    ],
+    fatLossTips: [
+      "絲瓜清熱利尿",
+      "低卡高纖維",
+      "清爽清淡"
+    ]
+  },
+  {
+    id: "soup_p8",
+    name: "豬肉蘿蔔湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 205,
+    protein: 26,
+    fat: 6,
+    carbs: 8,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "150g" },
+      { name: "白蘿蔔", quantity: "160g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "白蘿蔔切塊",
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入豬肉、蘿蔔、薑片",
+      "煮24分鐘調味"
+    ],
+    fatLossTips: [
+      "蘿蔔助消化",
+      "清熱潤肺",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_p9",
+    name: "豬肉海帶湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 200,
+    protein: 26,
+    fat: 5,
+    carbs: 6,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "140g" },
+      { name: "海帶", quantity: "45g" },
+      { name: "豆腐", quantity: "90g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "海帶提前泡軟切段",
+      "豆腐切塊",
+      "豬肉切塊焯水",
+      "清湯煮沸加入所有材料",
+      "煮22分鐘調味"
+    ],
+    fatLossTips: [
+      "海帶含碘豐富",
+      "豆腐植物蛋白",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_p10",
+    name: "豬肉薏米湯",
+    protein_type: "pork",
+    category: "soup",
+    kcal: 220,
+    protein: 25,
+    fat: 6,
+    carbs: 13,
+    totalWeight: 520,
+    ingredients: [
+      { name: "豬里肌肉", quantity: "140g" },
+      { name: "薏米", quantity: "45g" },
+      { name: "紅豆", quantity: "35g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米和紅豆提前浸泡",
+      "豬肉切塊焯水",
+      "清湯煮沸",
+      "加入薏米、紅豆、豬肉",
+      "煮27分鐘調味"
+    ],
+    fatLossTips: [
+      "薏米祛濕健脾",
+      "紅豆補血益氣",
+      "滋補養生湯"
+    ]
+  }
+];
+
+const soupBeef: RecipeData[] = [
+  {
+    id: "soup_b1",
+    name: "牛肉蔬菜湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 230,
+    protein: 28,
+    fat: 8,
+    carbs: 10,
+    totalWeight: 500,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "冬瓜", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉和蔬菜",
+      "中火煮25分鐘",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "牛肉鐵質豐富",
+      "蔬菜纖維豐富",
+      "營養均衡湯"
+    ]
+  },
+  {
+    id: "soup_b2",
+    name: "牛肉冬瓜薏米湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 220,
+    protein: 27,
+    fat: 7,
+    carbs: 13,
+    totalWeight: 540,
+    ingredients: [
+      { name: "牛肉", quantity: "150g" },
+      { name: "冬瓜", quantity: "180g" },
+      { name: "薏米", quantity: "35g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米提前浸泡",
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉、冬瓜、薏米",
+      "煮27分鐘調味"
+    ],
+    fatLossTips: [
+      "冬瓜利尿消腫",
+      "薏米祛濕健脾",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_b3",
+    name: "牛肉玉米湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 250,
+    protein: 28,
+    fat: 9,
+    carbs: 15,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "玉米", quantity: "130g" },
+      { name: "紅蘿蔔", quantity: "90g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉和玉米",
+      "煮17分鐘",
+      "加入紅蘿蔔再煮7分鐘"
+    ],
+    fatLossTips: [
+      "玉米纖維豐富",
+      "營養均衡搭配",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "soup_b4",
+    name: "牛肉香菇湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 240,
+    protein: 29,
+    fat: 8,
+    carbs: 7,
+    totalWeight: 480,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "香菇", quantity: "140g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "香菇切片",
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉、香菇、薑片",
+      "煮22分鐘調味"
+    ],
+    fatLossTips: [
+      "香菇免疫力強",
+      "牛肉營養豐富",
+      "清淡易消化"
+    ]
+  },
+  {
+    id: "soup_b5",
+    name: "牛肉番茄湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 245,
+    protein: 28,
+    fat: 8,
+    carbs: 12,
+    totalWeight: 500,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "番茄", quantity: "170g" },
+      { name: "洋蔥", quantity: "70g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "番茄切塊",
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉、番茄、洋蔥",
+      "煮24分鐘調味"
+    ],
+    fatLossTips: [
+      "番茄抗氧化",
+      "酸性促消化",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_b6",
+    name: "牛肉黑木耳湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 225,
+    protein: 27,
+    fat: 7,
+    carbs: 6,
+    totalWeight: 480,
+    ingredients: [
+      { name: "牛肉", quantity: "150g" },
+      { name: "黑木耳", quantity: "40g" },
+      { name: "紅棗", quantity: "4個" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "黑木耳提前泡軟",
+      "紅棗去核",
+      "牛肉切塊焯水",
+      "清湯煮沸加入所有材料",
+      "煮22分鐘調味"
+    ],
+    fatLossTips: [
+      "黑木耳清血管",
+      "紅棗補氣血",
+      "滋補營養湯"
+    ]
+  },
+  {
+    id: "soup_b7",
+    name: "牛肉絲瓜湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 215,
+    protein: 26,
+    fat: 7,
+    carbs: 5,
+    totalWeight: 470,
+    ingredients: [
+      { name: "牛肉", quantity: "140g" },
+      { name: "絲瓜", quantity: "170g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "絲瓜削皮切塊",
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉和薑片",
+      "煮11分鐘加絲瓜再煮6分鐘"
+    ],
+    fatLossTips: [
+      "絲瓜清熱利尿",
+      "低卡高纖維",
+      "清爽清淡"
+    ]
+  },
+  {
+    id: "soup_b8",
+    name: "牛肉蘿蔔湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 235,
+    protein: 28,
+    fat: 8,
+    carbs: 9,
+    totalWeight: 520,
+    ingredients: [
+      { name: "牛肉", quantity: "160g" },
+      { name: "白蘿蔔", quantity: "170g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "白蘿蔔切塊",
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入牛肉、蘿蔔、薑片",
+      "煮26分鐘調味"
+    ],
+    fatLossTips: [
+      "蘿蔔助消化",
+      "清熱潤肺",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_b9",
+    name: "牛肉海帶湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 230,
+    protein: 28,
+    fat: 7,
+    carbs: 7,
+    totalWeight: 500,
+    ingredients: [
+      { name: "牛肉", quantity: "150g" },
+      { name: "海帶", quantity: "50g" },
+      { name: "豆腐", quantity: "100g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "海帶提前泡軟切段",
+      "豆腐切塊",
+      "牛肉切塊焯水",
+      "清湯煮沸加入所有材料",
+      "煮24分鐘調味"
+    ],
+    fatLossTips: [
+      "海帶含碘豐富",
+      "豆腐植物蛋白",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_b10",
+    name: "牛肉薏米湯",
+    protein_type: "beef",
+    category: "soup",
+    kcal: 250,
+    protein: 27,
+    fat: 8,
+    carbs: 14,
+    totalWeight: 540,
+    ingredients: [
+      { name: "牛肉", quantity: "150g" },
+      { name: "薏米", quantity: "50g" },
+      { name: "紅豆", quantity: "40g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米和紅豆提前浸泡",
+      "牛肉切塊焯水",
+      "清湯煮沸",
+      "加入薏米、紅豆、牛肉",
+      "煮29分鐘調味"
+    ],
+    fatLossTips: [
+      "薏米祛濕健脾",
+      "紅豆補血益氣",
+      "滋補養生湯"
+    ]
+  }
+];
+
+const soupSeafood: RecipeData[] = [
+  {
+    id: "soup_sf1",
+    name: "蝦仁蔬菜湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 160,
+    protein: 26,
+    fat: 2,
+    carbs: 8,
+    totalWeight: 440,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "冬瓜", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "70g" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁和蔬菜",
+      "中火煮15分鐘",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "蝦仁低脂高蛋白",
+      "蔬菜纖維豐富",
+      "清淡營養湯"
+    ]
+  },
+  {
+    id: "soup_sf2",
+    name: "蝦仁冬瓜薏米湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 150,
+    protein: 25,
+    fat: 2,
+    carbs: 11,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蝦仁", quantity: "130g" },
+      { name: "冬瓜", quantity: "180g" },
+      { name: "薏米", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米提前浸泡",
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁、冬瓜、薏米",
+      "煮22分鐘調味"
+    ],
+    fatLossTips: [
+      "冬瓜利尿消腫",
+      "薏米祛濕健脾",
+      "低脂清爽湯"
+    ]
+  },
+  {
+    id: "soup_sf3",
+    name: "蝦仁玉米湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 180,
+    protein: 27,
+    fat: 3,
+    carbs: 13,
+    totalWeight: 480,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "玉米", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁和玉米",
+      "煮12分鐘",
+      "加入紅蘿蔔再煮5分鐘"
+    ],
+    fatLossTips: [
+      "玉米纖維豐富",
+      "營養均衡搭配",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "soup_sf4",
+    name: "蝦仁香菇湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 170,
+    protein: 27,
+    fat: 2,
+    carbs: 5,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "香菇", quantity: "120g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "香菇切片",
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁、香菇、薑片",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "香菇免疫力強",
+      "蝦仁高蛋白",
+      "清淡易消化"
+    ]
+  },
+  {
+    id: "soup_sf5",
+    name: "蝦仁番茄湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 175,
+    protein: 26,
+    fat: 2,
+    carbs: 10,
+    totalWeight: 460,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "番茄", quantity: "150g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "番茄切塊",
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁、番茄、洋蔥",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "番茄抗氧化",
+      "酸性促消化",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_sf6",
+    name: "蝦仁黑木耳湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 155,
+    protein: 26,
+    fat: 1,
+    carbs: 4,
+    totalWeight: 440,
+    ingredients: [
+      { name: "蝦仁", quantity: "130g" },
+      { name: "黑木耳", quantity: "30g" },
+      { name: "紅棗", quantity: "3個" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "黑木耳提前泡軟",
+      "紅棗去核",
+      "蝦仁清洗",
+      "清湯煮沸加入所有材料",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "黑木耳清血管",
+      "紅棗補氣血",
+      "滋補低脂"
+    ]
+  },
+  {
+    id: "soup_sf7",
+    name: "蝦仁絲瓜湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 145,
+    protein: 25,
+    fat: 1,
+    carbs: 3,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蝦仁", quantity: "130g" },
+      { name: "絲瓜", quantity: "150g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "絲瓜削皮切塊",
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁和薑片",
+      "煮8分鐘加絲瓜再煮4分鐘"
+    ],
+    fatLossTips: [
+      "絲瓜清熱利尿",
+      "低卡高纖維",
+      "清爽清淡"
+    ]
+  },
+  {
+    id: "soup_sf8",
+    name: "蝦仁蘿蔔湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 165,
+    protein: 26,
+    fat: 2,
+    carbs: 7,
+    totalWeight: 480,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "白蘿蔔", quantity: "150g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "白蘿蔔切塊",
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入蝦仁、蘿蔔、薑片",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "蘿蔔助消化",
+      "清熱潤肺",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_sf9",
+    name: "蝦仁海帶湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 160,
+    protein: 27,
+    fat: 1,
+    carbs: 5,
+    totalWeight: 450,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "海帶", quantity: "40g" },
+      { name: "豆腐", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "海帶提前泡軟切段",
+      "豆腐切塊",
+      "蝦仁清洗",
+      "清湯煮沸加入所有材料",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "海帶含碘豐富",
+      "豆腐植物蛋白",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_sf10",
+    name: "蝦仁薏米湯",
+    protein_type: "seafood",
+    category: "soup",
+    kcal: 170,
+    protein: 26,
+    fat: 2,
+    carbs: 11,
+    totalWeight: 500,
+    ingredients: [
+      { name: "蝦仁", quantity: "140g" },
+      { name: "薏米", quantity: "40g" },
+      { name: "紅豆", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米和紅豆提前浸泡",
+      "蝦仁清洗",
+      "清湯煮沸",
+      "加入薏米、紅豆、蝦仁",
+      "煮23分鐘調味"
+    ],
+    fatLossTips: [
+      "薏米祛濕健脾",
+      "紅豆補血益氣",
+      "滋補養生湯"
+    ]
+  }
+];
+
+const soupEgg: RecipeData[] = [
+  {
+    id: "soup_e1",
+    name: "蛋白蔬菜湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 140,
+    protein: 24,
+    fat: 2,
+    carbs: 7,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "冬瓜", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "70g" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蛋打散",
+      "清湯煮沸",
+      "加入蔬菜",
+      "煮10分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "蛋白質完整",
+      "蔬菜纖維豐富",
+      "清淡營養湯"
+    ]
+  },
+  {
+    id: "soup_e2",
+    name: "蛋白冬瓜薏米湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 130,
+    protein: 23,
+    fat: 2,
+    carbs: 10,
+    totalWeight: 480,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "冬瓜", quantity: "180g" },
+      { name: "薏米", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米提前浸泡",
+      "清湯煮沸",
+      "加入冬瓜、薏米",
+      "煮15分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "冬瓜利尿消腫",
+      "薏米祛濕健脾",
+      "低脂清爽湯"
+    ]
+  },
+  {
+    id: "soup_e3",
+    name: "蛋白玉米湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 160,
+    protein: 25,
+    fat: 3,
+    carbs: 12,
+    totalWeight: 460,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "玉米", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "蛋打散",
+      "清湯煮沸",
+      "加入玉米和紅蘿蔔",
+      "煮12分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "玉米纖維豐富",
+      "營養均衡搭配",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "soup_e4",
+    name: "蛋白香菇湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 150,
+    protein: 24,
+    fat: 2,
+    carbs: 4,
+    totalWeight: 400,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "香菇", quantity: "120g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "香菇切片",
+      "蛋打散",
+      "清湯煮沸",
+      "加入香菇、薑片，煮10分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "香菇免疫力強",
+      "蛋白質完整",
+      "清淡易消化"
+    ]
+  },
+  {
+    id: "soup_e5",
+    name: "蛋白番茄湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 155,
+    protein: 24,
+    fat: 2,
+    carbs: 9,
+    totalWeight: 440,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "番茄", quantity: "150g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "番茄切塊",
+      "蛋打散",
+      "清湯煮沸",
+      "加入番茄、洋蔥，煮12分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "番茄抗氧化",
+      "酸性促消化",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_e6",
+    name: "蛋白黑木耳湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 135,
+    protein: 23,
+    fat: 2,
+    carbs: 4,
+    totalWeight: 420,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "黑木耳", quantity: "30g" },
+      { name: "紅棗", quantity: "3個" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "黑木耳提前泡軟",
+      "紅棗去核",
+      "蛋打散",
+      "清湯煮沸加入黑木耳、紅棗，煮10分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "黑木耳清血管",
+      "紅棗補氣血",
+      "滋補低脂"
+    ]
+  },
+  {
+    id: "soup_e7",
+    name: "蛋白絲瓜湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 125,
+    protein: 22,
+    fat: 2,
+    carbs: 2,
+    totalWeight: 400,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "絲瓜", quantity: "150g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "絲瓜削皮切塊",
+      "蛋打散",
+      "清湯煮沸",
+      "加入絲瓜、薑片，煮8分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "絲瓜清熱利尿",
+      "低卡高纖維",
+      "清爽清淡"
+    ]
+  },
+  {
+    id: "soup_e8",
+    name: "蛋白蘿蔔湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 145,
+    protein: 24,
+    fat: 2,
+    carbs: 6,
+    totalWeight: 460,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "白蘿蔔", quantity: "150g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "白蘿蔔切塊",
+      "蛋打散",
+      "清湯煮沸",
+      "加入蘿蔔、薑片，煮15分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "蘿蔔助消化",
+      "清熱潤肺",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_e9",
+    name: "蛋白海帶湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 140,
+    protein: 25,
+    fat: 2,
+    carbs: 5,
+    totalWeight: 430,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "海帶", quantity: "40g" },
+      { name: "豆腐", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "海帶提前泡軟切段",
+      "豆腐切塊",
+      "蛋打散",
+      "清湯煮沸加入海帶、豆腐，煮10分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "海帶含碘豐富",
+      "豆腐植物蛋白",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_e10",
+    name: "蛋白薏米湯",
+    protein_type: "egg",
+    category: "soup",
+    kcal: 150,
+    protein: 23,
+    fat: 2,
+    carbs: 10,
+    totalWeight: 480,
+    ingredients: [
+      { name: "蛋", quantity: "2個" },
+      { name: "薏米", quantity: "40g" },
+      { name: "紅豆", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米和紅豆提前浸泡",
+      "蛋打散",
+      "清湯煮沸",
+      "加入薏米、紅豆，煮20分鐘後倒入蛋液",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "薏米祛濕健脾",
+      "紅豆補血益氣",
+      "滋補養生湯"
+    ]
+  }
+];
+
+const soupVegetarian: RecipeData[] = [
+  {
+    id: "soup_v1",
+    name: "豆腐蔬菜湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 130,
+    protein: 18,
+    fat: 3,
+    carbs: 8,
+    totalWeight: 440,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "冬瓜", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "70g" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐和蔬菜",
+      "中火煮15分鐘",
+      "調味即可"
+    ],
+    fatLossTips: [
+      "豆腐植物蛋白",
+      "蔬菜纖維豐富",
+      "清淡營養湯"
+    ]
+  },
+  {
+    id: "soup_v2",
+    name: "豆腐冬瓜薏米湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 120,
+    protein: 17,
+    fat: 2,
+    carbs: 11,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "冬瓜", quantity: "180g" },
+      { name: "薏米", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米提前浸泡",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐、冬瓜、薏米",
+      "煮20分鐘調味"
+    ],
+    fatLossTips: [
+      "冬瓜利尿消腫",
+      "薏米祛濕健脾",
+      "低脂清爽湯"
+    ]
+  },
+  {
+    id: "soup_v3",
+    name: "豆腐玉米湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 150,
+    protein: 19,
+    fat: 3,
+    carbs: 13,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "玉米", quantity: "120g" },
+      { name: "紅蘿蔔", quantity: "80g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐和玉米",
+      "煮12分鐘",
+      "加入紅蘿蔔再煮5分鐘"
+    ],
+    fatLossTips: [
+      "玉米纖維豐富",
+      "營養均衡搭配",
+      "飽腹感強"
+    ]
+  },
+  {
+    id: "soup_v4",
+    name: "豆腐香菇湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 140,
+    protein: 18,
+    fat: 2,
+    carbs: 5,
+    totalWeight: 420,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "香菇", quantity: "120g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "香菇切片",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐、香菇、薑片",
+      "煮16分鐘調味"
+    ],
+    fatLossTips: [
+      "香菇免疫力強",
+      "豆腐植物蛋白",
+      "清淡易消化"
+    ]
+  },
+  {
+    id: "soup_v5",
+    name: "豆腐番茄湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 145,
+    protein: 18,
+    fat: 2,
+    carbs: 10,
+    totalWeight: 460,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "番茄", quantity: "150g" },
+      { name: "洋蔥", quantity: "50g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "番茄切塊",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐、番茄、洋蔥",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "番茄抗氧化",
+      "酸性促消化",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_v6",
+    name: "豆腐黑木耳湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 125,
+    protein: 17,
+    fat: 2,
+    carbs: 4,
+    totalWeight: 440,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "黑木耳", quantity: "30g" },
+      { name: "紅棗", quantity: "3個" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "黑木耳提前泡軟",
+      "紅棗去核",
+      "豆腐切塊",
+      "清湯煮沸加入所有材料",
+      "煮16分鐘調味"
+    ],
+    fatLossTips: [
+      "黑木耳清血管",
+      "紅棗補氣血",
+      "滋補低脂"
+    ]
+  },
+  {
+    id: "soup_v7",
+    name: "豆腐絲瓜湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 115,
+    protein: 16,
+    fat: 2,
+    carbs: 3,
+    totalWeight: 420,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "絲瓜", quantity: "150g" },
+      { name: "薑", quantity: "2片" },
+      { name: "清湯", quantity: "600ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "絲瓜削皮切塊",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐和薑片",
+      "煮8分鐘加絲瓜再煮4分鐘"
+    ],
+    fatLossTips: [
+      "絲瓜清熱利尿",
+      "低卡高纖維",
+      "清爽清淡"
+    ]
+  },
+  {
+    id: "soup_v8",
+    name: "豆腐蘿蔔湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 135,
+    protein: 18,
+    fat: 2,
+    carbs: 7,
+    totalWeight: 480,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "白蘿蔔", quantity: "150g" },
+      { name: "薑", quantity: "3片" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "白蘿蔔切塊",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐、蘿蔔、薑片",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "蘿蔔助消化",
+      "清熱潤肺",
+      "營養清湯"
+    ]
+  },
+  {
+    id: "soup_v9",
+    name: "豆腐海帶湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 130,
+    protein: 19,
+    fat: 2,
+    carbs: 5,
+    totalWeight: 450,
+    ingredients: [
+      { name: "豆腐", quantity: "150g" },
+      { name: "海帶", quantity: "40g" },
+      { name: "昆布", quantity: "5g" },
+      { name: "清湯", quantity: "650ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "海帶提前泡軟切段",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入豆腐、海帶、昆布",
+      "煮18分鐘調味"
+    ],
+    fatLossTips: [
+      "海帶含碘豐富",
+      "豆腐植物蛋白",
+      "低脂營養湯"
+    ]
+  },
+  {
+    id: "soup_v10",
+    name: "豆腐薏米湯",
+    protein_type: "vegetarian",
+    category: "soup",
+    kcal: 140,
+    protein: 17,
+    fat: 2,
+    carbs: 11,
+    totalWeight: 500,
+    ingredients: [
+      { name: "豆腐", quantity: "140g" },
+      { name: "薏米", quantity: "40g" },
+      { name: "紅豆", quantity: "30g" },
+      { name: "清湯", quantity: "700ml" },
+      { name: "鹽", quantity: "1茶匙" }
+    ],
+    steps: [
+      "薏米和紅豆提前浸泡",
+      "豆腐切塊",
+      "清湯煮沸",
+      "加入薏米、紅豆、豆腐",
+      "煮21分鐘調味"
+    ],
+    fatLossTips: [
+      "薏米祛濕健脾",
+      "紅豆補血益氣",
+      "滋補養生湯"
+    ]
+  }
+];
+
 // Create the main recipes object
 export const recipes: Record<string, Record<string, RecipeData[]>> = {
   breakfast: {
@@ -7749,14 +9569,15 @@ export const recipes: Record<string, Record<string, RecipeData[]>> = {
     vegetarian: snackVegetarian
   },
   soup: {
-    chicken: [], // To be filled
-    pork: [], // To be filled
-    beef: [], // To be filled
-    seafood: [], // To be filled
-    egg: [], // To be filled
-    vegetarian: [] // To be filled
+    chicken: soupChicken,
+    pork: soupPork,
+    beef: soupBeef,
+    seafood: soupSeafood,
+    egg: soupEgg,
+    vegetarian: soupVegetarian
   }
 };
+
 
 // Helper function to get recipes by meal type and protein type
 export function getRecipesByMealAndProtein(mealType: string, proteinType: string): RecipeData[] {
