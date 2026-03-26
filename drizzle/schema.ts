@@ -174,24 +174,26 @@ export const generalFoodCache = mysqlTable("general_food_cache", {
 	index("unique_source_id").on(table.source, table.externalId),
 ]);
 
-export const userProfiles = mysqlTable("user_profiles", {
-	id: int().autoincrement().notNull(),
-	userId: int().notNull(),
-	gender: mysqlEnum(['male','female']).notNull(),
-	age: int().notNull(),
-	heightCm: decimal({ precision: 5, scale: 1 }).notNull(),
-	weightKg: decimal({ precision: 5, scale: 1 }).notNull(),
-	fitnessGoal: mysqlEnum(['lose','maintain','gain']).notNull(),
-	activityLevel: mysqlEnum(['sedentary','light','moderate','high']).notNull(),
-	goalKg: decimal({ precision: 5, scale: 1 }),
-	goalDays: int(),
-	displayName: varchar({ length: 100 }),
-	calorieMode: mysqlEnum(['safe','aggressive']).default('safe').notNull(),
-	calorieTarget: int().default(2000).notNull(),
-	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
-	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
-	aiToneStyle: mysqlEnum(['gentle','coach','hk_style']).default('gentle').notNull(),
-},
+	export const userProfiles = mysqlTable("user_profiles", {
+		id: int().autoincrement().notNull(),
+		userId: int().notNull(),
+		gender: mysqlEnum(['male','female']).notNull(),
+		age: int().notNull(),
+		heightCm: decimal({ precision: 5, scale: 1 }).notNull(),
+		weightKg: decimal({ precision: 5, scale: 1 }).notNull(),
+		startWeightKg: decimal({ precision: 5, scale: 1 }), // Initial weight when goal was set
+		fitnessGoal: mysqlEnum(['lose','maintain','gain']).notNull(),
+		activityLevel: mysqlEnum(['sedentary','light','moderate','high']).notNull(),
+		goalWeightChangeKg: decimal({ precision: 5, scale: 1 }), // Amount to lose/gain (renamed from goalKg)
+		goalDays: int(),
+		goalStartDate: timestamp({ mode: 'string' }), // When the goal was started
+		displayName: varchar({ length: 100 }),
+		calorieMode: mysqlEnum(['safe','aggressive']).default('safe').notNull(),
+		calorieTarget: int().default(2000).notNull(),
+		createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+		aiToneStyle: mysqlEnum(['gentle','coach','hk_style']).default('gentle').notNull(),
+	},
 (table) => [
 	index("user_profiles_userId_unique").on(table.userId),
 ]);

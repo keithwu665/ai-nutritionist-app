@@ -203,10 +203,15 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // startWeight = weightKg (initial weight)
   // goalWeightChange = goalKg (amount to lose/gain)
   // goalType = fitnessGoal (lose/maintain/gain)
-  const startWeight = parseFloat(input.dashboardData?.profile?.weightKg) || bodyWeight;
-  const goalWeightChange = parseFloat(input.dashboardData?.profile?.goalKg) || 0;
+  const startWeight = parseFloat(input.dashboardData?.profile?.startWeightKg) 
+    || parseFloat(input.dashboardData?.profile?.weightKg) 
+    || bodyWeight;
+  const goalWeightChange = parseFloat(input.dashboardData?.profile?.goalWeightChangeKg) 
+    || parseFloat(input.dashboardData?.profile?.goalKg) 
+    || 0;
   const goalType = input.dashboardData?.profile?.fitnessGoal || 'maintain';
   const currentWeight = bodyWeight;
+  const goalStartDate = input.dashboardData?.profile?.goalStartDate ? new Date(input.dashboardData.profile.goalStartDate) : null;
   
   // Compute target weight based on goal type
   let targetWeight = startWeight;

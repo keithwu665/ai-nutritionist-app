@@ -68,7 +68,7 @@ export default function Settings() {
   const metabolicData = profile ? (() => {
     const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
     const tdee = calculateTDEE(bmr, profile.activityLevel);
-    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, goalSettings.calorieMode);
+    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalWeightChangeKg ? Number(profile.goalWeightChangeKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, goalSettings.calorieMode);
     return { bmr, tdee, target: calcResult.dailyCalories, originalTarget: calcResult.originalCalories, deficit: calcResult.dailyDeficit, isAggressive: calcResult.isAggressive };
   })() : null;
 
@@ -76,7 +76,7 @@ export default function Settings() {
   const aggressiveModalTarget = profile ? (() => {
     const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
     const tdee = calculateTDEE(bmr, profile.activityLevel);
-    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, 'aggressive');
+    const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalWeightChangeKg ? Number(profile.goalWeightChangeKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, 'aggressive');
     return calcResult.originalCalories;
   })() : 0;
 
@@ -96,7 +96,7 @@ export default function Settings() {
 
       setGoalSettings({
         fitnessGoal: profile.fitnessGoal,
-        goalKg: profile.goalKg ? String(profile.goalKg) : '',
+        goalKg: profile.goalWeightChangeKg ? String(profile.goalWeightChangeKg) : '',
         goalDays: profile.goalDays ? String(profile.goalDays) : '',
         calorieMode: profile.calorieMode || 'safe',
       });

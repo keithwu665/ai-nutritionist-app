@@ -143,10 +143,10 @@ export const appRouter = router({
         const profile = await db.getUserProfile(ctx.user.id);
         if (!profile) throw new Error('Profile not found');
 
-        const goalKg = profile.goalKg ? Number(profile.goalKg) : null;
+        const goalWeightChangeKg = profile.goalWeightChangeKg ? Number(profile.goalWeightChangeKg) : null;
         const goalDays = profile.goalDays ? Number(profile.goalDays) : null;
 
-        if (!goalKg || !goalDays) {
+        if (!goalWeightChangeKg || !goalDays) {
           return {
             type: 'no_goal',
             advice: '請先設定你的減重目標',
@@ -165,7 +165,7 @@ export const appRouter = router({
         const daysElapsed = Math.max(1, Math.floor((selectedDateObj.getTime() - baselineDate.getTime()) / (1000 * 60 * 60 * 24)));
         
         // Calculate expected vs actual progress
-        const expectedProgress = (daysElapsed / goalDays) * Math.abs(goalKg);
+        const expectedProgress = (daysElapsed / goalDays) * Math.abs(goalWeightChangeKg);
         const actualProgress = Math.abs(baselineWeight - input.weight);
         
         // Determine status based on progress comparison
@@ -181,11 +181,11 @@ export const appRouter = router({
         }
         
         // If weight is increasing when goal is to lose, mark as off_track
-        if (input.weightTrend === 'increasing' && goalKg < 0) {
+        if (input.weightTrend === 'increasing' && goalWeightChangeKg < 0) {
           status = 'off_track';
         }
         
-        const dailyDeficit = (Math.abs(goalKg) * 7700) / goalDays;
+        const dailyDeficit = (Math.abs(goalWeightChangeKg) * 7700) / goalDays;
 
         let advice = '';
         if (input.personality === 'gentle') {
@@ -219,7 +219,7 @@ export const appRouter = router({
           advice,
           status,
           dailyDeficit: Math.round(dailyDeficit),
-          goalKg,
+          goalWeightChangeKg,
           goalDays,
           daysElapsed,
           expectedProgress: Math.round(expectedProgress * 10) / 10,
@@ -746,7 +746,7 @@ export const appRouter = router({
 
       const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
       const tdee = calculateTDEE(bmr, profile.activityLevel);
-      const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalKg ? Number(profile.goalKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, profile.calorieMode || 'safe');
+      const calcResult = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, profile.goalWeightChangeKg ? Number(profile.goalWeightChangeKg) : undefined, profile.goalDays ? Number(profile.goalDays) : undefined, profile.gender, profile.calorieMode || 'safe');
 
       // Use enhanced recommendation engine
       const analysisData: AnalysisData = {
