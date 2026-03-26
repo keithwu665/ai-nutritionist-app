@@ -305,11 +305,25 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ACTIVITY SECTION
   // ─────────────────────────────────────────────────────────────────────────
   const activities = input.activities || [];
-  const exerciseItems = activities.map((act: any) => ({
-    type: act.type || 'unknown',
-    durationDisplay: `${act.durationMinutes || 0}`,
-    caloriesDisplay: `${act.caloriesBurned || 0}`,
-  }));
+  // DEBUG: Log raw activities
+  console.log('=== ACTIVITY DEBUG ===');
+  console.log('RAW activities:', activities);
+  
+  const exerciseItems = activities.map((act: any) => {
+    // API returns: { name, duration, calories }
+    // NOT: { type, durationMinutes, caloriesBurned }
+    const activityName = act.name || act.type || 'unknown';
+    const durationMinutes = act.duration || act.durationMinutes || 0;
+    const caloriesBurned = act.calories || act.caloriesBurned || 0;
+    
+    return {
+      type: activityName,
+      durationDisplay: `${durationMinutes}`,
+      caloriesDisplay: `${caloriesBurned}`,
+    };
+  });
+  
+  console.log('exerciseItems:', exerciseItems);
 
   const activity = {
     exercises: exerciseItems,
