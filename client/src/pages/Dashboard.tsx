@@ -12,12 +12,30 @@ import { getExerciseDisplay } from '@/lib/exerciseMapping';
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
   const aiRecommendationsRef = useRef<HTMLDivElement>(null);
   const profileQuery = trpc.profile.get.useQuery();
   const { data: profile, isLoading: profileLoading, error: profileError } = profileQuery;
-  const { data: dashData, isLoading: dashLoading } = trpc.dashboard.getData.useQuery();
-  const { data: recs, isLoading: recsLoading } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
+  const { data: dashData, isLoading: dashLoading, error: dashError } = trpc.dashboard.getData.useQuery();
+  const { data: recs, isLoading: recsLoading, error: recsError } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
+
+  // Handle API errors with user-friendly messages
+  useEffect(() => {
+    if (profileError || dashError || recsError) {
+      const error = profileError || dashError || recsError;
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      if (errorMsg.includes('rate') || errorMsg.includes('429')) {
+        setApiError('系統繁忙，請稍後再試');
+      } else if (errorMsg.includes('Unauthorized') || errorMsg.includes('401')) {
+        setApiError('請重新登入');
+      } else {
+        setApiError('載入失敗，請重新整理頁面');
+      }
+    } else {
+      setApiError(null);
+    }
+  }, [profileError, dashError, recsError]);
 
   // Debug logging
   useEffect(() => {
@@ -113,6 +131,12 @@ export default function Dashboard() {
 
   return (
     <div className="pb-32 md:pb-8">
+      {/* Error Banner */}
+      {apiError && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 m-4 rounded">
+          <p className="text-sm text-yellow-800">{apiError}</p>
+        </div>
+      )}
       {/* Greeting Section - Rebuilt from Screenshot */}
       <div className="p-4">
         <p className="text-xs text-muted-foreground mb-4">{getDateString()}</p>
