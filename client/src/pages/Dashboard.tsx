@@ -1,8 +1,8 @@
 import { useLocation } from 'wouter';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Bell, User } from 'lucide-react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/_core/hooks/useAuth';
+import { Bell, User } from 'lucide-react';
 
 type RecommendationLike = {
   title?: string;
@@ -47,10 +47,11 @@ export function Dashboard() {
   const aiRecommendationsRef = useRef<HTMLDivElement>(null);
   const [todayMood, setTodayMood] = useState<string | null>(null);
 
+  // Fetch dashboard data - using getData which has all aggregations
   const { data: dashboardData } = trpc.dashboard.getData.useQuery();
   const { data: recommendationsData } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetricsList } = trpc.bodyMetrics.list.useQuery({ days: 1 });
-  
+
   // Extract latest body metric from list (same source as Body page)
   const bodyMetricsData = bodyMetricsList && bodyMetricsList.length > 0 ? bodyMetricsList[0] : null;
 
@@ -61,6 +62,7 @@ export function Dashboard() {
   const caloriePercent =
     calorieTarget > 0 ? Math.max(0, Math.min(100, Math.round((todayCalories / calorieTarget) * 100))) : 0;
 
+  // Load mood from localStorage
   useEffect(() => {
     const today = new Date().toDateString();
     const stored = localStorage.getItem('userMoods');
@@ -147,7 +149,7 @@ export function Dashboard() {
   // Get coach tone from profile for AI Advice variation
   const coachTone = dashboardData?.profile?.aiToneStyle || 'gentle';
 
-  // Extract macro data (TODO: calculate from food logs when available)
+  // Extract macro data from dashboard
   const proteinGrams = dashboardData?.today?.proteinTotal ? Math.round(Number(dashboardData.today.proteinTotal)) : null;
   const carbsGrams = dashboardData?.today?.carbsTotal ? Math.round(Number(dashboardData.today.carbsTotal)) : null;
   const fatsGrams = dashboardData?.today?.fatsTotal ? Math.round(Number(dashboardData.today.fatsTotal)) : null;
@@ -355,132 +357,84 @@ export function Dashboard() {
               })}
             </div>
           </section>
+
+          <section className="rounded-2xl border border-[#d9c9b3]/40 bg-[#fef5eb]/50 p-6 text-center">
+            <p
+              className="mb-4 text-sm italic text-[#7b6a5e]"
+              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
+            >
+              "Nourishing the body is an act of gratitude for the soul's temporary home."
+            </p>
+            <p className="text-[9px] uppercase tracking-[0.15em] text-[#8a9a5b]">Daily Intention</p>
+          </section>
         </div>
       </header>
 
-      <main className="mx-auto max-w-md space-y-8 px-6 pt-2">
-        <section className="relative overflow-hidden rounded-2xl bg-[#d27d5b]/10 p-8 text-center">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-[#d27d5b]/5 blur-2xl" />
-          <p
-            className="text-lg italic leading-relaxed text-[#924a2c]"
-            style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-          >
-            &quot;Nourishing the body is an act of gratitude for the soul&apos;s temporary home.&quot;
-          </p>
-          <p className="mt-4 text-xs uppercase tracking-widest text-[#464646]/60">Daily Intention</p>
-        </section>
-
+      <main className="mx-auto max-w-md space-y-6 px-6">
         <section className="space-y-4">
-          <div className="flex items-end justify-between px-2">
+          <div className="flex items-center justify-between px-2">
             <h2
-              className="text-3xl font-bold text-[#1c1c19]"
+              className="text-2xl font-bold text-[#1c1c19]"
               style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
             >
               Daily Fuel
             </h2>
-            <div className="text-right">
-              <span
-                className="text-2xl font-bold text-[#56642b]"
-                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-              >
-                {Math.round(todayCalories).toLocaleString()}
-              </span>
-              <span className="ml-1 text-sm text-[#46483c]/80">
-                / {Math.round(calorieTarget).toLocaleString()} kcal
-              </span>
-            </div>
+            <p className="text-sm font-light text-[#7b6a5e]">
+              {Math.round(todayCalories)} / {Math.round(calorieTarget)} kcal
+            </p>
           </div>
 
-          <div className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-2xl bg-[#ffffff]">
-            <svg className="h-40 w-40 -rotate-90" viewBox="0 0 160 160">
-              <circle
-                cx="80"
-                cy="80"
-                r={circleRadius}
-                fill="transparent"
-                stroke="#e5e2dd"
-                strokeWidth="12"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r={circleRadius}
-                fill="transparent"
-                stroke="url(#dashboardFuelGradient)"
-                strokeWidth="14"
-                strokeLinecap="round"
-                strokeDasharray={circleCircumference}
-                strokeDashoffset={progressOffset}
-                className="transition-all duration-700"
-              />
-              <defs>
-                <linearGradient id="dashboardFuelGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#56642b" />
-                  <stop offset="100%" stopColor="#8a9a5b" />
-                </linearGradient>
-              </defs>
-            </svg>
-
-            <div className="absolute flex flex-col items-center">
-              <span
-                className="text-4xl text-[#1c1c19]"
-                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-              >
-                {caloriePercent}%
-              </span>
-              <span className="text-[10px] uppercase tracking-tight text-[#46483c]/70">Consumed</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid grid-cols-2 gap-4">
-          <div className="col-span-2 flex items-center justify-between rounded-2xl bg-[#f6dfc2] p-6">
-            <div>
-              <h3 className="font-bold text-[#251a08]">Protein</h3>
-              <p className="text-sm text-[#251a08]/70">Building blocks</p>
-            </div>
-            <div className="text-right">
-              <span
-                className="text-xl text-[#251a08]"
-                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-              >
-                {proteinGrams ? proteinGrams : '—'}g
-              </span>
-              <div className="mt-2 h-1.5 w-24 overflow-hidden rounded-full bg-[#251a08]/10">
-                <div className="h-full w-[70%] rounded-full bg-[#251a08]" />
+          <div className="flex justify-center">
+            <div style={{ width: '160px', height: '160px', position: 'relative' }}>
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#e8d4c4" strokeWidth="10" />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="50"
+                  fill="none"
+                  stroke="#a89968"
+                  strokeWidth="10"
+                  strokeDasharray={`${(caloriePercent / 100) * 314} 314`}
+                  strokeLinecap="round"
+                  className="transition-all duration-500"
+                />
+              </svg>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="text-center">
+                  <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#78350f' }}>{caloriePercent}%</p>
+                  <p className="text-xs text-[#8a9a5b]">completed</p>
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-2xl bg-[#ebe8e3] p-6">
-            <h3 className="font-bold text-[#1c1c19]">Carbs</h3>
-            <span
-              className="block text-xl text-[#1c1c19]"
-              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-            >
-              {carbsGrams ? carbsGrams : '—'}g
-            </span>
-            <div className="h-1 w-full overflow-hidden rounded-full bg-[#c6c8b8]/30">
-              <div className="h-full w-[60%] rounded-full bg-[#8a9a5b]" />
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-2xl bg-[#ebe8e3] p-6">
-            <h3 className="font-bold text-[#1c1c19]">Fats</h3>
-            <span
-              className="block text-xl text-[#1c1c19]"
-              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-            >
-              {fatsGrams ? fatsGrams : '—'}g
-            </span>
-            <div className="h-1 w-full overflow-hidden rounded-full bg-[#c6c8b8]/30">
-              <div className="h-full w-[45%] rounded-full bg-[#d27d5b]" />
             </div>
           </div>
         </section>
 
         <section className="space-y-4">
-          <div className="px-2">
+          <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#46483c]/60">Macro Breakdown</h3>
+
+          <div className="rounded-2xl border border-[#f5b041]/30 bg-[#fef3c7] p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-2xl font-bold text-[#1c1c19]">{proteinGrams ?? '—'}g</p>
+              <div className="h-2 w-10 rounded-full bg-[#fbbf24]" />
+            </div>
+            <p className="text-xs text-[#8a9a5b]">Protein</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-[#f5b041]/30 bg-[#fef3c7] p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#8a9a5b]">Carbs</p>
+              <p className="text-xl font-bold text-[#1c1c19]">{carbsGrams ?? '—'}g</p>
+            </div>
+            <div className="rounded-2xl border border-[#f472b6]/30 bg-[#fce7f3] p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#be185d]">Fats</p>
+              <p className="text-xl font-bold text-[#1c1c19]">{fatsGrams ?? '—'}g</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between px-2">
             <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#46483c]/60">Body Balance</h3>
           </div>
 
@@ -504,54 +458,29 @@ export function Dashboard() {
             </button>
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl bg-[#f6f3ee] p-6">
-            <div className="mr-6 flex-1 space-y-4">
-              <div className="flex items-end justify-between">
-                <div className="space-y-0.5">
-                  <p className="text-[10px] uppercase tracking-widest text-[#46483c]/70">Start from</p>
-                  <p
-                    className="text-lg font-bold text-[#1c1c19]"
-                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-                  >
-                    {targetStartWeight ? targetStartWeight.toFixed(1) : '—'}kg
-                  </p>
-                </div>
-                <div className="space-y-0.5 text-right">
-                  <p className="text-[10px] uppercase tracking-widest text-[#46483c]/70">Goal</p>
-                  <p
-                    className="text-lg font-bold text-[#56642b]"
-                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-                  >
-                    {targetStartWeight && targetGoalWeight ? Math.abs(targetStartWeight - targetGoalWeight).toFixed(1) : '—'}kg
-                  </p>
-                </div>
+          <div className="rounded-2xl border border-[#d9c9b3]/40 bg-[#fef5eb]/50 p-6">
+            <div className="mb-6 grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#8a9a5b]">Start From</p>
+                <p className="text-lg font-bold text-[#1c1c19]">{targetStartWeight?.toFixed(1) ?? '—'}kg</p>
               </div>
-
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#e5e2dd]">
-                <div className="h-full rounded-full bg-[#8a9a5b]" style={{ width: `${targetProgressPercent}%` }} />
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#8a9a5b]">Goal</p>
+                <p className="text-lg font-bold text-[#1c1c19]">{targetGoalWeight?.toFixed(1) ?? '—'}kg</p>
               </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-tight text-[#56642b]">
-                  {targetProgressPercent}% Completed
-                </span>
-                <span className="text-[10px] uppercase tracking-tight text-[#46483c]/70">
-                  Difference {targetDifference ? targetDifference.toFixed(1) : '—'}kg
-                </span>
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[#8a9a5b]">Days Left</p>
+                <p className="text-lg font-bold text-[#1c1c19]">{targetDaysRemaining ?? '—'}</p>
               </div>
             </div>
 
-            <div className="border-l border-[#c6c8b8]/40 pl-6 text-center">
-              <p
-                className="text-4xl font-bold leading-none text-[#1c1c19]"
-                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-              >
-                {targetDaysRemaining ? targetDaysRemaining : '—'}
-              </p>
-              <p className="mt-1 whitespace-nowrap text-[9px] uppercase tracking-tighter text-[#46483c]/60">
-                Days Remaining
-              </p>
+            <div className="mb-3 h-2 overflow-hidden rounded-full bg-[#e8d4c4]">
+              <div
+                className="h-full bg-[#f5b041] transition-all duration-500"
+                style={{ width: `${targetProgressPercent}%` }}
+              />
             </div>
+            <p className="text-xs text-[#8a9a5b]">{targetProgressPercent}% completed</p>
           </div>
         </section>
 
@@ -563,34 +492,22 @@ export function Dashboard() {
             >
               AI Advice
             </h2>
-            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline" onClick={() => setLocation('/ai-recommendations')}>
+            <button type="button" className="text-sm font-semibold text-[#56642b] hover:underline" onClick={() => setLocation('/recommendations')}>
               more
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {displayRecommendations.slice(0, 2).map((item, idx) => (
-              <div key={idx} className="flex items-start gap-4 rounded-2xl bg-[#f6f3ee] p-5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#56642b]/10">
-                  <span className="text-xl text-[#56642b]">{idx === 0 ? '🍽️' : '💪'}</span>
-                </div>
-                <div className="space-y-1">
-                  <h4
-                    className="text-base font-bold text-[#1c1c19]"
-                    style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-                  >
-                    {item.title || (idx === 0 ? 'Diet' : 'Exercise')}
-                  </h4>
-                  <p className="text-xs leading-relaxed text-[#46483c]/80">
-                    {item.description}
-                  </p>
-                </div>
+          <div className="space-y-3">
+            {displayRecommendations.map((rec, idx) => (
+              <div key={idx} className="rounded-2xl border border-[#d9c9b3]/40 bg-[#fef5eb]/50 p-4">
+                <p className="mb-2 text-sm font-semibold text-[#1c1c19]">{rec.title}</p>
+                <p className="text-xs text-[#7b6a5e]">{rec.description}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="mt-8 space-y-4">
           <div className="flex items-center justify-between px-2">
             <h2
               className="text-2xl font-bold text-[#1c1c19]"
@@ -604,74 +521,32 @@ export function Dashboard() {
           </div>
 
           {activityList.length > 0 ? (
-            <>
-              {activityList.slice(0, 1).map((activity, idx) => (
-                <div
-                  key={`activity-primary-${activity.id ?? idx}`}
-                  className="flex items-center justify-between rounded-2xl bg-[#f6f3ee] p-5"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#56642b]/10">
-                      <span className="text-2xl text-[#56642b]">🚶</span>
-                    </div>
-                    <div className="space-y-0.5">
-                      <h4
-                        className="text-lg font-bold text-[#1c1c19]"
-                        style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-                      >
-                        {activity.name || 'Daily Walk'}
-                      </h4>
-                      <p className="text-xs text-[#46483c]/70">
-                        {activity.duration || 20} mins
-                        {activity.distance ? ` • ${activity.distance} km` : ''}
-                      </p>
+            <div className="space-y-2">
+              {activityList.map((activity, idx) => (
+                <div key={idx} className="flex items-center justify-between rounded-xl border border-[#d9c9b3]/40 bg-[#fef5eb]/50 p-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">🏃</span>
+                    <div>
+                      <p className="text-sm font-semibold text-[#1c1c19]">{activity.name}</p>
+                      <p className="text-xs text-[#8a9a5b]">{activity.duration} min</p>
                     </div>
                   </div>
-
                   <button
                     type="button"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#56642b] text-white shadow-sm transition-transform active:scale-95"
+                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#8a9a5b]/20 text-sm font-semibold text-[#56642b] hover:bg-[#8a9a5b]/30"
                   >
                     +
                   </button>
                 </div>
               ))}
-
-              {activityList.slice(1, 3).map((activity, idx) => (
-                <div
-                  key={`activity-secondary-${activity.id ?? idx}`}
-                  className="group mt-4 flex items-center gap-4 rounded-xl bg-[#f6f3ee] p-3 transition-shadow hover:shadow-sm"
-                >
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-[#e5e2dd] text-3xl">
-                    🥗
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <h4 className="font-bold text-[#1c1c19]">{activity.name || 'Harvest Activity'}</h4>
-                      <span className="text-xs text-[#46483c]/70">08:30 AM</span>
-                    </div>
-                    <p className="mt-1 text-sm italic text-[#46483c]/80">
-                      {activity.duration ? `${activity.duration} mins completed` : 'Balanced daily movement'}
-                    </p>
-                    <div className="mt-2 flex gap-2">
-                      <span className="rounded-full bg-[#f6dfc2] px-3 py-0.5 text-[10px] font-bold uppercase tracking-tight text-[#251a08]">
-                        Active
-                      </span>
-                      <span className="rounded-full bg-[#d9eaa3] px-3 py-0.5 text-[10px] font-bold uppercase tracking-tight text-[#161f00]">
-                        Healthy
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </>
+            </div>
           ) : (
-            <div className="rounded-2xl bg-[#f6f3ee] p-5 text-center">
-              <p className="mb-4 text-sm text-[#46483c]/70">No activity recorded today</p>
+            <div className="rounded-2xl border border-[#d9c9b3]/40 bg-[#fef5eb]/50 p-6 text-center">
+              <p className="mb-3 text-sm text-[#8a9a5b]">No activity recorded today</p>
               <button
                 type="button"
+                className="rounded-lg bg-[#56642b] px-4 py-2 text-xs font-semibold text-white hover:bg-[#46533f]"
                 onClick={() => setLocation('/exercise')}
-                className="rounded-full bg-[#56642b] px-5 py-2 text-white hover:bg-[#4a5625]"
               >
                 + Add Activity
               </button>
@@ -679,113 +554,40 @@ export function Dashboard() {
           )}
         </section>
 
-        <section className="flex items-center justify-between rounded-xl border-l-4 border-[#56642b] bg-[#f6f3ee] p-8">
-          <div className="space-y-1">
-            <h3
-              className="text-xl text-[#1c1c19]"
-              style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-            >
-              Hydration Pulse
-            </h3>
-            <p className="text-sm text-[#46483c]/80">
-              {hydrationCurrent && hydrationGoal ? `${hydrationCurrent}L of ${hydrationGoal}L goal` : '— L of — L goal'}
-            </p>
-          </div>
-
-          <div className="flex -space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#56642b]/20">
-              <span className="text-sm text-[#56642b]">💧</span>
+        <section className="rounded-2xl border border-[#0284c7]/30 bg-[#e0f2fe] p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="mb-1 text-sm font-semibold text-[#0c4a6e]">Hydration Pulse</p>
+              <p className="text-xs text-[#0369a1]">
+                {hydrationCurrent ?? '—'}L of {hydrationGoal ?? '—'}L goal
+              </p>
             </div>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fcf9f4] bg-[#56642b]/40">
-              <span className="text-sm text-[#56642b]">💧</span>
-            </div>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#fcf9f4] bg-[#56642b] text-white">
-              +
+            <div className="flex gap-1">
+              {[...Array(5)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-2 w-2 rounded-full"
+                  style={{
+                    backgroundColor: i < (hydrationCurrent ? Math.floor(Number(hydrationCurrent)) : 0) ? '#0284c7' : '#cbd5e1',
+                  }}
+                />
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="flex items-center justify-between rounded-xl border-l-4 border-[#7e947f] bg-[#f6f3ee] p-8">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#7e947f]/10">
-              <span className="text-2xl text-[#7e947f]">🌙</span>
+        <section className="rounded-2xl border border-[#a855f7]/30 bg-[#f3e8ff] p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="mb-1 text-sm font-semibold text-[#581c87]">Sleep</p>
+              <p className="text-xs text-[#7e22ce]">
+                {sleepHours ?? '—'}h of {sleepGoal ?? '—'}h goal
+              </p>
             </div>
-            <div className="space-y-0.5">
-              <h3
-                className="text-xl text-[#1c1c19]"
-                style={{ fontFamily: '"Noto Serif", "Georgia", serif' }}
-              >
-                Sleep
-              </h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-sm font-bold text-[#1c1c19]">
-                  {sleepHours ? `${sleepHours}h` : '— h'}
-                </span>
-                <span className="text-[10px] text-[#46483c]/70">
-                  {sleepHours && sleepGoal ? `${sleepHours}h of ${sleepGoal}h goal` : '— h of — h goal'}
-                </span>
-              </div>
-              <div className="mt-1 h-1 w-24 overflow-hidden rounded-full bg-[#7e947f]/10">
-                <div className="h-full rounded-full bg-[#7e947f]" style={{ width: sleepHours && sleepGoal ? `${Math.min(100, (sleepHours / sleepGoal) * 100)}%` : '0%' }} />
-              </div>
-            </div>
+            <span className="text-lg">🌙</span>
           </div>
-
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#7e947f] text-white shadow-sm transition-transform active:scale-95"
-          >
-            +
-          </button>
         </section>
       </main>
-
-      <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-[3rem] bg-[#fcf9f4]/90 px-2 pb-6 pt-2 shadow-[0_-4px_32px_rgba(28,28,25,0.04)] backdrop-blur-md">
-        <button
-          type="button"
-          onClick={() => setLocation('/dashboard')}
-          className="flex flex-col items-center justify-center rounded-full bg-[#f6dfc2] px-4 py-2 text-[#56642b] transition-transform duration-300 active:scale-90"
-        >
-          <span className="text-lg">▦</span>
-          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Dashboard</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setLocation('/body')}
-          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
-        >
-          <span className="text-lg">🧍</span>
-          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Body</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setLocation('/exercise')}
-          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
-        >
-          <span className="text-lg">🏋️</span>
-          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Exercise</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setLocation('/diet/inspiration/home-cooking')}
-          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
-        >
-          <span className="text-lg">🝴</span>
-          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Diet</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setLocation('/settings')}
-          className="flex flex-col items-center justify-center px-4 py-2 text-stone-500 transition-colors duration-300 hover:text-[#56642b] active:scale-90"
-        >
-          <span className="text-lg">👤</span>
-          <span className="mt-1 text-[10px] font-semibold uppercase tracking-widest">Profile</span>
-        </button>
-      </nav>
     </div>
   );
 }
