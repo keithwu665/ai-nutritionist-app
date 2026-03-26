@@ -42,7 +42,7 @@ export const appRouter = router({
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
         displayName: z.string().nullable().optional(),
-        goalKg: z.string().optional(),
+        goalWeightChangeKg: z.string().optional(),
         goalDays: z.number().optional(),
         calorieMode: z.enum(['safe', 'aggressive']).optional(),
       }))
@@ -65,7 +65,7 @@ export const appRouter = router({
         activityLevel: z.enum(["sedentary", "light", "moderate", "high"]).optional(),
         aiToneStyle: z.enum(["gentle", "coach", "hk_style"]).optional(),
         displayName: z.string().nullable().optional(),
-        goalKg: z.string().optional(),
+        goalWeightChangeKg: z.string().optional(),
         goalDays: z.number().optional(),
         calorieMode: z.enum(['safe', 'aggressive']).optional(),
         calorieTarget: z.number().optional(),
