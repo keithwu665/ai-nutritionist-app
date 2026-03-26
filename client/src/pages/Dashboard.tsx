@@ -76,6 +76,13 @@ export default function Dashboard() {
   const carbs = 113;
   const totalMacros = protein + fat + carbs;
 
+  // Goal progress calculation - use latest saved values from profile
+  const currentWeight = parseFloat(profile.weightKg) || 0;
+  const targetWeight = parseFloat(profile.goalKg) || currentWeight;
+  const weightDifference = Math.abs(targetWeight - currentWeight);
+  const totalWeightChange = Math.abs(parseFloat(profile.goalKg) - parseFloat(profile.weightKg)) || 1;
+  const goalProgress = totalWeightChange > 0 ? ((totalWeightChange - weightDifference) / totalWeightChange) * 100 : 0;
+
   // Notification badge logic
   const hasNegativeMood = todayMood === 'sad' || todayMood === 'angry' || todayMood === 'tired';
   const hasProteinDeficit = protein < 30;
@@ -294,10 +301,10 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <p className="text-xs text-primary font-medium">35% 完成</p>
-              <p className="text-xs text-muted-foreground text-center">還差 3.6kg</p>
+              <p className="text-xs text-primary font-medium">{Math.round(goalProgress)}% 完成</p>
+              <p className="text-xs text-muted-foreground text-center">還差 {weightDifference.toFixed(1)}kg</p>
               <div className="text-right">
-                <p className="text-2xl font-bold text-primary">92</p>
+                <p className="text-2xl font-bold text-primary">{profile.goalDays || 0}</p>
                 <p className="text-xs text-muted-foreground">天後</p>
               </div>
             </div>
