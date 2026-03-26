@@ -49,7 +49,10 @@ export function Dashboard() {
 
   const { data: dashboardData } = trpc.dashboard.getData.useQuery();
   const { data: recommendationsData } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
-  const { data: bodyMetricsData } = trpc.bodyMetrics.latest.useQuery();
+  const { data: bodyMetricsList } = trpc.bodyMetrics.list.useQuery({ days: 1 });
+  
+  // Extract latest body metric from list (same source as Body page)
+  const bodyMetricsData = bodyMetricsList && bodyMetricsList.length > 0 ? bodyMetricsList[0] : null;
 
   // Extract profile and calculate calorie target
   const profile = dashboardData?.profile;
