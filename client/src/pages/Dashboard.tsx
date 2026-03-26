@@ -1,19 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { calculateBMR, calculateTDEE, calculateDailyCalorieTarget } from '@shared/calculations';
+import { buildDashboardViewModel, DashboardViewModelInput } from '@/_core/viewModels/dashboardViewModel';
 import { getExerciseDisplay } from '@/lib/exerciseMapping';
-
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [todayMood, setTodayMood] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const aiRecommendationsRef = useRef<HTMLDivElement>(null);
+  
+  // Query data
   const profileQuery = trpc.profile.get.useQuery();
   const { data: profile, isLoading: profileLoading, error: profileError } = profileQuery;
   const { data: dashData, isLoading: dashLoading, error: dashError } = trpc.dashboard.getData.useQuery();
@@ -37,11 +38,6 @@ export default function Dashboard() {
     }
   }, [profileError, dashError, recsError]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('[Dashboard] Profile query state:', { profileLoading, profile, profileError });
-  }, [profileLoading, profile, profileError]);
-
   // Load mood from localStorage on mount
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -64,6 +60,20 @@ export default function Dashboard() {
     setTodayMood(mood);
   };
 
+  // Build ViewModel - SINGLE SOURCE OF TRUTH for all Dashboard data
+  const viewModel = useMemo(() => {
+    const input: DashboardViewModelInput = {
+      dashboardData: dashData,
+      recommendationsData: recs,
+      bodyMetrics: bodyMetrics ? [bodyMetrics] : [],
+      activities: dashData?.today.exercises || [],
+      todayMood: todayMood ? parseInt(todayMood) : null,
+      userName: profile?.displayName || 'User',
+      todayDate: new Date(),
+    };
+    return buildDashboardViewModel(input);
+  }, [dashData, recs, bodyMetrics, todayMood, profile?.displayName]);
+
   // Only show loading if profile is actually loading and we don't have any data
   const isLoading = profileLoading && !profile;
 
@@ -77,58 +87,6 @@ export default function Dashboard() {
 
   if (!profile) return null;
 
-  // Use saved calorieTarget from database as single source of truth
-  // Do NOT recalculate from TDEE or other formulas
-  // NO fallback - if calorieTarget is missing, that's a data error
-  const target = profile.calorieTarget || 0;
-
-  const todayCalories = dashData?.today.calories ?? 0;
-  const todayExercise = dashData?.today.exerciseCalories ?? 0;
-  const netCalories = todayCalories - todayExercise;
-  const caloriePercent = target > 0 ? Math.round((todayCalories / target) * 100) : 0;
-  const remaining = Math.max(0, target - todayCalories);
-
-  // Get macros - use default values if not available
-  const protein = 126; // Placeholder - would come from dashData if available
-  const fat = 43;
-  const carbs = 113;
-  const totalMacros = protein + fat + carbs;
-
-  // Goal progress calculation - use latest saved values from profile
-  const currentWeight = parseFloat(profile.weightKg) || 0;
-  const targetWeight = parseFloat(profile.goalKg) || currentWeight;
-  const weightDifference = Math.abs(targetWeight - currentWeight);
-  const totalWeightChange = Math.abs(parseFloat(profile.goalKg) - parseFloat(profile.weightKg)) || 1;
-  const goalProgress = totalWeightChange > 0 ? ((totalWeightChange - weightDifference) / totalWeightChange) * 100 : 0;
-
-  // Notification badge logic
-  const hasNegativeMood = todayMood === 'sad' || todayMood === 'angry' || todayMood === 'tired';
-  const hasProteinDeficit = protein < 30;
-  const noExerciseToday = todayExercise === 0;
-  const hasCalorieGap = remaining > 100;
-  const shouldShowNotification = hasNegativeMood || hasProteinDeficit || noExerciseToday || hasCalorieGap;
-
-  const getDateString = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const weekDay = ['日', '一', '二', '三', '四', '五', '六'][now.getDay()];
-    return `${year}年${month}月${day}日 · 星期${weekDay}`;
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    const name = profile?.displayName || '';
-    const greeting = hour < 12 ? '早晨' : hour < 18 ? '午安' : '晚安';
-    const emoji = hour < 12 ? '🌤️' : hour < 18 ? '☀️' : '🌙';
-    
-    if (name) {
-      return `${greeting}，${name}！${emoji}`;
-    }
-    return `${greeting}！${emoji}`;
-  };
-
   return (
     <div className="pb-32 md:pb-8">
       {/* Error Banner */}
@@ -137,11 +95,12 @@ export default function Dashboard() {
           <p className="text-sm text-yellow-800">{apiError}</p>
         </div>
       )}
-      {/* Greeting Section - Rebuilt from Screenshot */}
+      
+      {/* Greeting Section - Using ViewModel */}
       <div className="p-4">
-        <p className="text-xs text-muted-foreground mb-4">{getDateString()}</p>
+        <p className="text-xs text-muted-foreground mb-4">{viewModel.header.dateText}</p>
         <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold">{getGreeting()}</h1>
+          <h1 className="text-4xl font-bold">{viewModel.header.greetingText}，{viewModel.header.userName}！</h1>
           <div className="flex items-center gap-3">
             <button 
               className="p-2 hover:bg-muted rounded-full transition-colors relative"
@@ -152,7 +111,7 @@ export default function Dashboard() {
             >
               <Bell className="h-5 w-5 text-foreground" />
               {/* Notification badge */}
-              {shouldShowNotification && (
+              {viewModel.flags.shouldShowNotification && (
                 <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
               )}
             </button>
@@ -168,7 +127,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <div className="p-4 md:p-8 space-y-3 md:space-y-4 max-w-7xl mx-auto">
         
-        {/* Mood Check-in Section */}
+        {/* Mood Check-in Section - Using ViewModel */}
         <div className="bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-2.5">
             <p className="text-sm font-semibold text-foreground">今日心情</p>
@@ -205,20 +164,20 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* Hero Calorie Card - Emerald Green */}
+        {/* Hero Calorie Card - Using ViewModel */}
         <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">
-          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-2 gap-4 mb-4">
             {/* Left: Intake */}
             <div>
               <p className="text-xs font-medium opacity-90 mb-0.5">今日熱量</p>
-              <p className="text-3xl md:text-4xl font-bold mb-1">{Math.round(todayCalories)}</p>
-              <p className="text-xs opacity-75 mb-0.5">/ {Math.round(target)} kcal</p>
-              <p className="text-xs opacity-75">還差 {Math.round(remaining)} kcal</p>
+              <p className="text-3xl md:text-4xl font-bold mb-1">{viewModel.calories.currentDisplay}</p>
+              <p className="text-xs opacity-75 mb-0.5">/ {viewModel.calories.targetDisplay} kcal</p>
+              <p className="text-xs opacity-75">還差 {viewModel.calories.remainingDisplay} kcal</p>
             </div>
             {/* Right: Net Calories */}
             <div className="text-right">
               <p className="text-xs font-medium opacity-90 mb-0.5">淨熱量</p>
-              <p className="text-3xl md:text-4xl font-bold">{Math.round(netCalories)}</p>
+              <p className="text-3xl md:text-4xl font-bold">{viewModel.calories.currentDisplay}</p>
               <p className="text-xs opacity-75 mt-1">kcal</p>
             </div>
           </div>
@@ -228,20 +187,18 @@ export default function Dashboard() {
             <div className="w-full bg-white/20 rounded-full h-1.5 overflow-hidden">
               <div 
                 className="bg-white h-full rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(caloriePercent, 100)}%` }}
+                style={{ width: `${viewModel.calories.percentWidth}%` }}
               ></div>
             </div>
           </div>
 
-          {/* Macro Circles */}
+          {/* Macro Circles - Using ViewModel */}
           <div className="grid grid-cols-3 gap-2">
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-white/30 flex items-center justify-center mb-1 relative">
-                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-white border-r-white" style={{
-                  transform: 'rotate(' + (protein / (totalMacros || 1) * 360) + 'deg)'
-                }}></div>
+                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-white border-r-white" style={{ transform: `rotate(${((viewModel.macros.proteinRaw / (viewModel.macros.proteinRaw + viewModel.macros.fatsRaw + viewModel.macros.carbsRaw || 1)) * 360)}deg)` }}></div>
                 <div className="text-center">
-                  <p className="text-sm md:text-base font-bold">{Math.round(protein)}</p>
+                  <p className="text-sm md:text-base font-bold">{viewModel.macros.proteinDisplay}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -251,7 +208,7 @@ export default function Dashboard() {
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-orange-300 flex items-center justify-center mb-1">
                 <div className="text-center">
-                  <p className="text-sm md:text-base font-bold">{Math.round(fat)}</p>
+                  <p className="text-sm md:text-base font-bold">{viewModel.macros.fatsDisplay}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -261,7 +218,7 @@ export default function Dashboard() {
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-blue-300 flex items-center justify-center mb-1">
                 <div className="text-center">
-                  <p className="text-sm md:text-base font-bold">{Math.round(carbs)}</p>
+                  <p className="text-sm md:text-base font-bold">{viewModel.macros.carbsDisplay}</p>
                   <p className="text-xs opacity-75">g</p>
                 </div>
               </div>
@@ -270,14 +227,14 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Body Metrics Cards - 3 Column */}
+        {/* Body Metrics Cards - Using ViewModel */}
         <div className="grid grid-cols-3 gap-2 md:gap-3">
           <Card className="rounded-2xl">
             <CardContent className="pt-3 pb-3">
               <p className="text-xs text-muted-foreground font-medium mb-1">體重</p>
-              <p className="text-xl font-bold">{profile.weightKg}</p>
+              <p className="text-xl font-bold">{viewModel.body.weightDisplay}</p>
               <p className="text-xs text-muted-foreground mt-0.5">kg</p>
-              {bodyMetrics && (
+              {viewModel.body.weightDisplay !== '—' && (
                 <p className="text-xs text-green-600 mt-0.5">-0.2 kg</p>
               )}
             </CardContent>
@@ -286,9 +243,9 @@ export default function Dashboard() {
           <Card className="rounded-2xl">
             <CardContent className="pt-3 pb-3">
               <p className="text-xs text-muted-foreground font-medium mb-1">體脂 %</p>
-              <p className="text-xl font-bold">{bodyMetrics?.bodyFatPercent ? Number(bodyMetrics.bodyFatPercent).toFixed(1) : '—'}</p>
+              <p className="text-xl font-bold">{viewModel.body.bodyFatDisplay}</p>
               <p className="text-xs text-muted-foreground mt-0.5">%</p>
-              {bodyMetrics && (
+              {viewModel.body.bodyFatDisplay !== '—' && (
                 <p className="text-xs text-green-600 mt-0.5">↓ 正在減少</p>
               )}
             </CardContent>
@@ -297,14 +254,16 @@ export default function Dashboard() {
           <Card className="rounded-2xl">
             <CardContent className="pt-3 pb-3">
               <p className="text-xs text-muted-foreground font-medium mb-1">BMI</p>
-              <p className="text-xl font-bold">{(Number(profile.weightKg) / ((Number(profile.heightCm) / 100) ** 2)).toFixed(1)}</p>
+              <p className="text-xl font-bold">{viewModel.body.bmiDisplay}</p>
               <p className="text-xs text-muted-foreground mt-0.5">kg/m²</p>
-              <p className="text-xs text-green-600 mt-0.5">正常</p>
+              {viewModel.body.bmiDisplay !== '—' && (
+                <p className="text-xs text-green-600 mt-0.5">正常</p>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Goal Progress Card */}
+        {/* Goal Progress Card - Using ViewModel */}
         <Card className="rounded-2xl">
           <CardContent className="pt-4 pb-4">
             <div className="flex justify-between items-start mb-3">
@@ -313,30 +272,30 @@ export default function Dashboard() {
             </div>
             
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <p className="text-xs text-muted-foreground">起點 {profile.weightKg}kg</p>
-              <p className="text-xs text-muted-foreground text-right">目標 {profile.goalKg}kg</p>
+              <p className="text-xs text-muted-foreground">起點 {viewModel.target.startWeightDisplay}kg</p>
+              <p className="text-xs text-muted-foreground text-right">目標 {viewModel.target.targetWeightDisplay}kg</p>
             </div>
 
             <div className="w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
               <div 
                 className="bg-primary h-full rounded-full transition-all duration-300"
-                style={{ width: '35%' }}
+                style={{ width: `${viewModel.target.progressWidth}%` }}
               ></div>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <p className="text-xs text-primary font-medium">{Math.round(goalProgress)}% 完成</p>
-              <p className="text-xs text-muted-foreground text-center">還差 {weightDifference.toFixed(1)}kg</p>
+              <p className="text-xs text-primary font-medium">{viewModel.target.progressPercentDisplay}% 完成</p>
+              <p className="text-xs text-muted-foreground text-center">還差 {viewModel.target.weightToGoDisplay}kg</p>
               <div className="text-right">
-                <p className="text-2xl font-bold text-primary">{profile.goalDays || 0}</p>
+                <p className="text-2xl font-bold text-primary">{viewModel.target.goalDaysDisplay}</p>
                 <p className="text-xs text-muted-foreground">天後</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* AI Recommendations Section */}
-        {recs && (
+        {/* AI Recommendations Section - Using ViewModel */}
+        {viewModel.ai.advice && (
           <div className="space-y-3" ref={aiRecommendationsRef}>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">AI 建議</h2>
@@ -348,37 +307,22 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* Diet Recommendation */}
+            {/* AI Advice Card */}
             <Card className="rounded-2xl bg-blue-50 border-blue-100">
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">🍽️</div>
+                  <div className="text-2xl">🤖</div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold mb-1">飲食建議</p>
-                    <p className="text-xs text-muted-foreground">{recs.diet?.[0]?.message || '增加蛋白質攝入，保持營養均衡。'}</p>
+                    <p className="text-sm font-semibold mb-1">AI 建議</p>
+                    <p className="text-xs text-muted-foreground">{viewModel.ai.advice}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Exercise Recommendation */}
-            <Card className="rounded-2xl bg-green-50 border-green-100">
-              <CardContent className="pt-4 pb-4">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">💪</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold mb-1">運動建議</p>
-                    <p className="text-xs text-muted-foreground">{recs.exercise?.[0]?.message || '今日運動量不足，建議進行 30 分鐘的中等強度運動。'}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-
           </div>
         )}
 
-        {/* Today's Exercise */}
+        {/* Today's Exercise - Using ViewModel */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">今日運動</h2>
@@ -390,20 +334,20 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {dashData?.today.exercises && dashData.today.exercises.length > 0 ? (
+          {viewModel.activity.exercises && viewModel.activity.exercises.length > 0 ? (
             <div className="space-y-2">
-              {dashData.today.exercises.map((exercise, idx) => {
-                const { icon, label } = getExerciseDisplay(exercise.name);
+              {viewModel.activity.exercises.map((exercise, idx) => {
+                const { icon, label } = getExerciseDisplay(exercise.type);
                 return (
                 <Card key={idx} className="rounded-2xl">
                   <CardContent className="pt-3 pb-3">
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-sm font-semibold flex items-center gap-2"><span>{icon}</span> {label}</p>
-                        <p className="text-xs text-muted-foreground">{exercise.duration} 分鐘</p>
+                        <p className="text-xs text-muted-foreground">{exercise.durationDisplay} 分鐘</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-primary">{exercise.calories}</p>
+                        <p className="text-lg font-bold text-primary">{exercise.caloriesDisplay}</p>
                         <p className="text-xs text-muted-foreground">kcal</p>
                       </div>
                     </div>
