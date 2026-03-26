@@ -215,7 +215,10 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // AI RECOMMENDATIONS SECTION
   // ─────────────────────────────────────────────────────────────────────────
-  const aiAdvice = input.recommendationsData?.advice || '';
+  // API returns { diet, exercise, body, encouragement } - pick first diet recommendation
+  const dietRecs = input.recommendationsData?.diet || [];
+  const firstDietRec = dietRecs.length > 0 ? dietRecs[0] : null;
+  const aiAdvice = firstDietRec?.message || '';
   const aiTone = input.recommendationsData?.tone || 'neutral';
 
   const ai = {

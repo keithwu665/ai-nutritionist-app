@@ -338,33 +338,33 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* AI Recommendations Section - Using ViewModel */}
-        {viewModel.ai.advice && (
-          <div className="space-y-3" ref={aiRecommendationsRef}>
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">AI 建議</h2>
-              <button 
-                onClick={() => setLocation('/ai-recommendations')}
-                className="text-xs text-primary hover:underline flex items-center gap-1"
-              >
-                查看全部 <ChevronRight className="h-3 w-3" />
-              </button>
-            </div>
-
-            {/* AI Advice Card */}
-            <Card className="rounded-2xl bg-blue-50 border-blue-100">
-              <CardContent className="pt-4 pb-4">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">🤖</div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold mb-1">AI 建議</p>
-                    <p className="text-xs text-muted-foreground">{viewModel.ai.advice}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* AI Recommendations Section - Always visible */}
+        <div className="space-y-3" ref={aiRecommendationsRef}>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">AI 建議</h2>
+            <button 
+              onClick={() => setLocation('/ai-recommendations')}
+              className="text-xs text-primary hover:underline flex items-center gap-1"
+            >
+              查看全部 <ChevronRight className="h-3 w-3" />
+            </button>
           </div>
-        )}
+
+          {/* AI Advice Card */}
+          <Card className="rounded-2xl bg-blue-50 border-blue-100">
+            <CardContent className="pt-4 pb-4">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">🤖</div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold mb-1">AI 建議</p>
+                  <p className="text-xs text-muted-foreground">
+                    {viewModel.ai.advice || '暫時未有 AI 建議'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Today's Exercise - Using ViewModel */}
         <div className="space-y-2">
