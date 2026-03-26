@@ -69,6 +69,7 @@ export interface DashboardViewModel {
 
   // AI recommendations section (always has safe defaults)
   ai: {
+    items: Array<{ type: string; message: string }>; // Array of recommendation items (diet, exercise, etc.)
     advice: string;             // AI-generated advice in Chinese, fallback ''
     tone: string;               // Coach tone used (gentle / coach / hk_style), fallback 'neutral'
   };
@@ -236,14 +237,23 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // AI RECOMMENDATIONS SECTION
   // ─────────────────────────────────────────────────────────────────────────
-  // API returns { diet, exercise, body, encouragement } - pick first diet recommendation
+  // API returns { diet, exercise, body, encouragement } - preserve diet and exercise as separate items
   const dietRecs = input.recommendationsData?.diet || [];
-  const firstDietRec = dietRecs.length > 0 ? dietRecs[0] : null;
-  const aiAdvice = firstDietRec?.message || '';
+  const exerciseRecs = input.recommendationsData?.exercise || [];
   const aiTone = input.recommendationsData?.tone || 'neutral';
 
+  // Build array of recommendation items: diet first, then exercise
+  const aiItems = [
+    ...(dietRecs.length > 0 ? [{ type: 'diet', message: dietRecs[0].message }] : []),
+    ...(exerciseRecs.length > 0 ? [{ type: 'exercise', message: exerciseRecs[0].message }] : []),
+  ];
+
+  // Fallback message if no recommendations
+  const aiAdvice = aiItems.length > 0 ? aiItems[0].message : '';
+
   const ai = {
-    advice: aiAdvice,
+    items: aiItems,
+    advice: aiAdvice, // Keep for backward compatibility
     tone: aiTone,
   };
 

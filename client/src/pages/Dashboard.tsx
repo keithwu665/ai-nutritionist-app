@@ -350,20 +350,38 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* AI Advice Card */}
-          <Card className="rounded-2xl bg-blue-50 border-blue-100">
-            <CardContent className="pt-4 pb-4">
-              <div className="flex items-start gap-3">
-                <div className="text-2xl">🤖</div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold mb-1">AI 建議</p>
-                  <p className="text-xs text-muted-foreground">
-                    {viewModel.ai.advice || '暫時未有 AI 建議'}
-                  </p>
+          {/* AI Recommendation Cards - Display each item separately */}
+          {viewModel.ai.items && viewModel.ai.items.length > 0 ? (
+            viewModel.ai.items.map((item: any, index: number) => (
+              <Card key={index} className="rounded-2xl bg-blue-50 border-blue-100">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="text-2xl">🤖</div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold mb-1">
+                        {item.type === 'diet' ? '飲食建議' : item.type === 'exercise' ? '運動建議' : 'AI 建議'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.message || '暫時未有建議'}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Card className="rounded-2xl bg-blue-50 border-blue-100">
+              <CardContent className="pt-4 pb-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">🤖</div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold mb-1">AI 建議</p>
+                    <p className="text-xs text-muted-foreground">暫時未有 AI 建議</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Today's Exercise - Using ViewModel */}
