@@ -191,6 +191,12 @@ export default function Settings() {
       updatePayload.goalDays = goalSettings.goalDays ? parseInt(goalSettings.goalDays) : undefined;
     }
 
+    // Compute and save the exact calorie target based on current mode
+    if (metabolicData) {
+      updatePayload.calorieTarget = Math.round(metabolicData.target);
+      console.log('[Settings] Computed calorieTarget:', updatePayload.calorieTarget);
+    }
+
     console.log('[Settings] Goal settings payload:', updatePayload);
     goalSettingsMutation.mutate(updatePayload);
   };

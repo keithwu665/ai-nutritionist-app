@@ -68,6 +68,7 @@ export const appRouter = router({
         goalKg: z.string().optional(),
         goalDays: z.number().optional(),
         calorieMode: z.enum(['safe', 'aggressive']).optional(),
+        calorieTarget: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         return db.updateUserProfile(ctx.user.id, input);

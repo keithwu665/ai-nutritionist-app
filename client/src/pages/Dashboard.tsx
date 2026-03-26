@@ -59,15 +59,10 @@ export default function Dashboard() {
 
   if (!profile) return null;
 
-  const bmr = calculateBMR(profile.gender, Number(profile.weightKg), Number(profile.heightCm), profile.age);
-  const tdee = calculateTDEE(bmr, profile.activityLevel);
-  const goalKg = profile.goalKg ? Number(profile.goalKg) : 0;
-  const goalDays = profile.goalDays ? Number(profile.goalDays) : 0;
-  const calorieCalc = calculateDailyCalorieTarget(tdee, profile.fitnessGoal, goalKg, goalDays, profile.gender, profile.calorieMode || 'safe');
-  let target = Number(calorieCalc?.originalCalories) || 2000;
-  if (!isFinite(target) || target <= 0) {
-    target = 2000;
-  }
+  // Use saved calorieTarget from database as single source of truth
+  // Do NOT recalculate from TDEE or other formulas
+  // NO fallback - if calorieTarget is missing, that's a data error
+  const target = profile.calorieTarget || 0;
 
   const todayCalories = dashData?.today.calories ?? 0;
   const todayExercise = dashData?.today.exerciseCalories ?? 0;

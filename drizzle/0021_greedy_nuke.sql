@@ -1,0 +1,1 @@
+ALTER TABLE `user_profiles` ADD `calorieTarget` int DEFAULT 2000 NOT NULL;

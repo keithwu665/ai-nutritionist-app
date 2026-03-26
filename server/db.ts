@@ -141,6 +141,7 @@ export async function getUserProfile(userId: number) {
     goalDays: userProfiles.goalDays,
     displayName: userProfiles.displayName,
     calorieMode: userProfiles.calorieMode,
+    calorieTarget: userProfiles.calorieTarget,
     createdAt: userProfiles.createdAt,
     updatedAt: userProfiles.updatedAt,
     aiToneStyle: userProfiles.aiToneStyle,
