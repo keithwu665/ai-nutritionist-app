@@ -181,12 +181,13 @@ export const generalFoodCache = mysqlTable("general_food_cache", {
 		age: int().notNull(),
 		heightCm: decimal({ precision: 5, scale: 1 }).notNull(),
 		weightKg: decimal({ precision: 5, scale: 1 }).notNull(),
-		startWeightKg: decimal({ precision: 5, scale: 1 }), // Initial weight when goal was set
+		startWeightKg: decimal({ precision: 5, scale: 1 }), // Initial weight when goal was set (NEW)
 		fitnessGoal: mysqlEnum(['lose','maintain','gain']).notNull(),
 		activityLevel: mysqlEnum(['sedentary','light','moderate','high']).notNull(),
-		goalWeightChangeKg: decimal({ precision: 5, scale: 1 }), // Amount to lose/gain (renamed from goalKg)
+		goalKg: decimal({ precision: 5, scale: 1 }), // LEGACY: goal weight change (kept for backward compatibility)
+		goalWeightChangeKg: decimal({ precision: 5, scale: 1 }), // NEW: alias for goalKg with clearer semantics
 		goalDays: int(),
-		goalStartDate: timestamp({ mode: 'string' }), // When the goal was started
+		goalStartDate: timestamp({ mode: 'string' }), // NEW: When the goal was started
 		displayName: varchar({ length: 100 }),
 		calorieMode: mysqlEnum(['safe','aggressive']).default('safe').notNull(),
 		calorieTarget: int().default(2000).notNull(),

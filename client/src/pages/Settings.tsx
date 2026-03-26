@@ -187,7 +187,7 @@ export default function Settings() {
     };
 
     if (goalSettings.fitnessGoal !== 'maintain') {
-      updatePayload.goalKg = goalSettings.goalKg ? String(goalSettings.goalKg) : undefined;
+      updatePayload.goalWeightChangeKg = goalSettings.goalKg ? String(goalSettings.goalKg) : undefined;
       updatePayload.goalDays = goalSettings.goalDays ? parseInt(goalSettings.goalDays) : undefined;
     }
 
