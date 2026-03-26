@@ -47,12 +47,12 @@ export function Dashboard() {
   const aiRecommendationsRef = useRef<HTMLDivElement>(null);
   const [todayMood, setTodayMood] = useState<string | null>(null);
 
-  // Fetch dashboard data - using getData which has all aggregations
+  // Original queries - RESTORED
   const { data: dashboardData } = trpc.dashboard.getData.useQuery();
   const { data: recommendationsData } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetricsList } = trpc.bodyMetrics.list.useQuery({ days: 1 });
 
-  // Extract latest body metric from list (same source as Body page)
+  // Extract latest body metric from list
   const bodyMetricsData = bodyMetricsList && bodyMetricsList.length > 0 ? bodyMetricsList[0] : null;
 
   // Extract profile and calculate calorie target
@@ -72,19 +72,16 @@ export function Dashboard() {
         const moods = JSON.parse(stored) as Record<string, string>;
         const moodForToday = moods[today] || null;
         setTodayMood(moodForToday);
-        console.log('[Dashboard] Loaded mood from localStorage:', moodForToday);
       } catch (e) {
         console.error('[Dashboard] Failed to parse moods:', e);
         setTodayMood(null);
       }
     } else {
-      console.log('[Dashboard] No moods in localStorage');
       setTodayMood(null);
     }
   }, []);
 
   const handleMoodSelect = (moodId: string) => {
-    console.log('[Dashboard] Mood selected:', moodId);
     setTodayMood(moodId);
 
     const today = new Date().toDateString();
@@ -94,7 +91,6 @@ export function Dashboard() {
       const moods = stored ? (JSON.parse(stored) as Record<string, string>) : {};
       moods[today] = moodId;
       localStorage.setItem('userMoods', JSON.stringify(moods));
-      console.log('[Dashboard] Mood saved to localStorage:', moods);
     } catch (e) {
       console.error('[Dashboard] Failed to save mood:', e);
       const moods: Record<string, string> = { [today]: moodId };
@@ -149,16 +145,16 @@ export function Dashboard() {
   // Get coach tone from profile for AI Advice variation
   const coachTone = dashboardData?.profile?.aiToneStyle || 'gentle';
 
-  // Extract macro data from dashboard
+  // Extract macro data from dashboard.getData
   const proteinGrams = dashboardData?.today?.proteinTotal ? Math.round(Number(dashboardData.today.proteinTotal)) : null;
   const carbsGrams = dashboardData?.today?.carbsTotal ? Math.round(Number(dashboardData.today.carbsTotal)) : null;
   const fatsGrams = dashboardData?.today?.fatsTotal ? Math.round(Number(dashboardData.today.fatsTotal)) : null;
 
-  // TODO: Add hydration and sleep data to dashboard.getData query when schema is updated
-  const hydrationCurrent = null; // TODO: bind to real data
-  const hydrationGoal = null; // TODO: bind to real data
-  const sleepHours = null; // TODO: bind to real data
-  const sleepGoal = null; // TODO: bind to real data
+  // TODO: Add hydration and sleep data to schema when available
+  const hydrationCurrent = null;
+  const hydrationGoal = null;
+  const sleepHours = null;
+  const sleepGoal = null;
 
   // Generate Chinese advice based on real data and coach tone
   const generateChineseAdvice = (): RecommendationLike[] => {
@@ -244,10 +240,6 @@ export function Dashboard() {
   const activities: ActivityLike[] = dashboardData?.today?.exercises ?? [];
   const activityList: ActivityLike[] = activities || [];
 
-  const circleRadius = 70;
-  const circleCircumference = 2 * Math.PI * circleRadius;
-  const progressOffset = circleCircumference - (caloriePercent / 100) * circleCircumference;
-
   // Target progress - use profile goal if available
   const targetStartWeight = profile?.weightKg ? Number(profile.weightKg) : null;
   const targetGoalWeight = profile?.goalKg ? Number(profile.goalKg) : null;
@@ -256,7 +248,6 @@ export function Dashboard() {
   const targetProgressPercent = targetStartWeight && targetGoalWeight && targetStartWeight !== targetGoalWeight && currentWeight
     ? Math.max(0, Math.min(100, Math.round(((targetStartWeight - currentWeight) / Math.abs(targetStartWeight - targetGoalWeight)) * 100)))
     : 0;
-  const targetDifference = targetGoalWeight && currentWeight ? Math.abs(currentWeight - targetGoalWeight) : null;
 
   const bodyWeight = bodyMetricsData?.weightKg ? Number(bodyMetricsData.weightKg).toFixed(1) : null;
   const bodyFat = bodyMetricsData?.bodyFatPercent ? Number(bodyMetricsData.bodyFatPercent).toFixed(1) : null;
