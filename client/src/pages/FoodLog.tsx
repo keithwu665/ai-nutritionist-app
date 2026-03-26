@@ -55,9 +55,8 @@ export default function FoodLog() {
   // Utils hook - must be called at top level, not inside handlers
   const utils = trpc.useUtils();
 
-  // Calculate daily calorie goal
-  // Calculate daily calorie goal - use default for now
-  const dailyCalorieGoal = 1642;
+  // Calculate daily calorie goal - use saved calorieTarget from profile
+  const dailyCalorieGoal = userProfile?.calorieTarget || 2000;
 
   // Get current month for calendar
   const currentDate = new Date(date);
