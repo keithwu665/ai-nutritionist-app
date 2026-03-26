@@ -102,6 +102,20 @@ export interface DashboardViewModelInput {
 
 export function buildDashboardViewModel(input: DashboardViewModelInput): DashboardViewModel {
   // ─────────────────────────────────────────────────────────────────────────
+  // DEBUG: Log raw data sources (TASK 4)
+  // ─────────────────────────────────────────────────────────────────────────
+  if (process.env.NODE_ENV === 'development') {
+    console.log('=== TASK 4: RAW DATA SOURCES ===');
+    console.log('latestBodyMetric', input.bodyMetrics?.[0]);
+    console.log('profile.height', input.dashboardData?.profile?.height);
+    console.log('profile.goalType', input.dashboardData?.profile?.goalType);
+    console.log('profile.startWeight', input.dashboardData?.profile?.startWeight);
+    console.log('profile.goalWeightChange', input.dashboardData?.profile?.goalWeightChange);
+    console.log('profile.goalDays', input.dashboardData?.profile?.goalDays);
+    console.log('profile.goalStartDate', input.dashboardData?.profile?.goalStartDate);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // HEADER SECTION
   // ─────────────────────────────────────────────────────────────────────────
   const now = input.todayDate;
@@ -159,7 +173,12 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   const latestBodyMetric = input.bodyMetrics?.[0] || {};
   const bodyWeight = parseFloat(latestBodyMetric.weightKg) || 0;
   const bodyBodyFat = parseFloat(latestBodyMetric.bodyFatPercent) || 0;
-  const bodyBmi = latestBodyMetric.bmi || 0;
+  
+  // BMI calculation: weight (kg) / (height (m) ^ 2)
+  // Height from profile in cm, convert to meters
+  const heightCm = parseFloat(input.dashboardData?.profile?.heightCm) || 0;
+  const heightMeters = heightCm > 0 ? heightCm / 100 : 0;
+  const bodyBmi = heightMeters > 0 ? bodyWeight / (heightMeters * heightMeters) : 0;
 
   const body = {
     weightDisplay: bodyWeight > 0 ? bodyWeight.toFixed(1) : '—',
@@ -170,26 +189,28 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // TARGET PROGRESS SECTION (ALL PRE-FORMATTED)
   // ─────────────────────────────────────────────────────────────────────────
-  const targetStartWeight = input.dashboardData?.profile?.startWeight || bodyWeight;
-  const targetGoalWeightChange = input.dashboardData?.profile?.goalWeightChange || 0;
-  const targetTargetWeight = targetStartWeight + targetGoalWeightChange;
+  // Use weightKg as start weight (profile baseline), goalKg as target weight
+  const targetStartWeight = parseFloat(input.dashboardData?.profile?.weightKg) || bodyWeight;
+  const targetGoalWeight = parseFloat(input.dashboardData?.profile?.goalKg) || targetStartWeight;
   const targetCurrentWeight = bodyWeight;
   
   // Calculate progress: how much weight has been lost/gained toward goal
   const targetWeightProgress = Math.abs(targetCurrentWeight - targetStartWeight);
-  const targetWeightToGo = Math.abs(targetTargetWeight - targetCurrentWeight);
+  const targetWeightToGo = Math.abs(targetGoalWeight - targetCurrentWeight);
   
+  // Days left: use raw goalDays for now (goalStartDate not available in API response)
+  // TODO: When goalStartDate is added to API, calculate: daysLeft = max(goalDays - daysPassed, 0)
   const targetGoalDays = input.dashboardData?.profile?.goalDays || 100;
   
   // Calculate progress percentage
-  const targetTotalWeightChange = Math.abs(targetGoalWeightChange);
+  const targetTotalWeightChange = Math.abs(targetGoalWeight - targetStartWeight);
   const targetProgressPercent = targetTotalWeightChange > 0 
     ? Math.round((targetWeightProgress / targetTotalWeightChange) * 100) 
     : 0;
 
   const target = {
     startWeightDisplay: String(targetStartWeight),
-    targetWeightDisplay: String(targetTargetWeight),
+    targetWeightDisplay: String(targetGoalWeight),
     weightToGoDisplay: targetWeightToGo.toFixed(1),
     progressPercentDisplay: Math.min(targetProgressPercent, 100),
     progressWidth: Math.min(targetProgressPercent, 100),
@@ -261,6 +282,13 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
 
   // Debug logging (development only)
   if (process.env.NODE_ENV === 'development') {
+    console.log('=== TASK 5: COMPUTED VALUES ===');
+    console.log('computed currentWeight', bodyWeight);
+    console.log('computed bodyFatPercent', bodyBodyFat);
+    console.log('computed bmi', bodyBmi);
+    console.log('computed targetWeight', targetGoalWeight);
+    console.log('computed daysLeft', targetGoalDays);
+    console.log('');
     console.log('[VIEWMODEL] Dashboard ViewModel built:', viewModel);
     console.log('=== VALIDATION ===');
     console.log('calories.current:', viewModel.calories.currentDisplay);
@@ -270,7 +298,12 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
     console.log('macros.fats:', viewModel.macros.fatsDisplay);
     console.log('body.weight:', viewModel.body.weightDisplay);
     console.log('body.bodyFat:', viewModel.body.bodyFatDisplay);
+    console.log('body.bmi:', viewModel.body.bmiDisplay);
+    console.log('target.startWeight:', viewModel.target.startWeightDisplay);
+    console.log('target.targetWeight:', viewModel.target.targetWeightDisplay);
+    console.log('target.weightToGo:', viewModel.target.weightToGoDisplay);
     console.log('target.progress:', viewModel.target.progressPercentDisplay);
+    console.log('target.goalDays:', viewModel.target.goalDaysDisplay);
   }
 
   return viewModel;
