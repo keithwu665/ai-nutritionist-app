@@ -30,14 +30,14 @@ export interface DashboardViewModel {
     percentWidth: number;       // Progress bar width (0-100)
   };
 
-  // Macros section (always has safe defaults, pre-formatted)
+  // Macros section (always has safe defaults, pre-formatted, percentages included)
   macros: {
     proteinDisplay: string;     // Formatted protein (e.g., "100")
     carbsDisplay: string;       // Formatted carbs (e.g., "200")
     fatsDisplay: string;        // Formatted fats (e.g., "50")
-    proteinRaw: number;         // Raw protein for calculations
-    carbsRaw: number;           // Raw carbs for calculations
-    fatsRaw: number;            // Raw fats for calculations
+    proteinPercent: number;     // Protein percentage (0-100) for rotation calculation
+    carbsPercent: number;       // Carbs percentage (0-100) for rotation calculation
+    fatsPercent: number;        // Fats percentage (0-100) for rotation calculation
   };
 
   // Body metrics section (always has safe defaults, pre-formatted)
@@ -66,7 +66,11 @@ export interface DashboardViewModel {
 
   // Activity section
   activity: {
-    exercises: Array<{ type: string; durationDisplay: string; caloriesDisplay: string }>; // Array of today's exercises
+    exercises: Array<{ 
+      label: string;            // Display label (e.g., "跑步" / "游泳") - NO helper needed
+      durationDisplay: string;  // Formatted duration (e.g., "30 分鐘")
+      caloriesDisplay: string;  // Formatted calories (e.g., "250 kcal")
+    }>; // Array of today's exercises
   };
 
   // Mood section (always has safe defaults)
@@ -154,13 +158,19 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   const macrosCarbs = input.dashboardData?.today?.macros?.carbs || 0;
   const macrosFats = input.dashboardData?.today?.macros?.fats || 0;
 
+  // Calculate macro percentages for rotation visualization
+  const macroTotal = macrosProtein + macrosCarbs + macrosFats || 1; // Avoid division by zero
+  const proteinPercent = (macrosProtein / macroTotal) * 360; // Degrees for rotation
+  const carbsPercent = (macrosCarbs / macroTotal) * 360;
+  const fatsPercent = (macrosFats / macroTotal) * 360;
+
   const macros = {
     proteinDisplay: String(Math.round(macrosProtein)),
     carbsDisplay: String(Math.round(macrosCarbs)),
     fatsDisplay: String(Math.round(macrosFats)),
-    proteinRaw: macrosProtein,
-    carbsRaw: macrosCarbs,
-    fatsRaw: macrosFats,
+    proteinPercent: proteinPercent,
+    carbsPercent: carbsPercent,
+    fatsPercent: fatsPercent,
   };
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -309,17 +319,41 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   console.log('=== ACTIVITY DEBUG ===');
   console.log('RAW activities:', activities);
   
+  // Exercise type to display label mapping (COMPLETE - no helper needed)
+  const exerciseTypeMap: Record<string, string> = {
+    'running': '\u{1F3C3} \u8dd1\u6b65',
+    'swimming': '\u{1F3CA} \u6e38\u6cf3',
+    'cycling': '\u{1F6B4} \u9a0e\u8eca',
+    'walking': '\u{1F6B6} \u6563\u6b65',
+    'gym': '\u{1F4AA} \u5065\u8eab\u623f',
+    'yoga': '\u{1F9d8} \u745c\u4f3d',
+    'basketball': '\u{1F3C0} \u7c43\u7403',
+    'soccer': '\u26bd \u8db3\u7403',
+    'tennis': '\u{1F3BE} \u7db2\u7403',
+    'badminton': '\u{1F3F8} \u7fbd\u6bdb\u7403',
+    'aerobics': '\u{1F3B5} \u6709\u6c27\u904b\u52d5',
+    'pilates': '\u{1F938} \u666e\u62c9\u63d0',
+    'boxing': '\u{1F94A} \u62f3\u64ca',
+    'hiking': '\u26f0\ufe0f \u767b\u5c71',
+    'stretching': '\u{1F938} \u4f38\u5c55',
+    'dancing': '\u{1F483} \u821e\u8e48',
+    'other': '\u{1F3cb}\ufe0f \u904b\u52d5',
+  };
+
   const exerciseItems = activities.map((act: any) => {
     // API returns: { name, duration, calories }
     // NOT: { type, durationMinutes, caloriesBurned }
-    const activityName = act.name || act.type || 'unknown';
+    const activityName = act.name || act.type || 'other';
     const durationMinutes = act.duration || act.durationMinutes || 0;
     const caloriesBurned = act.calories || act.caloriesBurned || 0;
     
+    // Get display label from map, fallback to name if not found
+    const displayLabel = exerciseTypeMap[activityName.toLowerCase()] || `\u{1F3cb}\ufe0f ${activityName}`;
+    
     return {
-      type: activityName,
-      durationDisplay: `${durationMinutes}`,
-      caloriesDisplay: `${caloriesBurned}`,
+      label: displayLabel,
+      durationDisplay: `${durationMinutes} \u5206\u9418`,
+      caloriesDisplay: `${caloriesBurned} kcal`,
     };
   });
   

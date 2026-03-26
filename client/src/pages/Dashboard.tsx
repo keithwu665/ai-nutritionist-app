@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { buildDashboardViewModel, DashboardViewModelInput } from '@/_core/viewModels/dashboardViewModel';
-import { getExerciseDisplay } from '@/lib/exerciseMapping';
+
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -240,7 +240,8 @@ export default function Dashboard() {
           <div className="grid grid-cols-3 gap-2">
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-3 border-white/30 flex items-center justify-center mb-1 relative">
-                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-white border-r-white" style={{ transform: `rotate(${((viewModel.macros.proteinRaw / (viewModel.macros.proteinRaw + viewModel.macros.fatsRaw + viewModel.macros.carbsRaw || 1)) * 360)}deg)` }}></div>
+                <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-white border-r-white" style={{ transform: `rotate(${viewModel.macros.proteinPercent}deg)` }} />
+
                 <div className="text-center">
                   <p className="text-sm md:text-base font-bold">{viewModel.macros.proteinDisplay}</p>
                   <p className="text-xs opacity-75">g</p>
@@ -399,14 +400,13 @@ export default function Dashboard() {
           {viewModel.activity.exercises && viewModel.activity.exercises.length > 0 ? (
             <div className="space-y-2">
               {viewModel.activity.exercises.map((exercise, idx) => {
-                const { icon, label } = getExerciseDisplay(exercise.type);
                 return (
                 <Card key={idx} className="rounded-2xl">
                   <CardContent className="pt-3 pb-3">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="text-sm font-semibold flex items-center gap-2"><span>{icon}</span> {label}</p>
-                        <p className="text-xs text-muted-foreground">{exercise.durationDisplay} 分鐘</p>
+                        <p className="text-sm font-semibold">{exercise.label}</p>
+                        <p className="text-xs text-muted-foreground">{exercise.durationDisplay}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-primary">{exercise.caloriesDisplay}</p>
