@@ -62,6 +62,33 @@ export default function Dashboard() {
 
   // Build ViewModel - SINGLE SOURCE OF TRUTH for all Dashboard data
   const viewModel = useMemo(() => {
+    // TASK 1: Log actual query results
+    console.log('=== PHASE 1: RAW QUERY DATA ===');
+    console.log('QUERY dashboardData:', dashData);
+    console.log('QUERY recommendationsData:', recs);
+    console.log('QUERY bodyMetrics:', bodyMetrics);
+    console.log('QUERY profile:', profile);
+    console.log('QUERY todayMood:', todayMood);
+    
+    // TASK 2: Check auth/session
+    console.log('=== AUTH/SESSION CHECK ===');
+    console.log('AUTH profile:', profile);
+    console.log('AUTH profile.id:', profile?.id);
+    console.log('AUTH profile.displayName:', profile?.displayName);
+    
+    // TASK 3: Check query status
+    console.log('=== QUERY STATUS ===');
+    console.log('dashboardData loading?', dashLoading, 'error?', dashError);
+    console.log('bodyMetrics exists?', !!bodyMetrics);
+    console.log('profile loading?', profileLoading, 'error?', profileError);
+    
+    // TASK 4: Check if ViewModel builds too early
+    console.log('=== BEFORE VIEWMODEL BUILD ===');
+    console.log('dashboardData ready?', !!dashData);
+    console.log('bodyMetrics ready?', !!bodyMetrics);
+    console.log('profile ready?', !!profile);
+    console.log('recommendationsData ready?', !!recs);
+    
     const input: DashboardViewModelInput = {
       dashboardData: dashData,
       recommendationsData: recs,
@@ -71,7 +98,24 @@ export default function Dashboard() {
       userName: profile?.displayName || 'User',
       todayDate: new Date(),
     };
-    return buildDashboardViewModel(input);
+    
+    console.log('=== PHASE 2: VIEWMODEL INPUT ===');
+    console.log('Input structure:', input);
+    console.log('dashboardData.today.calories:', dashData?.today?.calories);
+    console.log('dashboardData.profile.calorieTarget:', dashData?.profile?.calorieTarget);
+    console.log('dashboardData.profile.startWeight:', (dashData as any)?.profile?.startWeight);
+    console.log('dashboardData.profile.goalDays:', dashData?.profile?.goalDays);
+    console.log('bodyMetrics array:', input.bodyMetrics);
+    console.log('bodyMetrics[0].weightKg:', input.bodyMetrics?.[0]?.weightKg);
+    console.log('bodyMetrics[0].bodyFatPercent:', input.bodyMetrics?.[0]?.bodyFatPercent);
+    console.log('recs type:', typeof recs, 'recs value:', recs);
+    
+    const vm = buildDashboardViewModel(input);
+    
+    console.log('=== PHASE 3: VIEWMODEL OUTPUT ===');
+    console.log('viewModel:', vm);
+    
+    return vm;
   }, [dashData, recs, bodyMetrics, todayMood, profile?.displayName]);
 
   // Only show loading if profile is actually loading and we don't have any data

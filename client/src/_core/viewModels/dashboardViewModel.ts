@@ -124,8 +124,8 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // CALORIES SECTION (ALL PRE-FORMATTED)
   // ─────────────────────────────────────────────────────────────────────────
-  const caloriesCurrent = input.dashboardData?.todayCalories || 0;
-  const caloriesTarget = input.dashboardData?.calorieTarget || 2000;
+  const caloriesCurrent = input.dashboardData?.today?.calories || 0;
+  const caloriesTarget = input.dashboardData?.profile?.calorieTarget || 2000;
   const caloriesPercent = caloriesTarget > 0 ? Math.round((caloriesCurrent / caloriesTarget) * 100) : 0;
   const caloriesRemaining = Math.max(0, caloriesTarget - caloriesCurrent);
 
@@ -140,9 +140,9 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // MACROS SECTION (ALL PRE-FORMATTED)
   // ─────────────────────────────────────────────────────────────────────────
-  const macrosProtein = input.dashboardData?.proteinTotal || 0;
-  const macrosCarbs = input.dashboardData?.carbsTotal || 0;
-  const macrosFats = input.dashboardData?.fatsTotal || 0;
+  const macrosProtein = input.dashboardData?.today?.macros?.protein || 0;
+  const macrosCarbs = input.dashboardData?.today?.macros?.carbs || 0;
+  const macrosFats = input.dashboardData?.today?.macros?.fats || 0;
 
   const macros = {
     proteinDisplay: String(Math.round(macrosProtein)),
@@ -157,8 +157,8 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // BODY METRICS SECTION (ALL PRE-FORMATTED)
   // ─────────────────────────────────────────────────────────────────────────
   const latestBodyMetric = input.bodyMetrics?.[0] || {};
-  const bodyWeight = latestBodyMetric.weight || 0;
-  const bodyBodyFat = latestBodyMetric.bodyFat || 0;
+  const bodyWeight = parseFloat(latestBodyMetric.weightKg) || 0;
+  const bodyBodyFat = parseFloat(latestBodyMetric.bodyFatPercent) || 0;
   const bodyBmi = latestBodyMetric.bmi || 0;
 
   const body = {
@@ -170,8 +170,8 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // TARGET PROGRESS SECTION (ALL PRE-FORMATTED)
   // ─────────────────────────────────────────────────────────────────────────
-  const targetStartWeight = input.dashboardData?.startWeight || bodyWeight;
-  const targetGoalWeightChange = input.dashboardData?.goalWeightChange || 0;
+  const targetStartWeight = input.dashboardData?.profile?.startWeight || bodyWeight;
+  const targetGoalWeightChange = input.dashboardData?.profile?.goalWeightChange || 0;
   const targetTargetWeight = targetStartWeight + targetGoalWeightChange;
   const targetCurrentWeight = bodyWeight;
   
@@ -179,7 +179,7 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   const targetWeightProgress = Math.abs(targetCurrentWeight - targetStartWeight);
   const targetWeightToGo = Math.abs(targetTargetWeight - targetCurrentWeight);
   
-  const targetGoalDays = input.dashboardData?.goalDays || 100;
+  const targetGoalDays = input.dashboardData?.profile?.goalDays || 100;
   
   // Calculate progress percentage
   const targetTotalWeightChange = Math.abs(targetGoalWeightChange);
@@ -259,6 +259,15 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // Debug logging (development only)
   if (process.env.NODE_ENV === 'development') {
     console.log('[VIEWMODEL] Dashboard ViewModel built:', viewModel);
+    console.log('=== VALIDATION ===');
+    console.log('calories.current:', viewModel.calories.currentDisplay);
+    console.log('calories.target:', viewModel.calories.targetDisplay);
+    console.log('macros.protein:', viewModel.macros.proteinDisplay);
+    console.log('macros.carbs:', viewModel.macros.carbsDisplay);
+    console.log('macros.fats:', viewModel.macros.fatsDisplay);
+    console.log('body.weight:', viewModel.body.weightDisplay);
+    console.log('body.bodyFat:', viewModel.body.bodyFatDisplay);
+    console.log('target.progress:', viewModel.target.progressPercentDisplay);
   }
 
   return viewModel;
