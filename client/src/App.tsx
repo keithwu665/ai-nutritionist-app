@@ -8,7 +8,7 @@ import { useAuth } from "./_core/hooks/useAuth";
 
 // Pages
 import Home from "./pages/Home";
-import { Dashboard } from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 import BodyMetrics from "./pages/BodyMetrics";
 import BodyMetricsAdd from "./pages/BodyMetricsAdd";
 import BodyMetricsImportCSV from "./pages/BodyMetricsImportCSV";

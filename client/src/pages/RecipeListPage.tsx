@@ -1,8 +1,7 @@
 import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ChevronLeft, Clock, Flame } from 'lucide-react';
-import { getRecipesByMealAndProtein } from '../lib/recipeDataReorganized';
+import { ChevronLeft, Clock, Flame } from 'lucide-react';import { getRecipesByMealAndProtein } from '../lib/recipeDataReorganized';
 
 // Map URL protein parameter to recipe protein_type
 const proteinMap: Record<string, 'chicken' | 'pork' | 'beef' | 'seafood' | 'egg' | 'vegetarian'> = {
@@ -51,7 +50,7 @@ export function RecipeListPage() {
   const allRecipes = getRecipesByMealAndProtein(mealType, proteinType);
   
   // Convert to display format
-  const recipes = allRecipes.map((r: any) => ({
+  const recipes = allRecipes.map(r => ({
     id: r.id,
     name: r.name,
     kcal: r.kcal,
@@ -63,7 +62,7 @@ export function RecipeListPage() {
   // MANDATORY PROTEIN-LEVEL DEBUG LOGGING
   console.log('RECIPE selectedMealType:', category);
   console.log('RECIPE selectedProtein:', protein);
-  console.log('DATA CHECK - ALL RECIPES:', allRecipes.map((r: any) => ({
+  console.log('DATA CHECK - ALL RECIPES:', allRecipes.map(r => ({
     name: r.name,
     mealType: r.category,
     proteinType: r.protein_type
@@ -72,7 +71,7 @@ export function RecipeListPage() {
     mealType: category,
     proteinType: protein
   });
-  console.log('FILTER RESULT:', recipes.map((r: any) => ({
+  console.log('FILTER RESULT:', recipes.map(r => ({
     name: r.name,
     mealType: r.mealType,
     proteinType: r.proteinType
@@ -112,7 +111,7 @@ export function RecipeListPage() {
             <p className="text-muted-foreground">沒有找到相應的食譜</p>
           </div>
         ) : (
-          recipes.map((recipe: any) => (
+          recipes.map((recipe) => (
             <Card
               key={recipe.id}
               className="p-4 cursor-pointer hover:shadow-md transition-shadow"
