@@ -192,6 +192,18 @@ export async function updateUserProfile(userId: number, data: Partial<InsertUser
     if ('calorieMode' in data && data.calorieMode) {
       updateData.calorieMode = data.calorieMode;
     }
+    // Convert goalWeightChangeKg from string to decimal
+    if ('goalWeightChangeKg' in data && data.goalWeightChangeKg) {
+      const parsed = parseFloat(data.goalWeightChangeKg);
+      updateData.goalWeightChangeKg = isNaN(parsed) ? null : parsed;
+      console.log('[updateUserProfile] Converted goalWeightChangeKg:', data.goalWeightChangeKg, '->', updateData.goalWeightChangeKg);
+    }
+    // Convert goalDays from string to int (if needed)
+    if ('goalDays' in data && data.goalDays) {
+      const parsed = parseInt(String(data.goalDays), 10);
+      updateData.goalDays = isNaN(parsed) ? null : parsed;
+      console.log('[updateUserProfile] Converted goalDays:', data.goalDays, '->', updateData.goalDays);
+    }
     console.log('[updateUserProfile] Update data:', updateData);
     await db.update(userProfiles).set(updateData).where(eq(userProfiles.userId, userId));
   }

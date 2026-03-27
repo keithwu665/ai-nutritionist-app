@@ -254,6 +254,19 @@
 - [ ] TEST 5: Cancel flow (verify full reset)
 - [ ] TEST 6: Personality comparison (verify 3 personalities sound distinctly different)
 
+## Bug Fixes - COMPLETE
+
+### goalWeightChangeKg Persistence Issue - FIXED
+- [x] Identified root cause: Type mismatch (STRING vs DECIMAL)
+- [x] Added type conversion in server/db.ts updateUserProfile()
+- [x] Convert goalWeightChangeKg from STRING to DECIMAL using parseFloat()
+- [x] Convert goalDays from STRING to INT using parseInt()
+- [x] Added NaN handling and null fallback
+- [x] Verified fix with manual UI test (save and refresh)
+- [x] Verified fix with database query (confirmed DECIMAL value saved)
+- [x] Tested value 12.5 kg persists correctly
+- [x] Ready for production deployment
+
 ### Success Criteria - INTEGRATION COMPLETE
 - [x] AI advice always matches final macros
 - [x] Protein 3g never called protein sufficient

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, userId, goalWeightChangeKg, goalDays, calorieTarget FROM user_profiles WHERE userId = (SELECT id FROM users WHERE name = 'Keith Wu' LIMIT 1) LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute SELECT id, userId, goalWeightChangeKg, goalDays, calorieTarget FROM user_profiles WHERE userId = (SELECT id FROM users WHERE name = 'Keith Wu' LIMIT 1) LIMIT 1;",
+  "rows": [
+    {
+      "id": "90001",
+      "userId": "1",
+      "goalWeightChangeKg": "12.5",
+      "goalDays": "30",
+      "calorieTarget": "1978"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tgoalWeightChangeKg\tgoalDays\tcalorieTarget\n90001\t1\t12.5\t30\t1978\n",
+  "stderr": "",
+  "execution_time_ms": 1706
+}
