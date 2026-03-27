@@ -485,7 +485,7 @@ export default function Dashboard() {
                     <div className="text-2xl">🤖</div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold mb-1">
-                        {item.type === 'diet' ? '飲食建議' : item.type === 'exercise' ? '運動建議' : 'AI 建議'}
+                        {item.type === 'diet' ? '飲食建議' : item.type === 'exercise' ? '運動建議' : item.type === 'body' ? '身體建議' : item.type === 'general' ? '全面建議' : 'AI 建議'}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {item.message || '暫時未有建議'}
