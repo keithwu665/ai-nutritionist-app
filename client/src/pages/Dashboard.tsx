@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Bell, User, Plus, TrendingDown, TrendingUp, Minus, ChevronRight } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { buildDashboardViewModel, DashboardViewModelInput } from '@/_core/viewModels/dashboardViewModel';
+import { useHydrationActions } from '@/hooks/useHydrationActions';
+import { useSleepActions } from '@/hooks/useSleepActions';
 
 
 export default function Dashboard() {
@@ -21,33 +23,19 @@ export default function Dashboard() {
   const { data: recs, isLoading: recsLoading, error: recsError } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
 
-  // Mutations for hydration and sleep updates
-  const hydrationUpdateMutation = trpc.hydration.update.useMutation();
-  const sleepUpdateMutation = trpc.sleep.update.useMutation();
-  const utils = trpc.useUtils();
+  // Use hooks for hydration and sleep actions
+  const { handleHydrationUpdate: updateHydration, handleViewAllHydration, isUpdating: hydrationUpdating } = useHydrationActions();
+  const { handleSleepUpdate: updateSleep, handleViewAllSleep, isUpdating: sleepUpdating } = useSleepActions();
 
-  // Handle hydration update
-  const handleHydrationUpdate = async (delta: number) => {
+  // Wrapper functions to pass current values
+  const handleHydrationUpdate = (delta: number) => {
     const currentIntake = dashData?.hydration?.current || 0;
-    const newIntake = Math.max(0, currentIntake + delta);
-    try {
-      await hydrationUpdateMutation.mutateAsync({ waterIntakeMl: newIntake });
-      await utils.dashboard.getData.invalidate();
-    } catch (error) {
-      console.error('Failed to update hydration:', error);
-    }
+    updateHydration(delta, currentIntake);
   };
 
-  // Handle sleep update
-  const handleSleepUpdate = async (delta: number) => {
+  const handleSleepUpdate = (delta: number) => {
     const currentSleep = dashData?.sleep?.current || 0;
-    const newSleep = Math.max(0, Math.min(12, currentSleep + delta));
-    try {
-      await sleepUpdateMutation.mutateAsync({ sleepHours: newSleep });
-      await utils.dashboard.getData.invalidate();
-    } catch (error) {
-      console.error('Failed to update sleep:', error);
-    }
+    updateSleep(delta, currentSleep);
   };
 
   // Handle API errors with user-friendly messages
@@ -395,7 +383,7 @@ export default function Dashboard() {
                   size="sm" 
                   variant="outline"
                   onClick={() => handleHydrationUpdate(-200)}
-                  disabled={hydrationUpdateMutation.isPending}
+                  disabled={hydrationUpdating}
                   className="h-6 w-6 p-0"
                 >
                   <Minus className="h-3 w-3" />
@@ -404,10 +392,18 @@ export default function Dashboard() {
                   size="sm" 
                   variant="outline"
                   onClick={() => handleHydrationUpdate(200)}
-                  disabled={hydrationUpdateMutation.isPending}
+                  disabled={hydrationUpdating}
                   className="h-6 w-6 p-0"
                 >
                   <Plus className="h-3 w-3" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  onClick={handleViewAllHydration}
+                  className="text-xs text-primary hover:bg-primary/10"
+                >
+                  查看全部
                 </Button>
               </div>
             </div>
@@ -441,7 +437,7 @@ export default function Dashboard() {
                   size="sm" 
                   variant="outline"
                   onClick={() => handleSleepUpdate(-1)}
-                  disabled={sleepUpdateMutation.isPending}
+                  disabled={sleepUpdating}
                   className="h-6 w-6 p-0"
                 >
                   <Minus className="h-3 w-3" />
@@ -450,10 +446,18 @@ export default function Dashboard() {
                   size="sm" 
                   variant="outline"
                   onClick={() => handleSleepUpdate(1)}
-                  disabled={sleepUpdateMutation.isPending}
+                  disabled={sleepUpdating}
                   className="h-6 w-6 p-0"
                 >
                   <Plus className="h-3 w-3" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  onClick={handleViewAllSleep}
+                  className="text-xs text-primary hover:bg-primary/10"
+                >
+                  查看全部
                 </Button>
               </div>
             </div>
