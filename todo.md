@@ -585,3 +585,67 @@
 - [x] Add routing for recipe list page
 - [x] Implement recipe selection with navigation to detail page
 - [x] Verify navigation: Category → Protein → Level 3 → 食譜頁 → Recipe List → Detail
+
+## Food Input System Refactoring - IN PROGRESS (Phase 5/9 Complete)
+
+### Database Schema Changes
+- [ ] Add aliases field to fitasty_products table (for Chinese + English search)
+- [ ] Create general_food_reference table (NEW) with: id, name, aliases, category, defaultServingGram, caloriesPer100g, proteinPer100g, carbsPer100g, fatsPer100g
+- [ ] Migrate/seed general_food_reference with common foods (vegetables, proteins, grains, dairy)
+- [ ] Verify data separation: fitasty_products ONLY for Fitasty tab, general_food_reference ONLY for manual input
+
+### Search & Query Helpers
+- [ ] Add searchFitastyProducts(query) helper - fuzzy search on name + aliases
+- [ ] Add searchGeneralFoods(query) helper - fuzzy search on name + aliases
+- [ ] Add getRecentFoods(userId) helper - track recently selected foods
+- [ ] Add getRecentFitastyProducts(userId) helper - track recently added Fitasty products
+
+### tRPC Procedures
+- [ ] Create trpc.food.searchFitasty(query) - returns Fitasty products with quick add support
+- [ ] Create trpc.food.searchGeneral(query) - returns general food suggestions for manual input
+- [ ] Create trpc.food.quickAddFitasty(productId, quantity) - instant add without detail page
+- [ ] Create trpc.food.getRecentItems() - return recently used foods
+
+### Manual Input Tab (手動輸入)
+- [ ] Add search input field with instant search (no enter needed)
+- [ ] Query from general_food_reference while typing
+- [ ] Show matching suggestions as dropdown
+- [ ] Auto-fill nutrition values when user selects suggestion
+- [ ] Allow manual editing of values before save
+- [ ] Show recent items at top of suggestions
+
+### Fitasty Product Tab (Fitasty 產品庫)
+- [ ] Add search input field with instant search
+- [ ] Query from fitasty_products while typing
+- [ ] Show product name, serving size, category in results
+- [ ] Add [+] Quick Add button for each product
+- [ ] Implement quick add flow (no detail page required)
+- [ ] Show recent Fitasty products at top
+
+### Search Features
+- [ ] Implement fuzzy matching (partial matches work)
+- [ ] Support Chinese search (e.g., "雞" → "雞胸肉")
+- [ ] Support English search (e.g., "milk" → "牛奶")
+- [ ] Ensure search feels instant (<300ms response)
+- [ ] Add category filter option (Protein / Carbs / Vegetable / Dairy)
+
+### Data Integrity & Testing
+- [ ] Verify manual input NEVER shows Fitasty products
+- [ ] Verify Fitasty tab NEVER shows general foods
+- [ ] Write vitest for searchFitasty() with fuzzy matching
+- [ ] Write vitest for searchGeneral() with fuzzy matching
+- [ ] Write vitest for quickAddFitasty() flow
+- [ ] Write vitest for auto-fill nutrition values
+- [ ] Test Chinese + English search on both tabs
+- [ ] Test recent items tracking and display
+
+### Final Verification
+- [ ] Manual input shows general food suggestions while typing
+- [ ] Fitasty tab shows ONLY Fitasty products
+- [ ] Chinese + English search both work
+- [ ] Selecting suggestion auto-fills nutrition values
+- [ ] [+] button adds item instantly
+- [ ] Recent items display correctly
+- [ ] No data source mixing
+- [ ] Create checkpoint
+- [ ] Publish to production

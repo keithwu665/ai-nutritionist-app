@@ -116,6 +116,7 @@ export const fitastyProducts = mysqlTable("fitasty_products", {
 	barcode: varchar({ length: 100 }),
 	productImageUrl: varchar("product_image_url", { length: 500 }),
 	isFeatured: tinyint("is_featured").default(0),
+	aliases: text(), // NEW: JSON array of search aliases (Chinese + English) for fuzzy search
 });
 
 export const foodLogItems = mysqlTable("food_log_items", {
@@ -270,4 +271,43 @@ export const sleepSettings = mysqlTable("sleep_settings", {
 },
 (table) => [
 	index("sleep_settings_userId_unique").on(table.userId),
+]);
+
+// ============================================================================
+// General Food Reference (NEW TABLE for manual input suggestions)
+// ============================================================================
+
+export const generalFoodReference = mysqlTable("general_food_reference", {
+	id: int().autoincrement().notNull(),
+	name: varchar({ length: 255 }).notNull(), // Primary food name (e.g., "雞胸肉" or "Chicken Breast")
+	aliases: text(), // JSON array of search aliases (Chinese + English variants)
+	category: varchar({ length: 100 }).notNull(), // Category: Protein, Carbs, Vegetable, Dairy, Fruit, etc.
+	defaultServingGram: int().default(100).notNull(), // Default serving size in grams
+	caloriesPer100g: decimal({ precision: 8, scale: 1 }).notNull(), // Calories per 100g
+	proteinPer100g: decimal({ precision: 6, scale: 1 }).notNull(), // Protein per 100g
+	carbsPer100g: decimal({ precision: 6, scale: 1 }).notNull(), // Carbs per 100g
+	fatsPer100g: decimal({ precision: 6, scale: 1 }).notNull(), // Fats per 100g
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("general_food_reference_name").on(table.name),
+	index("general_food_reference_category").on(table.category),
+]);
+
+// ============================================================================
+// Recent Food Items Tracking (for quick access)
+// ============================================================================
+
+export const recentFoodItems = mysqlTable("recent_food_items", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	foodType: mysqlEnum(['general','fitasty']).notNull(), // Track source: general_food_reference or fitasty_products
+	foodId: int().notNull(), // ID from either general_food_reference or fitasty_products
+	foodName: varchar({ length: 255 }).notNull(), // Cached name for quick display
+	lastUsedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+},
+(table) => [
+	index("recent_food_items_userId_lastUsed").on(table.userId, table.lastUsedAt),
 ]);

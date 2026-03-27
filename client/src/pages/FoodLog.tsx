@@ -28,6 +28,8 @@ export default function FoodLog() {
   const [fatG, setFatG] = useState<string>('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // Photo input state
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -154,67 +156,72 @@ export default function FoodLog() {
 
   // Debounce search query
   const [searchQuery, setSearchQuery] = useState('');
-  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
-  // Use tRPC query for food search with enabled flag
-  const { data: searchData, isLoading: isSearching } = trpc.foodLogs.searchUnified.useQuery(
-    { query: searchQuery, locale: 'en' },
-    { enabled: searchQuery.length >= 2 }
-  );
 
-  // Update search results when data changes
-  useEffect(() => {
-    if (searchQuery.length >= 2) {
-      setShowSearchResults(true);
-      if (searchData) {
-        setSearchResults(searchData || []);
-      }
-    }
-  }, [searchData, searchQuery]);
 
-  // Handle search with debounce
-  const handleSearch = useCallback((query: string) => {
+  // Instant search for general foods (manual input tab)
+  const handleSearch = (query: string) => {
     setFoodName(query);
     
     // Clear previous timeout
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
     }
     
-    if (query.length < 2) {
+    if (query.length < 1) {
       setSearchResults([]);
       setShowSearchResults(false);
-      setSearchQuery('');
       return;
     }
     
-    // Show loading state immediately
-    setShowSearchResults(true);
-    setSearchResults([]);
+    setIsSearching(true);
     
-    // Debounce the search query update (300ms)
-    searchTimeoutRef.current = setTimeout(() => {
-      setSearchQuery(query);
+    // Debounce search with 300ms delay
+    const timeout = setTimeout(async () => {
+      try {
+        // Call tRPC query using fetch
+        const input = JSON.stringify({ query, limit: 10 });
+        const response = await fetch(`/api/trpc/foodLogs.searchGeneral?input=${encodeURIComponent(input)}`);
+        const data = await response.json();
+        const results = data.result?.data || [];
+        setSearchResults(results);
+        setShowSearchResults(true);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
     }, 300);
-  }, []);
+    
+    setSearchTimeout(timeout);
+  };
 
-  // Select food from search
+  // Select food from search and auto-fill nutrition
   const handleSelectFood = (food: any) => {
     setFoodName(food.name);
-    setCalories(String(food.kcal || 0));
-    setProteinG(String(food.proteinG || 0));
-    setCarbsG(String(food.carbsG || 0));
-    setFatG(String(food.fatG || 0));
+    // Auto-fill nutrition values based on 100g
+    const caloriesPer100g = typeof food.caloriesPer100g === 'string' ? parseFloat(food.caloriesPer100g) : food.caloriesPer100g;
+    const proteinPer100g = typeof food.proteinPer100g === 'string' ? parseFloat(food.proteinPer100g) : food.proteinPer100g;
+    const carbsPer100g = typeof food.carbsPer100g === 'string' ? parseFloat(food.carbsPer100g) : food.carbsPer100g;
+    const fatsPer100g = typeof food.fatsPer100g === 'string' ? parseFloat(food.fatsPer100g) : food.fatsPer100g;
+    
+    setCalories(String(caloriesPer100g || 0));
+    setProteinG(String(proteinPer100g || 0));
+    setCarbsG(String(carbsPer100g || 0));
+    setFatG(String(fatsPer100g || 0));
+    setPortionGrams('100'); // Reset to 100g default
     setShowSearchResults(false);
     setSearchResults([]);
   };
 
-  // Recalculate nutrition based on portion
+  // Recalculate nutrition based on portion (for manual input)
   const handlePortionChange = (grams: string) => {
     setPortionGrams(grams);
-    if (grams && calories && parseInt(calories) > 0) {
+    // Only recalculate if we have base calories per 100g
+    if (grams && calories) {
+      const baseCalories = parseFloat(calories) || 0;
       const ratio = parseInt(grams) / 100;
-      setCalories(String(Math.round((parseInt(calories) || 0) * ratio)));
+      setCalories(String(Math.round(baseCalories * ratio)));
       setProteinG(String(((parseFloat(proteinG) || 0) * ratio).toFixed(1)));
       setCarbsG(String(((parseFloat(carbsG) || 0) * ratio).toFixed(1)));
       setFatG(String(((parseFloat(fatG) || 0) * ratio).toFixed(1)));
@@ -637,7 +644,7 @@ export default function FoodLog() {
                 </Select>
               </div>
 
-              {/* Food Name Search */}
+              {/* Food Name Search - Instant search with suggestions */}
               <div>
                 <label className="text-sm font-medium mb-2 block">食物名稱 *</label>
                 <div className="relative">
@@ -645,7 +652,8 @@ export default function FoodLog() {
                     placeholder="搜尋食物 (支援中文/英文)"
                     value={foodName}
                     onChange={(e) => handleSearch(e.target.value)}
-                    onFocus={() => foodName.length >= 2 && setShowSearchResults(true)}
+                    onFocus={() => foodName.length >= 1 && setShowSearchResults(true)}
+                    className="w-full"
                   />
                   {showSearchResults && (searchResults.length > 0 || isSearching) && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
@@ -656,10 +664,10 @@ export default function FoodLog() {
                           <button
                             key={idx}
                             onClick={() => handleSelectFood(result)}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
+                            className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm transition-colors"
                           >
-                            <div className="font-medium">{result.displayName || result.name}</div>
-                            <div className="text-xs text-gray-500">{result.kcal_per_100g || result.kcal || 0} kcal · {result.badge || result.source || 'USDA'}</div>
+                            <div className="font-medium">{result.name}</div>
+                            <div className="text-xs text-gray-500">{result.caloriesPer100g || 0} kcal/100g · {result.category}</div>
                           </button>
                         ))
                       ) : (
@@ -670,7 +678,7 @@ export default function FoodLog() {
                 </div>
               </div>
 
-              {/* Portion */}
+              {/* Portion - Auto-recalculates nutrition */}
               <div>
                 <label className="text-sm font-medium mb-2 block">份量 (克) *</label>
                 <Input
@@ -678,7 +686,9 @@ export default function FoodLog() {
                   placeholder="100"
                   value={portionGrams}
                   onChange={(e) => handlePortionChange(e.target.value)}
+                  className="w-full"
                 />
+                <p className="text-xs text-gray-500 mt-1">選擇食物後會自動按份量調整營養資訊</p>
               </div>
 
               {/* Nutrition Info */}

@@ -10,6 +10,7 @@ import { bodyReportRouter } from "./bodyReportRouter";
 import { foodPhotoRouter } from "./foodPhotoRouter";
 import { generateAllRecommendations, transformAllRecommendationsWithPersonality, type AnalysisData } from "./utils/recommendationEngine";
 import { dataExportRouter } from "./routers/dataExport";
+import * as foodDb from "./foodDb";
 
 export const appRouter = router({
   system: systemRouter,
@@ -538,6 +539,137 @@ export const appRouter = router({
         };
         const pdfBuffer = await generateNutritionPDF(reportData);
         return { filename: `nutrition-report-${input.dateRange}-${new Date().toISOString().split('T')[0]}.pdf`, data: pdfBuffer.toString('base64') };
+      }),
+
+    // ====================================================================
+    // NEW: Food Search & Quick Add Procedures
+    // ====================================================================
+
+    searchGeneral: publicProcedure
+      .input(z.object({ query: z.string().min(1), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const { searchGeneralFoods } = await import('./foodDb');
+        return searchGeneralFoods(input.query, input.limit);
+      }),
+
+    searchFitasty: publicProcedure
+      .input(z.object({ query: z.string().min(1), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const { searchFitastyProductsAdvanced } = await import('./foodDb');
+        return searchFitastyProductsAdvanced(input.query, input.limit);
+      }),
+
+    getRecentItems: protectedProcedure
+      .input(z.object({ limit: z.number().default(5) }))
+      .query(async ({ ctx, input }) => {
+        const { getRecentFoods } = await import('./foodDb');
+        return getRecentFoods(ctx.user.id, input.limit);
+      }),
+
+    trackRecentFood: protectedProcedure
+      .input(z.object({
+        foodType: z.enum(['general', 'fitasty']),
+        foodId: z.number(),
+        foodName: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { trackRecentFood } = await import('./foodDb');
+        await trackRecentFood(ctx.user.id, input.foodType, input.foodId, input.foodName);
+        return { success: true };
+      }),
+
+    quickAddFitasty: protectedProcedure
+      .input(z.object({
+        date: z.string(),
+        productId: z.number(),
+        mealType: z.enum(['breakfast', 'lunch', 'dinner', 'snack']),
+        quantity: z.number().default(1), // Multiplier for serving size
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const { getFitastyProduct } = await import('./foodDb');
+          const product = await getFitastyProduct(input.productId);
+          
+          if (!product) {
+            throw new Error('Product not found');
+          }
+
+          // Calculate nutrition based on quantity
+          const calories = Number(product.calories) * input.quantity;
+          const proteinG = product.proteinG ? Number(product.proteinG) * input.quantity : null;
+          const carbsG = product.carbsG ? Number(product.carbsG) * input.quantity : null;
+          const fatG = product.fatG ? Number(product.fatG) * input.quantity : null;
+
+          // Create food log item
+          const log = await db.getOrCreateFoodLog(ctx.user.id, input.date);
+          const item = await db.createFoodLogItem({
+            foodLogId: log.id,
+            userId: ctx.user.id,
+            mealType: input.mealType,
+            name: product.productNameZh || product.name,
+            calories: String(calories),
+            proteinG: proteinG !== null ? String(proteinG) : null,
+            carbsG: carbsG !== null ? String(carbsG) : null,
+            fatG: fatG !== null ? String(fatG) : null,
+          } as any);
+
+          // Track as recent
+          const { trackRecentFood } = await import('./foodDb');
+          await trackRecentFood(ctx.user.id, 'fitasty', input.productId, product.productNameZh || product.name);
+
+          return item;
+        } catch (error) {
+          console.error('[FoodLogs] quickAddFitasty error:', error instanceof Error ? error.message : String(error));
+          throw error;
+        }
+      }),
+
+    quickAddGeneral: protectedProcedure
+      .input(z.object({
+        date: z.string(),
+        foodId: z.number(),
+        mealType: z.enum(['breakfast', 'lunch', 'dinner', 'snack']),
+        grams: z.number().default(100),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const { getGeneralFood } = await import('./foodDb');
+          const food = await getGeneralFood(input.foodId);
+          
+          if (!food) {
+            throw new Error('Food not found');
+          }
+
+          // Calculate nutrition based on grams
+          const multiplier = input.grams / 100;
+          const calories = Number(food.caloriesPer100g) * multiplier;
+          const proteinG = Number(food.proteinPer100g) * multiplier;
+          const carbsG = Number(food.carbsPer100g) * multiplier;
+          const fatG = Number(food.fatsPer100g) * multiplier;
+
+          // Create food log item
+          const log = await db.getOrCreateFoodLog(ctx.user.id, input.date);
+          const item = await db.createFoodLogItem({
+            foodLogId: log.id,
+            userId: ctx.user.id,
+            mealType: input.mealType,
+            name: food.name,
+            calories: String(calories),
+            proteinG: String(proteinG),
+            carbsG: String(carbsG),
+            fatG: String(fatG),
+            grams: String(input.grams),
+          } as any);
+
+          // Track as recent
+          const { trackRecentFood } = await import('./foodDb');
+          await trackRecentFood(ctx.user.id, 'general', input.foodId, food.name);
+
+          return item;
+        } catch (error) {
+          console.error('[FoodLogs] quickAddGeneral error:', error instanceof Error ? error.message : String(error));
+          throw error;
+        }
       }),
 
   }),
