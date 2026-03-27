@@ -205,9 +205,8 @@ export function generateBodyMetricsRecommendations(data: AnalysisData): Recommen
   const recs: Recommendation[] = [];
   const bodyMetrics = data.lastSevenDays.bodyMetrics;
   
-  if (bodyMetrics.length < 2) return recs;
-  
-  const sorted = [...bodyMetrics].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  if (bodyMetrics.length >= 2) {
+    const sorted = [...bodyMetrics].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const firstWeight = sorted[0].weight;
   const lastWeight = sorted[sorted.length - 1].weight;
   const weightChange = lastWeight - firstWeight;
@@ -224,6 +223,37 @@ export function generateBodyMetricsRecommendations(data: AnalysisData): Recommen
       action: weeklyRate > 0 ? "檢查熱量攝入" : "保持目前策略",
       priority: "high",
     });
+  }
+  
+  // FALLBACK: Always generate at least one body recommendation
+  if (recs.length === 0) {
+    const currentWeight = data.profile.currentWeight;
+    const heightM = data.profile.heightCm / 100;
+    const bmi = currentWeight / (heightM * heightM);
+    
+    let fallbackMessage = '';
+    let fallbackTitle = '';
+    
+    if (bmi < 18.5) {
+      fallbackTitle = '體重偏低';
+      fallbackMessage = '你的 BMI 低於正常範圍。建議增加營養攝入，特別是蛋白質和健康脂肪，同時配合適度運動。';
+    } else if (bmi > 25) {
+      fallbackTitle = '體重管理';
+      fallbackMessage = '你的 BMI 高於正常範圍。建議通過均衡飲食和規律運動逐步改善，每週減重 0.5-1kg 為健康速度。';
+    } else {
+      fallbackTitle = '保持健康體態';
+      fallbackMessage = '你的 BMI 在正常範圍內。建議繼續保持規律運動和均衡飲食，定期監測體重和身體成分變化。';
+    }
+    
+    recs.push({
+      type: "encouragement",
+      title: fallbackTitle,
+      message: fallbackMessage,
+      dataBasis: `BMI: ${bmi.toFixed(1)} (體重: ${currentWeight}kg, 身高: ${data.profile.heightCm}cm)`,
+      action: '每週測量一次體重和身體成分',
+      priority: 'medium',
+    });
+  }
   }
   
   return recs;
@@ -273,6 +303,42 @@ export function generateEncouragementRecommendations(data: AnalysisData): Recomm
     });
   }
 
+  // FALLBACK: Always generate at least one encouragement/general recommendation
+  if (recs.length === 0) {
+    const loggingRate = foodLogs.length;
+    const exerciseRate = exercises.length;
+    const totalActivity = loggingRate + exerciseRate;
+    
+    let fallbackMessage = '';
+    let fallbackTitle = '';
+    
+    if (totalActivity === 0) {
+      fallbackTitle = '開始你的健康旅程';
+      fallbackMessage = '現在開始記錄飲食和運動，建立健康習慣。每一步都很重要，從今天開始，每天進步一點點。';
+    } else if (loggingRate < 3 && exerciseRate < 2) {
+      fallbackTitle = '逐步建立習慣';
+      fallbackMessage = '你已經開始了！建議增加記錄頻率和運動次數。持之以恆是成功的關鍵，目標是每週至少運動 3 次。';
+    } else if (loggingRate >= 3 && exerciseRate < 2) {
+      fallbackTitle = '飲食記錄很好';
+      fallbackMessage = '飲食記錄做得不錯！現在需要加強運動。運動不僅幫助消耗熱量，還能改善心肺功能和心情。';
+    } else if (loggingRate < 3 && exerciseRate >= 2) {
+      fallbackTitle = '運動很積極';
+      fallbackMessage = '你的運動習慣很好！建議更細心地記錄飲食，這樣才能更準確地了解進度。飲食和運動相輔相成。';
+    } else {
+      fallbackTitle = '保持健康生活';
+      fallbackMessage = '你正在建立健康的生活方式。繼續保持飲食記錄和運動習慣，定期檢查進度，根據需要調整策略。';
+    }
+    
+    recs.push({
+      type: "encouragement",
+      title: fallbackTitle,
+      message: fallbackMessage,
+      dataBasis: `飲食記錄: ${loggingRate}/7 天, 運動: ${exerciseRate}/7 天`,
+      action: '每天堅持記錄，每週至少運動 3 次',
+      priority: 'medium',
+    });
+  }
+  
   return recs;
 }
 
@@ -285,12 +351,37 @@ export function generateAllRecommendations(data: AnalysisData): {
   body: Recommendation[];
   encouragement: Recommendation[];
 } {
-  return {
+  const recommendations = {
     diet: generateDietRecommendations(data),
     exercise: generateExerciseRecommendations(data),
     body: generateBodyMetricsRecommendations(data),
     encouragement: generateEncouragementRecommendations(data),
   };
+  
+  // CRITICAL: Ensure no empty arrays - each category must have at least 1 recommendation
+  if (recommendations.diet.length === 0) {
+    recommendations.diet.push({
+      type: "diet",
+      title: "飲食基礎",
+      message: "建議記錄更多飲食數據以獲得個性化建議。均衡飲食包括：蛋白質、碳水化合物、健康脂肪和蔬菜。",
+      dataBasis: "飲食數據不足",
+      action: "每天記錄三餐飲食",
+      priority: "medium",
+    });
+  }
+  
+  if (recommendations.exercise.length === 0) {
+    recommendations.exercise.push({
+      type: "exercise",
+      title: "開始運動",
+      message: "建議每週至少進行 3-5 次運動，每次 30-60 分鐘。可以選擇有氧運動、力量訓練或柔韌性訓練。",
+      dataBasis: "運動記錄不足",
+      action: "本週安排 3 次運動",
+      priority: "medium",
+    });
+  }
+  
+  return recommendations;
 }
 
 /**
