@@ -466,14 +466,8 @@ export default function Dashboard() {
 
         {/* AI Recommendations Section - Always visible */}
         <div className="space-y-3" ref={aiRecommendationsRef}>
-          <div className="flex items-center justify-between">
+          <div>
             <h2 className="text-lg font-semibold">AI 建議</h2>
-            <button 
-              onClick={() => setLocation('/ai-recommendations')}
-              className="text-xs text-primary hover:underline flex items-center gap-1"
-            >
-              查看全部 <ChevronRight className="h-3 w-3" />
-            </button>
           </div>
 
           {/* AI Recommendation Cards - Display each item separately */}
