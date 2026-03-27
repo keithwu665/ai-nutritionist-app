@@ -792,3 +792,31 @@ export async function updateSleepLog(userId: number, date: string, sleepHours: n
   
   return getSleepLog(userId, date);
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// HYDRATION & SLEEP DATE RANGE QUERIES
+// ─────────────────────────────────────────────────────────────────────────
+
+export async function getHydrationLogsByDateRange(userId: number, startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(hydrationLogs)
+    .where(and(
+      eq(hydrationLogs.userId, userId),
+      gte(hydrationLogs.date, startDate),
+      lte(hydrationLogs.date, endDate)
+    ));
+}
+
+export async function getSleepLogsByDateRange(userId: number, startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(sleepLogs)
+    .where(and(
+      eq(sleepLogs.userId, userId),
+      gte(sleepLogs.date, startDate),
+      lte(sleepLogs.date, endDate)
+    ));
+}

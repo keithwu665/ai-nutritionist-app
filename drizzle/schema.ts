@@ -191,6 +191,8 @@ export const generalFoodCache = mysqlTable("general_food_cache", {
 		displayName: varchar({ length: 100 }),
 		calorieMode: mysqlEnum(['safe','aggressive']).default('safe').notNull(),
 		calorieTarget: int().default(2000).notNull(),
+		targetWaterIntakeMl: int().default(2000).notNull(), // Target daily water intake in ml
+		targetSleepHours: decimal({ precision: 3, scale: 1 }).default('8.0').notNull(), // Target daily sleep in hours
 		createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 		updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 		aiToneStyle: mysqlEnum(['gentle','coach','hk_style']).default('gentle').notNull(),
@@ -242,4 +244,30 @@ export const sleepLogs = mysqlTable("sleep_logs", {
 },
 (table) => [
 	index("sleep_logs_userId_date").on(table.userId, table.date),
+]);
+
+// ============================================================================
+// Hydration & Sleep Settings (User Defaults)
+// ============================================================================
+
+export const hydrationSettings = mysqlTable("hydration_settings", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	targetMl: int().default(2000).notNull(), // Daily target in ml
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("hydration_settings_userId_unique").on(table.userId),
+]);
+
+export const sleepSettings = mysqlTable("sleep_settings", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	targetHours: decimal({ precision: 3, scale: 1 }).default('8.0').notNull(), // Daily target in hours
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("sleep_settings_userId_unique").on(table.userId),
 ]);

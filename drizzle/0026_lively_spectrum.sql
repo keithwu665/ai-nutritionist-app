@@ -1,0 +1,1 @@
+ALTER TABLE `user_profiles` MODIFY COLUMN `targetSleepHours` decimal(3,1) NOT NULL DEFAULT '8.0';

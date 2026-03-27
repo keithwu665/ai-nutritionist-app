@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS targetWaterIntakeMl INT DEFAULT 2000 NOT NULL AFTER calorieTarget; ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS targetSleepHours DECIMAL(3,1) DEFAULT 8.0 NOT NULL AFTER targetWaterIntakeMl;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS targetWaterIntakeMl INT DEFAULT 2000 NOT NULL AFTER calorieTarget; ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS targetSleepHours DECIMAL(3,1) DEFAULT 8.0 NOT NULL AFTER targetWaterIntakeMl;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3199
+}
