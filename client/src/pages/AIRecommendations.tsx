@@ -107,7 +107,7 @@ export default function AIRecommendations() {
                         <div className="mb-2">
                           <p className="font-medium mt-1">{item.title}</p>
                         </div>
-                        <p className="text-sm text-gray-700 mb-3 leading-relaxed">{item.content}</p>
+                        <p className="text-sm text-gray-700 mb-3 leading-relaxed">{item.message}</p>
                         {item.dataBasis && (
                           <p className="text-xs text-muted-foreground mb-2">📊 {item.dataBasis}</p>
                         )}
