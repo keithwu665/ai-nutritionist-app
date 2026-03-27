@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS hydration_logs (\n  id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  userId INT NOT NULL,\n  date VARCHAR(10) NOT NULL,\n  waterIntakeMl INT NOT NULL,\n  targetMl INT NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX hydration_logs_userId_date (userId, date)\n);\n\nCREATE TABLE IF NOT EXISTS sleep_logs (\n  id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  userId INT NOT NULL,\n  date VARCHAR(10) NOT NULL,\n  sleepHours DECIMAL(3,1) NOT NULL,\n  targetHours DECIMAL(3,1) NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX sleep_logs_userId_date (userId, date)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3KVUcvtm8roQLHR.root --database btNuTCzqZzpzomYwWSYu4y --execute CREATE TABLE IF NOT EXISTS hydration_logs (\n  id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  userId INT NOT NULL,\n  date VARCHAR(10) NOT NULL,\n  waterIntakeMl INT NOT NULL,\n  targetMl INT NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX hydration_logs_userId_date (userId, date)\n);\n\nCREATE TABLE IF NOT EXISTS sleep_logs (\n  id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,\n  userId INT NOT NULL,\n  date VARCHAR(10) NOT NULL,\n  sleepHours DECIMAL(3,1) NOT NULL,\n  targetHours DECIMAL(3,1) NOT NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  INDEX sleep_logs_userId_date (userId, date)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1927
+}

@@ -661,7 +661,7 @@ export const appRouter = router({
       weekAgo.setDate(weekAgo.getDate() - 7);
       const weekAgoStr = weekAgo.toISOString().split('T')[0];
 
-      const [profile, todayFood, todayExercises, weekFood, weekExercises, weightTrend, allFitastyProducts] = await Promise.all([
+      const [profile, todayFood, todayExercises, weekFood, weekExercises, weightTrend, allFitastyProducts, hydrationLog, sleepLog] = await Promise.all([
         db.getUserProfile(ctx.user.id),
         db.getFoodLogItems(ctx.user.id, today),
         db.getExercises(ctx.user.id, today),
@@ -669,6 +669,8 @@ export const appRouter = router({
         db.getExercisesForDateRange(ctx.user.id, weekAgoStr, today),
         db.getBodyMetrics(ctx.user.id, 7),
         db.getAllFitastyProducts(),
+        db.getOrCreateHydrationLog(ctx.user.id, today),
+        db.getOrCreateSleepLog(ctx.user.id, today),
       ]);
 
       const todayCalories = todayFood.reduce((sum, item) => sum + Number(item.calories), 0);
@@ -687,6 +689,16 @@ export const appRouter = router({
       const uniqueFoodDays = new Set(weekFood.map((item: any) => item.date)).size;
       const uniqueExerciseDays = new Set(weekExercises.map(ex => ex.date)).size;
 
+      // Calculate hydration progress
+      const hydrationCurrent = hydrationLog ? Number(hydrationLog.waterIntakeMl) : 0;
+      const hydrationTarget = hydrationLog ? Number(hydrationLog.targetMl) : 2000;
+      const hydrationPercent = hydrationTarget > 0 ? Math.round((hydrationCurrent / hydrationTarget) * 100) : 0;
+      
+      // Calculate sleep progress
+      const sleepCurrent = sleepLog ? Number(sleepLog.sleepHours) : 0;
+      const sleepTarget = sleepLog ? Number(sleepLog.targetHours) : 8;
+      const sleepPercent = sleepTarget > 0 ? Math.round((sleepCurrent / sleepTarget) * 100) : 0;
+
       return {
         profile,
         today: {
@@ -701,6 +713,22 @@ export const appRouter = router({
             duration: ex.durationMinutes,
             calories: Number(ex.caloriesBurned),
           })),
+        },
+        hydration: {
+          current: hydrationCurrent,
+          target: hydrationTarget,
+          progressPercent: hydrationPercent,
+          currentDisplay: `${hydrationCurrent}ml`,
+          targetDisplay: `${hydrationTarget}ml`,
+          progressDisplay: `${hydrationPercent}%`,
+        },
+        sleep: {
+          current: sleepCurrent,
+          target: sleepTarget,
+          progressPercent: sleepPercent,
+          currentDisplay: `${sleepCurrent.toFixed(1)}h`,
+          targetDisplay: `${sleepTarget.toFixed(1)}h`,
+          progressDisplay: `${sleepPercent}%`,
         },
         weekly: {
           avgCalories: uniqueFoodDays > 0 ? weekCalories / uniqueFoodDays : 0,

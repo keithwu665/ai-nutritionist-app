@@ -339,6 +339,54 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* Hydration Card */}
+        <Card className="rounded-2xl">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex justify-between items-start mb-3">
+              <p className="text-sm font-semibold">今日飲水量</p>
+              <p className="text-xs text-muted-foreground">💧</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <p className="text-xs text-muted-foreground">已飲 {dashData?.hydration?.currentDisplay || '0ml'}</p>
+              <p className="text-xs text-muted-foreground text-right">目標 {dashData?.hydration?.targetDisplay || '2000ml'}</p>
+            </div>
+
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+              <div 
+                className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                style={{ width: `${Math.min(dashData?.hydration?.progressPercent || 0, 100)}%` }}
+              ></div>
+            </div>
+
+            <p className="text-xs text-blue-600 font-medium">{dashData?.hydration?.progressDisplay || '0%'} 完成</p>
+          </CardContent>
+        </Card>
+
+        {/* Sleep Card */}
+        <Card className="rounded-2xl">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex justify-between items-start mb-3">
+              <p className="text-sm font-semibold">睡眠時間</p>
+              <p className="text-xs text-muted-foreground">😴</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <p className="text-xs text-muted-foreground">已睡 {dashData?.sleep?.currentDisplay || '0h'}</p>
+              <p className="text-xs text-muted-foreground text-right">目標 {dashData?.sleep?.targetDisplay || '8h'}</p>
+            </div>
+
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+              <div 
+                className="bg-purple-500 h-full rounded-full transition-all duration-300"
+                style={{ width: `${Math.min(dashData?.sleep?.progressPercent || 0, 100)}%` }}
+              ></div>
+            </div>
+
+            <p className="text-xs text-purple-600 font-medium">{dashData?.sleep?.progressDisplay || '0%'} 完成</p>
+          </CardContent>
+        </Card>
+
         {/* AI Recommendations Section - Always visible */}
         <div className="space-y-3" ref={aiRecommendationsRef}>
           <div className="flex items-center justify-between">

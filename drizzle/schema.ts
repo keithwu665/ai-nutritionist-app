@@ -213,3 +213,33 @@ export const users = mysqlTable("users", {
 (table) => [
 	index("users_openId_unique").on(table.openId),
 ]);
+
+// ============================================================================
+// Hydration & Sleep Tracking (NEW)
+// ============================================================================
+
+export const hydrationLogs = mysqlTable("hydration_logs", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	date: varchar({ length: 10 }).notNull(),
+	waterIntakeMl: int().notNull(),
+	targetMl: int().notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("hydration_logs_userId_date").on(table.userId, table.date),
+]);
+
+export const sleepLogs = mysqlTable("sleep_logs", {
+	id: int().autoincrement().notNull(),
+	userId: int().notNull(),
+	date: varchar({ length: 10 }).notNull(),
+	sleepHours: decimal({ precision: 3, scale: 1 }).notNull(),
+	targetHours: decimal({ precision: 3, scale: 1 }).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+},
+(table) => [
+	index("sleep_logs_userId_date").on(table.userId, table.date),
+]);

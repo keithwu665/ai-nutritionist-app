@@ -11,6 +11,8 @@ import {
   fitastyProducts,
   bodyReportTemplates,
   bodyPhotos,
+  hydrationLogs,
+  sleepLogs,
 } from "../drizzle/schema";
 
 type InsertUser = InferInsertModel<typeof users>;
@@ -701,4 +703,92 @@ export async function deleteBodyPhoto(photoId: number, userId: number) {
     ));
   
   return { success: true };
+}
+
+// ============================================================================
+// Hydration Logs
+// ============================================================================
+
+export async function getHydrationLog(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(hydrationLogs)
+    .where(and(eq(hydrationLogs.userId, userId), eq(hydrationLogs.date, date)))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getOrCreateHydrationLog(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let log = await getHydrationLog(userId, date);
+  if (!log) {
+    await db.insert(hydrationLogs).values({
+      userId,
+      date,
+      waterIntakeMl: 0,
+      targetMl: 2000,
+    });
+    log = await getHydrationLog(userId, date);
+  }
+  return log;
+}
+
+export async function updateHydrationLog(userId: number, date: string, waterIntakeMl: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const log = await getOrCreateHydrationLog(userId, date);
+  if (!log) throw new Error("Failed to get or create hydration log");
+  
+  await db.update(hydrationLogs)
+    .set({ waterIntakeMl })
+    .where(and(eq(hydrationLogs.userId, userId), eq(hydrationLogs.date, date)));
+  
+  return getHydrationLog(userId, date);
+}
+
+// ============================================================================
+// Sleep Logs
+// ============================================================================
+
+export async function getSleepLog(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(sleepLogs)
+    .where(and(eq(sleepLogs.userId, userId), eq(sleepLogs.date, date)))
+    .limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function getOrCreateSleepLog(userId: number, date: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let log = await getSleepLog(userId, date);
+  if (!log) {
+    await db.insert(sleepLogs).values({
+      userId,
+      date,
+      sleepHours: "0.0",
+      targetHours: "8.0",
+    });
+    log = await getSleepLog(userId, date);
+  }
+  return log;
+}
+
+export async function updateSleepLog(userId: number, date: string, sleepHours: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const log = await getOrCreateSleepLog(userId, date);
+  if (!log) throw new Error("Failed to get or create sleep log");
+  
+  await db.update(sleepLogs)
+    .set({ sleepHours: String(sleepHours) })
+    .where(and(eq(sleepLogs.userId, userId), eq(sleepLogs.date, date)));
+  
+  return getSleepLog(userId, date);
 }
