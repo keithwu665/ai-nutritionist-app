@@ -13,6 +13,8 @@ import {
   bodyPhotos,
   hydrationLogs,
   sleepLogs,
+  hydrationSettings,
+  sleepSettings,
 } from "../drizzle/schema";
 
 type InsertUser = InferInsertModel<typeof users>;
@@ -819,4 +821,86 @@ export async function getSleepLogsByDateRange(userId: number, startDate: string,
       gte(sleepLogs.date, startDate),
       lte(sleepLogs.date, endDate)
     ));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// HYDRATION & SLEEP SETTINGS
+// ─────────────────────────────────────────────────────────────────────────
+
+export async function getHydrationSettings(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(hydrationSettings)
+    .where(eq(hydrationSettings.userId, userId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function getOrCreateHydrationSettings(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  let settings = await getHydrationSettings(userId);
+  
+  if (!settings) {
+    await db.insert(hydrationSettings)
+      .values({ userId, targetMl: 2000 })
+      .onDuplicateKeyUpdate({ set: { targetMl: 2000 } });
+    
+    settings = await getHydrationSettings(userId);
+  }
+  
+  return settings;
+}
+
+export async function updateHydrationSettings(userId: number, targetMl: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db.update(hydrationSettings)
+    .set({ targetMl })
+    .where(eq(hydrationSettings.userId, userId));
+  
+  return getHydrationSettings(userId);
+}
+
+export async function getSleepSettings(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db.select().from(sleepSettings)
+    .where(eq(sleepSettings.userId, userId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function getOrCreateSleepSettings(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  let settings = await getSleepSettings(userId);
+  
+  if (!settings) {
+    await db.insert(sleepSettings)
+      .values({ userId, targetHours: '8.0' })
+      .onDuplicateKeyUpdate({ set: { targetHours: '8.0' } });
+    
+    settings = await getSleepSettings(userId);
+  }
+  
+  return settings;
+}
+
+export async function updateSleepSettings(userId: number, targetHours: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  await db.update(sleepSettings)
+    .set({ targetHours })
+    .where(eq(sleepSettings.userId, userId));
+  
+  return getSleepSettings(userId);
 }

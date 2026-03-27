@@ -754,6 +754,65 @@ export const appRouter = router({
         const today = new Date().toISOString().split('T')[0];
         return db.updateHydrationLog(ctx.user.id, today, input.waterIntakeMl);
       }),
+
+    getMonthly: protectedProcedure
+      .input(z.object({ year: z.number(), month: z.number().min(1).max(12) }))
+      .query(async ({ ctx, input }) => {
+        const startDate = new Date(input.year, input.month - 1, 1).toISOString().split('T')[0];
+        const endDate = new Date(input.year, input.month, 0).toISOString().split('T')[0];
+        const logs = await db.getHydrationLogsByDateRange(ctx.user.id, startDate, endDate);
+        const settings = await db.getOrCreateHydrationSettings(ctx.user.id);
+        const targetMl = settings?.targetMl || 2000;
+        
+        const calendarData: Record<string, any> = {};
+        const daysInMonth = new Date(input.year, input.month, 0).getDate();
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = `${input.year}-${String(input.month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const log = logs.find(l => l.date === dateStr);
+          calendarData[dateStr] = {
+            date: dateStr,
+            ml: log?.waterIntakeMl || 0,
+            target: targetMl,
+            percent: log ? Math.min((log.waterIntakeMl / targetMl) * 100, 100) : 0,
+          };
+        }
+        
+        return { calendarData, targetMl };
+      }),
+
+    getSummary: protectedProcedure
+      .input(z.object({ days: z.number().min(1).max(90) }))
+      .query(async ({ ctx, input }) => {
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - input.days + 1);
+        const startDateStr = startDate.toISOString().split('T')[0];
+        
+        const logs = await db.getHydrationLogsByDateRange(ctx.user.id, startDateStr, endDate);
+        const settings = await db.getOrCreateHydrationSettings(ctx.user.id);
+        const targetMl = settings?.targetMl || 2000;
+        
+        const avgMl = logs.length > 0 ? logs.reduce((sum, l) => sum + l.waterIntakeMl, 0) / input.days : 0;
+        const completionDays = logs.filter(l => l.waterIntakeMl >= targetMl).length;
+        const completionRate = (completionDays / input.days) * 100;
+        
+        let streak = 0;
+        const today = new Date();
+        for (let i = 0; i < input.days; i++) {
+          const checkDate = new Date(today);
+          checkDate.setDate(checkDate.getDate() - i);
+          const dateStr = checkDate.toISOString().split('T')[0];
+          const log = logs.find(l => l.date === dateStr);
+          if (log && log.waterIntakeMl >= targetMl) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+        
+        return { avgMl, completionRate, streak, targetMl };
+      }),
   }),
 
   sleep: router({
@@ -762,6 +821,67 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const today = new Date().toISOString().split('T')[0];
         return db.updateSleepLog(ctx.user.id, today, input.sleepHours);
+      }),
+
+    getMonthly: protectedProcedure
+      .input(z.object({ year: z.number(), month: z.number().min(1).max(12) }))
+      .query(async ({ ctx, input }) => {
+        const startDate = new Date(input.year, input.month - 1, 1).toISOString().split('T')[0];
+        const endDate = new Date(input.year, input.month, 0).toISOString().split('T')[0];
+        const logs = await db.getSleepLogsByDateRange(ctx.user.id, startDate, endDate);
+        const settings = await db.getOrCreateSleepSettings(ctx.user.id);
+        const targetHours = parseFloat(settings?.targetHours || '8.0');
+        
+        const calendarData: Record<string, any> = {};
+        const daysInMonth = new Date(input.year, input.month, 0).getDate();
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = `${input.year}-${String(input.month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const log = logs.find(l => l.date === dateStr);
+          const hours = log ? parseFloat(log.sleepHours) : 0;
+          calendarData[dateStr] = {
+            date: dateStr,
+            hours,
+            target: targetHours,
+            percent: log ? Math.min((hours / targetHours) * 100, 100) : 0,
+          };
+        }
+        
+        return { calendarData, targetHours };
+      }),
+
+    getSummary: protectedProcedure
+      .input(z.object({ days: z.number().min(1).max(90) }))
+      .query(async ({ ctx, input }) => {
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - input.days + 1);
+        const startDateStr = startDate.toISOString().split('T')[0];
+        
+        const logs = await db.getSleepLogsByDateRange(ctx.user.id, startDateStr, endDate);
+        const settings = await db.getOrCreateSleepSettings(ctx.user.id);
+        const targetHours = parseFloat(settings?.targetHours || '8.0');
+        
+        const totalHours = logs.length > 0 ? logs.reduce((sum, l) => sum + parseFloat(l.sleepHours), 0) : 0;
+        const avgHours = totalHours / input.days;
+        const completionDays = logs.filter(l => parseFloat(l.sleepHours) >= targetHours).length;
+        const completionRate = (completionDays / input.days) * 100;
+        
+        let streak = 0;
+        const today = new Date();
+        for (let i = 0; i < input.days; i++) {
+          const checkDate = new Date(today);
+          checkDate.setDate(checkDate.getDate() - i);
+          const dateStr = checkDate.toISOString().split('T')[0];
+          const log = logs.find(l => l.date === dateStr);
+          if (log && parseFloat(log.sleepHours) >= targetHours) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+        
+        return { avgHours, completionRate, streak, targetHours };
       }),
   }),
 

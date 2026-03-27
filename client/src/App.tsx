@@ -33,6 +33,8 @@ import AIRecommendedRecipes from "./pages/AIRecommendedRecipes";
 import FitastyIntegration from "./pages/FitastyIntegration";
 import { RecipeListPage } from "./pages/RecipeListPage";
 import AppLayout from "./components/AppLayout";
+import { HydrationCalendar } from "./components/HydrationCalendar";
+import { SleepCalendar } from "./components/SleepCalendar";
 
 function Router() {
   return (
@@ -140,6 +142,16 @@ function Router() {
       <Route path={"/settings"}>
         <AppLayout>
           <Settings />
+        </AppLayout>
+      </Route>
+      <Route path={"/hydration-calendar"}>
+        <AppLayout>
+          <HydrationCalendar />
+        </AppLayout>
+      </Route>
+      <Route path={"/sleep-calendar"}>
+        <AppLayout>
+          <SleepCalendar />
         </AppLayout>
       </Route>
       <Route path={"/share-permissions"}>
