@@ -255,22 +255,30 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   // ─────────────────────────────────────────────────────────────────────────
   // AI RECOMMENDATIONS SECTION
   // ─────────────────────────────────────────────────────────────────────────
-  // API returns { diet, exercise, body, encouragement } - preserve diet and exercise as separate items
+  // API returns { diet, exercise, body, encouragement } - map all 4 categories
   const dietRecs = input.recommendationsData?.diet || [];
   const exerciseRecs = input.recommendationsData?.exercise || [];
+  const bodyRecs = input.recommendationsData?.body || [];
+  const generalRecs = input.recommendationsData?.encouragement || [];
   const aiTone = input.recommendationsData?.tone || 'neutral';
 
   // DEBUG: Log raw recommendations
   console.log('=== AI RECOMMENDATIONS DEBUG ===');
   console.log('dietRecs count:', dietRecs.length);
   console.log('exerciseRecs count:', exerciseRecs.length);
+  console.log('bodyRecs count:', bodyRecs.length);
+  console.log('generalRecs count:', generalRecs.length);
   console.log('dietRecs:', dietRecs);
   console.log('exerciseRecs:', exerciseRecs);
+  console.log('bodyRecs:', bodyRecs);
+  console.log('generalRecs:', generalRecs);
   
   // DEDUPLICATION: Take only first of each type to avoid duplicates
   const aiItems = [
     ...(dietRecs.length > 0 ? [{ type: 'diet', message: dietRecs[0].message, title: dietRecs[0].title }] : []),
     ...(exerciseRecs.length > 0 ? [{ type: 'exercise', message: exerciseRecs[0].message, title: exerciseRecs[0].title }] : []),
+    ...(bodyRecs.length > 0 ? [{ type: 'body', message: bodyRecs[0].message, title: bodyRecs[0].title }] : []),
+    ...(generalRecs.length > 0 ? [{ type: 'general', message: generalRecs[0].message, title: generalRecs[0].title }] : []),
   ];
   
   console.log('aiItems count (after deduplication):', aiItems.length);
@@ -283,6 +291,10 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
     items: aiItems,
     advice: aiAdvice, // Keep for backward compatibility
     tone: aiTone,
+    diet: dietRecs.length > 0 ? dietRecs[0] : null,
+    exercise: exerciseRecs.length > 0 ? exerciseRecs[0] : null,
+    body: bodyRecs.length > 0 ? bodyRecs[0] : null,
+    general: generalRecs.length > 0 ? generalRecs[0] : null,
   };
 
   // ─────────────────────────────────────────────────────────────────────────
