@@ -745,6 +745,27 @@ export const appRouter = router({
   }),
 
   // ========================================================================
+  // Hydration & Sleep Updates
+  // ========================================================================
+  hydration: router({
+    update: protectedProcedure
+      .input(z.object({ waterIntakeMl: z.number().min(0) }))
+      .mutation(async ({ ctx, input }) => {
+        const today = new Date().toISOString().split('T')[0];
+        return db.updateHydrationLog(ctx.user.id, today, input.waterIntakeMl);
+      }),
+  }),
+
+  sleep: router({
+    update: protectedProcedure
+      .input(z.object({ sleepHours: z.number().min(0).max(12) }))
+      .mutation(async ({ ctx, input }) => {
+        const today = new Date().toISOString().split('T')[0];
+        return db.updateSleepLog(ctx.user.id, today, input.sleepHours);
+      }),
+  }),
+
+  // ========================================================================
   // Recommendations
   // ========================================================================
   recommendations: router({

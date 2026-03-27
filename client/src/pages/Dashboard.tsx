@@ -21,6 +21,35 @@ export default function Dashboard() {
   const { data: recs, isLoading: recsLoading, error: recsError } = trpc.recommendations.get.useQuery({ mood: todayMood || undefined });
   const { data: bodyMetrics } = trpc.bodyMetrics.latest.useQuery();
 
+  // Mutations for hydration and sleep updates
+  const hydrationUpdateMutation = trpc.hydration.update.useMutation();
+  const sleepUpdateMutation = trpc.sleep.update.useMutation();
+  const utils = trpc.useUtils();
+
+  // Handle hydration update
+  const handleHydrationUpdate = async (delta: number) => {
+    const currentIntake = dashData?.hydration?.current || 0;
+    const newIntake = Math.max(0, currentIntake + delta);
+    try {
+      await hydrationUpdateMutation.mutateAsync({ waterIntakeMl: newIntake });
+      await utils.dashboard.getData.invalidate();
+    } catch (error) {
+      console.error('Failed to update hydration:', error);
+    }
+  };
+
+  // Handle sleep update
+  const handleSleepUpdate = async (delta: number) => {
+    const currentSleep = dashData?.sleep?.current || 0;
+    const newSleep = Math.max(0, Math.min(12, currentSleep + delta));
+    try {
+      await sleepUpdateMutation.mutateAsync({ sleepHours: newSleep });
+      await utils.dashboard.getData.invalidate();
+    } catch (error) {
+      console.error('Failed to update sleep:', error);
+    }
+  };
+
   // Handle API errors with user-friendly messages
   useEffect(() => {
     if (profileError || dashError || recsError) {
@@ -359,7 +388,29 @@ export default function Dashboard() {
               ></div>
             </div>
 
-            <p className="text-xs text-blue-600 font-medium">{dashData?.hydration?.progressDisplay || '0%'} 完成</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-blue-600 font-medium">{dashData?.hydration?.progressDisplay || '0%'} 完成</p>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleHydrationUpdate(-200)}
+                  disabled={hydrationUpdateMutation.isPending}
+                  className="h-6 w-6 p-0"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleHydrationUpdate(200)}
+                  disabled={hydrationUpdateMutation.isPending}
+                  className="h-6 w-6 p-0"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -383,7 +434,29 @@ export default function Dashboard() {
               ></div>
             </div>
 
-            <p className="text-xs text-purple-600 font-medium">{dashData?.sleep?.progressDisplay || '0%'} 完成</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-purple-600 font-medium">{dashData?.sleep?.progressDisplay || '0%'} 完成</p>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleSleepUpdate(-1)}
+                  disabled={sleepUpdateMutation.isPending}
+                  className="h-6 w-6 p-0"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleSleepUpdate(1)}
+                  disabled={sleepUpdateMutation.isPending}
+                  className="h-6 w-6 p-0"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

@@ -267,14 +267,14 @@ export function buildDashboardViewModel(input: DashboardViewModelInput): Dashboa
   console.log('dietRecs:', dietRecs);
   console.log('exerciseRecs:', exerciseRecs);
   
-  // Build array of recommendation items: include ALL diet and exercise items, not just first
+  // DEDUPLICATION: Take only first of each type to avoid duplicates
   const aiItems = [
-    ...dietRecs.map((rec: any) => ({ type: 'diet', message: rec.message, title: rec.title })),
-    ...exerciseRecs.map((rec: any) => ({ type: 'exercise', message: rec.message, title: rec.title })),
+    ...(dietRecs.length > 0 ? [{ type: 'diet', message: dietRecs[0].message, title: dietRecs[0].title }] : []),
+    ...(exerciseRecs.length > 0 ? [{ type: 'exercise', message: exerciseRecs[0].message, title: exerciseRecs[0].title }] : []),
   ];
   
-  console.log('aiItems count:', aiItems.length);
-  console.log('aiItems:', aiItems);
+  console.log('aiItems count (after deduplication):', aiItems.length);
+  console.log('aiItems (deduplicated):', aiItems);
 
   // Fallback message if no recommendations
   const aiAdvice = aiItems.length > 0 ? aiItems[0].message : '';
