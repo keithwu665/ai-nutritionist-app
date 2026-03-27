@@ -470,13 +470,19 @@ export default function Dashboard() {
 
         {/* AI Recommendations Section - Always visible */}
         <div className="space-y-3" ref={aiRecommendationsRef}>
-          <div>
+          <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">AI 建議</h2>
+            <button 
+              onClick={() => setLocation('/ai-recommendations')}
+              className="text-xs text-primary hover:underline flex items-center gap-1"
+            >
+              查看全部 <ChevronRight className="h-3 w-3" />
+            </button>
           </div>
 
-          {/* AI Recommendation Cards - Display each item separately */}
-          {viewModel.ai.items && viewModel.ai.items.length > 0 ? (
-            viewModel.ai.items.map((item: any, index: number) => (
+          {/* AI Recommendation Cards - Display only diet and exercise */}
+          {viewModel.ai.items && viewModel.ai.items.filter((item: any) => item.type === 'diet' || item.type === 'exercise').length > 0 ? (
+            viewModel.ai.items.filter((item: any) => item.type === 'diet' || item.type === 'exercise').map((item: any, index: number) => (
               <Card key={index} className="rounded-2xl bg-blue-50 border-blue-100">
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-start gap-3">
