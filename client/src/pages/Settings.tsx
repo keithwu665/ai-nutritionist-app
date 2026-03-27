@@ -48,6 +48,19 @@ export default function Settings() {
   });
 
   // ========================================================================
+  // SECTION 4: LANGUAGE STATE
+  // ========================================================================
+  const [language, setLanguage] = useState<'zh' | 'en'>(() => {
+    const saved = localStorage.getItem('appLanguage');
+    return (saved as 'zh' | 'en') || 'zh';
+  });
+
+  const handleLanguageChange = (newLang: 'zh' | 'en') => {
+    setLanguage(newLang);
+    localStorage.setItem('appLanguage', newLang);
+  };
+
+  // ========================================================================
   // SECTION 4: NOTIFICATIONS STATE
   // ========================================================================
   const [notifications, setNotifications] = useState({
@@ -613,6 +626,37 @@ export default function Settings() {
       {/* ================================================================== */}
       <div className="mt-8">
         <DataExport />
+      </div>
+
+      {/* ================================================================== */}
+      {/* LANGUAGE SECTION */}
+      {/* ================================================================== */}
+      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+        <label className="block">
+          <p className="font-medium mb-3">語言</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleLanguageChange('zh')}
+              className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all ${
+                language === 'zh'
+                  ? 'bg-primary text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              中文
+            </button>
+            <button
+              onClick={() => handleLanguageChange('en')}
+              className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all ${
+                language === 'en'
+                  ? 'bg-primary text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              English
+            </button>
+          </div>
+        </label>
       </div>
 
       <Button onClick={logout} variant="outline" className="w-full mt-8">
