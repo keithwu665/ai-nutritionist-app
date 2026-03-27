@@ -8,6 +8,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { buildDashboardViewModel, DashboardViewModelInput } from '@/_core/viewModels/dashboardViewModel';
 import { useHydrationActions } from '@/hooks/useHydrationActions';
 import { useSleepActions } from '@/hooks/useSleepActions';
+import { DailyQuote } from '@/components/DailyQuote';
 
 
 export default function Dashboard() {
@@ -224,6 +225,9 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+        
+        {/* Daily Quote Section */}
+        <DailyQuote />
         
         {/* Hero Calorie Card - Using ViewModel */}
         <div className="bg-gradient-to-br from-primary to-primary/80 rounded-3xl p-4 md:p-6 text-white shadow-lg">
