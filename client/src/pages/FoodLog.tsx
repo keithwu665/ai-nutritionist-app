@@ -228,6 +228,82 @@ export default function FoodLog() {
     }
   };
 
+  // Instant search for Fitasty products (Fitasty tab only)
+  const handleFitastySearch = (query: string) => {
+    setFoodName(query);
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    if (query.length < 1) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    setIsSearching(true);
+    
+    // Debounce search with 300ms delay
+    const timeout = setTimeout(async () => {
+      try {
+        // Call tRPC query using fetch
+        const input = JSON.stringify({ query, limit: 10 });
+        const response = await fetch(`/api/trpc/foodLogs.searchFitasty?input=${encodeURIComponent(input)}`);
+        const data = await response.json();
+        const results = data.result?.data || [];
+        setSearchResults(results);
+        setShowSearchResults(true);
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+    
+    setSearchTimeout(timeout);
+  };
+
+  // Quick add Fitasty product
+  const handleQuickAddFitasty = async (product: any) => {
+    try {
+      // Call quickAddFitasty mutation
+      const input = JSON.stringify({
+        date,
+        productId: product.id,
+        mealType,
+        quantity: 1,
+      });
+      const response = await fetch(`/api/trpc/foodLogs.quickAddFitasty`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: input,
+      });
+      const result = await response.json();
+      
+      if (result.result?.data) {
+        toast.success(`已添加 ${product.productNameZh || product.name}`);
+        // Reset form
+        setFoodName('');
+        setCalories('');
+        setProteinG('');
+        setCarbsG('');
+        setFatG('');
+        setShowSearchResults(false);
+        setSearchResults([]);
+        
+        // Refresh food log items
+        await utils.foodLogs.getItems.invalidate({ date });
+        await utils.foodLogs.getItemsForRange.invalidate();
+      }
+    } catch (error) {
+      console.error('Quick add error:', error);
+      toast.error('添加失敗');
+    }
+  };
+
   // Handle photo upload
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -627,7 +703,7 @@ export default function FoodLog() {
             </TabsList>
 
             {/* Manual Input Tab */}
-            <TabsContent value="manual" className="space-y-4 mt-4">
+            <TabsContent value="manual" className="space-y-4 mt-4 flex-1 overflow-y-auto pr-2">
               {/* Meal Type */}
               <div>
                 <label className="text-sm font-medium mb-2 block">餐次</label>
@@ -920,15 +996,16 @@ export default function FoodLog() {
                 </Select>
               </div>
 
-              {/* Product Search */}
+              {/* Product Search - Instant search for Fitasty products only */}
               <div>
                 <label className="text-sm font-medium mb-2 block">搜尋產品 *</label>
                 <div className="relative">
                   <Input
                     placeholder="輸入產品名稱 (中文/英文)"
                     value={foodName}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    onFocus={() => foodName.length >= 2 && setShowSearchResults(true)}
+                    onChange={(e) => handleFitastySearch(e.target.value)}
+                    onFocus={() => foodName.length >= 1 && setShowSearchResults(true)}
+                    className="w-full"
                   />
                   {showSearchResults && (searchResults.length > 0 || isSearching) && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
@@ -936,16 +1013,25 @@ export default function FoodLog() {
                         <div className="px-4 py-3 text-center text-sm text-gray-500">搜尋中...</div>
                       ) : searchResults.length > 0 ? (
                         searchResults.map((result, idx) => (
-                          <button
+                          <div
                             key={idx}
-                            onClick={() => handleSelectFood(result)}
-                            className="w-full text-left px-4 py-3 hover:bg-emerald-50 border-b last:border-b-0 text-sm"
+                            className="w-full px-4 py-3 hover:bg-emerald-50 border-b last:border-b-0 text-sm flex items-center justify-between group"
                           >
-                            <div className="font-medium">{result.displayName || result.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {result.kcal_per_100g || result.kcal || 0} kcal · P:{result.proteinG || 0}g · C:{result.carbsG || 0}g · F:{result.fatG || 0}g
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium truncate">{result.productNameZh || result.name}</div>
+                              <div className="text-xs text-gray-500">
+                                {result.calories || 0} kcal · {result.servingSize || '100g'}
+                              </div>
                             </div>
-                          </button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="ml-2 flex-shrink-0 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 text-emerald-700"
+                              onClick={() => handleQuickAddFitasty(result)}
+                            >
+                              +
+                            </Button>
+                          </div>
                         ))
                       ) : (
                         <div className="px-4 py-3 text-center text-sm text-gray-500">未找到結果</div>
