@@ -3,6 +3,7 @@ import { getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
 import { BarChart3, Utensils, Activity, Settings, Dumbbell, Loader2 } from "lucide-react";
 import { useEffect } from "react";
+import { i18n } from "@shared/i18n";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -38,11 +39,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   const navItems = [
-    { href: '/dashboard', label: '儀錶板', icon: BarChart3 },
-    { href: '/body', label: '身體', icon: Activity },
-    { href: '/food', label: '飲食', icon: Utensils },
-    { href: '/exercise', label: '運動', icon: Dumbbell },
-    { href: '/settings', label: '設定', icon: Settings },
+    { href: '/dashboard', label: i18n.nav.home, icon: BarChart3 },
+    { href: '/body', label: i18n.nav.body, icon: Activity },
+    { href: '/food', label: i18n.nav.food, icon: Utensils },
+    { href: '/exercise', label: i18n.nav.exercise, icon: Dumbbell },
+    { href: '/settings', label: i18n.nav.settings, icon: Settings },
   ];
 
   const isActive = (href: string) => location === href || location.startsWith(href + '/');

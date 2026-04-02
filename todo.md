@@ -649,3 +649,13 @@
 - [ ] No data source mixing
 - [ ] Create checkpoint
 - [ ] Publish to production
+
+
+## Navigation Label Rename - COMPLETE
+
+- [x] Check current i18n setup and navigation structure
+- [x] Update translation files with nav.home key (Chinese: 主頁, English: Home)
+- [x] Replace "儀錶板" with i18n in sidebar navigation
+- [x] Replace "儀錶板" with i18n in bottom tab navigation
+- [x] Test language switching and verify all labels update
+- [ ] Create checkpoint and publish

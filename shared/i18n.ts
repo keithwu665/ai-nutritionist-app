@@ -5,7 +5,7 @@
 export const i18n = {
   // Navigation
   nav: {
-    dashboard: '儀錶板',
+    home: '主頁',
     body: '身體數據',
     food: '飲食記錄',
     exercise: '運動記錄',
@@ -123,7 +123,7 @@ export const i18n = {
 
   // Dashboard
   dashboard: {
-    title: '儀錶板',
+    title: '主頁',
     today: '今日',
     thisWeek: '本週',
     intake: '攝取',
