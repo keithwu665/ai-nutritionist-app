@@ -3,7 +3,8 @@ import { getLoginUrl } from "@/const";
 import { Link, useLocation } from "wouter";
 import { BarChart3, Utensils, Activity, Settings, Dumbbell, Loader2 } from "lucide-react";
 import { useEffect } from "react";
-import { i18n } from "@shared/i18n";
+import { t } from "@shared/i18n";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const { user, loading, isAuthenticated } = useAuth();
   const [location] = useLocation();
+  const { language } = useLanguage();
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -39,11 +41,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }
 
   const navItems = [
-    { href: '/dashboard', label: i18n.nav.home, icon: BarChart3 },
-    { href: '/body', label: i18n.nav.body, icon: Activity },
-    { href: '/food', label: i18n.nav.food, icon: Utensils },
-    { href: '/exercise', label: i18n.nav.exercise, icon: Dumbbell },
-    { href: '/settings', label: i18n.nav.settings, icon: Settings },
+    { href: '/dashboard', label: t('nav.home', language), icon: BarChart3 },
+    { href: '/body', label: t('nav.body', language), icon: Activity },
+    { href: '/food', label: t('nav.food', language), icon: Utensils },
+    { href: '/exercise', label: t('nav.exercise', language), icon: Dumbbell },
+    { href: '/settings', label: t('nav.settings', language), icon: Settings },
   ];
 
   const isActive = (href: string) => location === href || location.startsWith(href + '/');
