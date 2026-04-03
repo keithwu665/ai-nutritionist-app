@@ -130,7 +130,7 @@ export const translations = {
       today: '今日',
       thisWeek: '本週',
       intake: '攝取',
-      burned: '消耗',
+      burned: '消費',
       net: '淨熱量',
       target: '目標',
       remaining: '剩餘',
@@ -138,6 +138,27 @@ export const translations = {
       exerciseTime: '運動時間',
       weightTrend: '體重趨勢',
       recommendations: '建議',
+      greetingMorning: '早上好',
+      greetingAfternoon: '午安',
+      greetingEvening: '晩上好',
+    },
+
+    // Mood
+    mood: {
+      title: '心情紀錄',
+      todayMood: '今日心情',
+      moodRecord: '心情紀錄',
+      happy: '開心',
+      neutral: '普通',
+      sad: '低落',
+      angry: '煙躁',
+      tired: '疲倦',
+      noMoodSelected: '還未選擇今日心情，選擇心情以獲得個人化建議。',
+      moodGood: '今日心情不錄，保持這份積極的心態。',
+      moodNeutral: '今日心情平穩，保持日常節奏。',
+      moodSad: '今日心情較低落，給自己一些溫柔和耐心。',
+      moodAngry: '今日心情有些煙躁，試試放慢腳步。',
+      moodTired: '今日感到疲倦，適當休息很重要。',
     },
 
     // Recommendations
@@ -353,6 +374,27 @@ export const translations = {
       exerciseTime: 'Exercise Time',
       weightTrend: 'Weight Trend',
       recommendations: 'Recommendations',
+      greetingMorning: 'Good Morning',
+      greetingAfternoon: 'Good Afternoon',
+      greetingEvening: 'Good Evening',
+    },
+
+    // Mood
+    mood: {
+      title: 'Mood Log',
+      todayMood: "Today's Mood",
+      moodRecord: 'Mood Record',
+      happy: 'Happy',
+      neutral: 'Normal',
+      sad: 'Sad',
+      angry: 'Frustrated',
+      tired: 'Tired',
+      noMoodSelected: 'No mood selected today. Choose a mood to get personalized suggestions.',
+      moodGood: 'Your mood is great today. Keep up this positive attitude.',
+      moodNeutral: 'Your mood is stable today. Keep your daily rhythm.',
+      moodSad: 'Your mood is a bit low today. Be gentle and patient with yourself.',
+      moodAngry: 'Your mood is a bit frustrated today. Try slowing down.',
+      moodTired: 'You feel tired today. Rest is important.',
     },
 
     // Recommendations
