@@ -3,6 +3,8 @@ import { useLocation } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { t } from '@shared/i18n';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MoodEntry {
   date: string;
@@ -11,6 +13,7 @@ interface MoodEntry {
 
 export default function MoodLog() {
   const [, setLocation] = useLocation();
+  const { language } = useLanguage();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [moodHistory, setMoodHistory] = useState<Record<string, string>>({});
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -34,13 +37,13 @@ export default function MoodLog() {
 
   const getMoodLabel = (mood: string) => {
     const moodMap: Record<string, string> = {
-      happy: '開心',
-      neutral: '普通',
-      sad: '低落',
-      angry: '煩躁',
-      tired: '疲倦',
+      happy: t('mood.happy', language),
+      neutral: t('mood.neutral', language),
+      sad: t('mood.sad', language),
+      angry: t('mood.angry', language),
+      tired: t('mood.tired', language),
     };
-    return moodMap[mood] || '未選擇';
+    return moodMap[mood] || (language === 'zh' ? '未選擇' : 'Not selected');
   };
 
   // Get last 7 days mood history
@@ -80,19 +83,19 @@ export default function MoodLog() {
     let recentStatus = '';
     let actionSuggestions = '';
 
-    // 【今日狀態】- Based on today's mood
+    // Today's status - Based on today's mood
     if (!todayMood) {
-      todayStatus = '還未選擇今日心情，選擇心情以獲得個人化建議。';
+      todayStatus = t('mood.noMoodSelected', language);
     } else if (todayMood === 'happy') {
-      todayStatus = '今日心情不錯，保持這份積極的心態。';
+      todayStatus = t('mood.moodGood', language);
     } else if (todayMood === 'neutral') {
-      todayStatus = '今日心情平穩，保持日常節奏。';
+      todayStatus = t('mood.moodNeutral', language);
     } else if (todayMood === 'sad') {
-      todayStatus = '今日心情較低落，給自己一些溫柔和耐心。';
+      todayStatus = t('mood.moodSad', language);
     } else if (todayMood === 'angry') {
-      todayStatus = '今日心情有些煩躁，試試放慢腳步。';
+      todayStatus = t('mood.moodAngry', language);
     } else if (todayMood === 'tired') {
-      todayStatus = '今日感到疲倦，適當休息很重要。';
+      todayStatus = t('mood.moodTired', language);
     }
 
     // 【近期狀態】- Based on last 7 days
@@ -174,7 +177,7 @@ export default function MoodLog() {
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">心情紀錄</h1>
+          <h1 className="text-2xl font-bold">{t('mood.title', language)}</h1>
         </div>
       </div>
 
