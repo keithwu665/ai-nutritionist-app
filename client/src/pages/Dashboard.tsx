@@ -9,10 +9,13 @@ import { buildDashboardViewModel, DashboardViewModelInput } from '@/_core/viewMo
 import { useHydrationActions } from '@/hooks/useHydrationActions';
 import { useSleepActions } from '@/hooks/useSleepActions';
 import { DailyQuote } from '@/components/DailyQuote';
+import { t } from '@shared/i18n';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { language } = useLanguage();
   const [todayMood, setTodayMood] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const aiRecommendationsRef = useRef<HTMLDivElement>(null);
@@ -192,23 +195,23 @@ export default function Dashboard() {
         {/* Mood Check-in Section - Using ViewModel */}
         <div className="bg-white rounded-2xl p-3 md:p-4 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-sm font-semibold text-foreground">今日心情</p>
+            <p className="text-sm font-semibold text-foreground">{t('mood.todayMood', language)}</p>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation('/mood-log')}
               className="text-xs font-medium text-primary hover:bg-primary/10"
             >
-              心情紀錄
+              {t('mood.moodRecord', language)}
             </Button>
           </div>
           <div className="flex gap-2 justify-between">
             {[
-              { id: 'happy', emoji: '😊', label: '開心' },
-              { id: 'neutral', emoji: '😐', label: '普通' },
-              { id: 'sad', emoji: '😞', label: '低落' },
-              { id: 'angry', emoji: '😡', label: '煩躁' },
-              { id: 'tired', emoji: '😴', label: '疲倦' },
+              { id: 'happy', emoji: '😊', label: t('mood.happy', language) },
+              { id: 'neutral', emoji: '😐', label: t('mood.neutral', language) },
+              { id: 'sad', emoji: '😞', label: t('mood.sad', language) },
+              { id: 'angry', emoji: '😡', label: t('mood.angry', language) },
+              { id: 'tired', emoji: '😴', label: t('mood.tired', language) },
             ].map((mood) => (
               <button
                 key={mood.id}
